@@ -8,28 +8,44 @@ export default function PythonBasicsPage() {
     <div style={{ maxWidth: '100%', margin: '0 auto' }}>
       <Navigation />
       <div style={{ 
-        padding: '20px',
+        padding: 'clamp(12px, 4vw, 20px)',
         maxWidth: '800px',
         margin: '0 auto',
-        fontFamily: 'Comic Sans MS, cursive, sans-serif'
+        fontFamily: 'Montserrat, -apple-system, BlinkMacSystemFont, sans-serif',
+        fontSize: 'clamp(14px, 2.5vw, 16px)',
+        lineHeight: '1.6'
       }}>
         <h1 style={{ 
           color: '#3776ab', 
           borderBottom: '3px solid #ffd43b',
-          paddingBottom: '10px'
+          paddingBottom: '10px',
+          fontSize: 'clamp(24px, 5vw, 36px)',
+          marginBottom: 'clamp(20px, 4vw, 30px)',
+          fontWeight: 700
         }}>
           Python Basics for Cool Kids!
         </h1>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#4b8bbe' }}>What is Coding? (The Super Simple Explanation) 💡</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#4b8bbe',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>What is Coding? (The Super Simple Explanation) 💡</h2>
           <p>
             Imagine you have a super smart robot friend, but it only speaks a special language. Coding is like learning that language so you can tell your robot friend what to do!
           </p>
           <p>
             <strong>Think of it this way:</strong>
           </p>
-          <ul style={{ lineHeight: '1.8', backgroundColor: '#f0f8ff', padding: '20px', borderRadius: '10px' }}>
+          <ul style={{ 
+            lineHeight: '1.8', 
+            backgroundColor: '#f0f8ff', 
+            padding: 'clamp(12px, 3vw, 20px)', 
+            borderRadius: '10px',
+            fontSize: 'clamp(14px, 2.5vw, 16px)'
+          }}>
             <li>📝 <strong>Writing code</strong> = Writing instructions for the computer</li>
             <li>🤖 <strong>The computer</strong> = Your robot friend who follows instructions</li>
             <li>✅ <strong>Running code</strong> = The computer reading and doing what you told it</li>
@@ -40,8 +56,13 @@ export default function PythonBasicsPage() {
           </p>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#4b8bbe' }}>What is Python? 🐍</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#4b8bbe',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>What is Python? 🐍</h2>
           <p>
             Python is a super friendly computer language that helps you tell computers what to do!
             It's named after the funny British comedy group "Monty Python," not the snake. 
@@ -49,9 +70,10 @@ export default function PythonBasicsPage() {
           </p>
           <div style={{ 
             backgroundColor: '#f0f8ff', 
-            padding: '15px', 
+            padding: 'clamp(12px, 3vw, 15px)', 
             borderRadius: '10px',
-            border: '1px solid #ccc'
+            border: '1px solid #ccc',
+            fontSize: 'clamp(14px, 2.5vw, 16px)'
           }}>
             <p><strong>Fun Fact:</strong> Python was created by Guido van Rossum in 1991. That's probably before you were born!</p>
           </div>
