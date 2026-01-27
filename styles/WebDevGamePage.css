@@ -361,6 +361,11 @@
 
 /* Responsive design */
 @media (max-width: 768px) {
+  .web-dev-game {
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+  
   .split-container {
     flex-direction: column;
   }
@@ -369,6 +374,11 @@
   .preview-panel {
     flex: 1;
     min-height: 300px;
+  }
+  
+  .level-panel {
+    margin: 5px;
+    padding: 8px 10px;
   }
 }
 
