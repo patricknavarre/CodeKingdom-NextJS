@@ -5,7 +5,7 @@ export interface IUser extends Document {
   username: string;
   email: string;
   password: string;
-  age: number;
+  age?: number;
   role: 'student' | 'teacher' | 'parent' | 'admin';
   avatar: {
     head: string;
@@ -59,7 +59,7 @@ const userSchema = new Schema<IUser>(
     },
     age: {
       type: Number,
-      required: [true, 'Please add an age'],
+      required: false,
     },
     role: {
       type: String,

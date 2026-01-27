@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   try {
     await connectDB();
     
-    const { username, email, password, age } = await req.json();
+    const { username, email, password } = await req.json();
 
     // Check if user exists
     const userExists = await User.findOne({ email });
@@ -29,7 +29,6 @@ export async function POST(req: Request) {
       username,
       email,
       password,
-      age,
     });
 
     // Create initial progress records for each module
@@ -47,7 +46,7 @@ export async function POST(req: Request) {
         _id: user._id,
         username: user.username,
         email: user.email,
-        age: user.age,
+        age: user.age || undefined,
         role: user.role,
         avatar: user.avatar,
         coins: user.coins,

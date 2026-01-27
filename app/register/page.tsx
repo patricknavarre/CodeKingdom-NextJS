@@ -10,7 +10,6 @@ export default function RegisterPage() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [age, setAge] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -22,14 +21,8 @@ export default function RegisterPage() {
     e.stopPropagation();
     setError('');
     
-    if (!username || !email || !password || !age) {
+    if (!username || !email || !password) {
       setError('Please fill in all fields');
-      return;
-    }
-
-    const ageNum = parseInt(age);
-    if (isNaN(ageNum) || ageNum < 1 || ageNum > 120) {
-      setError('Please enter a valid age');
       return;
     }
 
@@ -38,7 +31,7 @@ export default function RegisterPage() {
     setSuccess(false);
     
     try {
-      await register({ username, email, password, age: ageNum });
+      await register({ username, email, password });
       setSuccess(true);
       setIsSubmitting(false);
       
@@ -186,35 +179,6 @@ export default function RegisterPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              disabled={isSubmitting}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '5px',
-                fontSize: '1rem',
-                boxSizing: 'border-box'
-              }}
-            />
-          </div>
-
-          <div style={{ marginBottom: '20px' }}>
-            <label htmlFor="age" style={{
-              display: 'block',
-              marginBottom: '5px',
-              color: '#333',
-              fontWeight: 'bold'
-            }}>
-              Age
-            </label>
-            <input
-              type="number"
-              id="age"
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-              required
-              min="1"
-              max="120"
               disabled={isSubmitting}
               style={{
                 width: '100%',
