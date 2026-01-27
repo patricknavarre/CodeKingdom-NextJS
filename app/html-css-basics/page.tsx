@@ -8,32 +8,48 @@ export default function HtmlCssBasicsPage() {
     <div style={{ maxWidth: '100%', margin: '0 auto' }}>
       <Navigation />
       <div style={{ 
-        padding: '20px',
+        padding: 'clamp(12px, 4vw, 20px)',
         maxWidth: '800px',
         margin: '0 auto',
-        fontFamily: 'Comic Sans MS, cursive, sans-serif'
+        fontFamily: 'Montserrat, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important',
+        fontSize: 'clamp(14px, 2.5vw, 16px)',
+        lineHeight: '1.6'
       }}>
         <h1 style={{ 
           color: '#e34c26', 
           borderBottom: '3px solid #264de4',
-          paddingBottom: '10px'
+          paddingBottom: '10px',
+          fontSize: 'clamp(24px, 5vw, 36px)',
+          marginBottom: 'clamp(20px, 4vw, 30px)',
+          fontWeight: 700
         }}>
           HTML & CSS Basics for Cool Kids! 🌐
         </h1>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#e34c26' }}>What is a Website? (Super Simple!) 🌍</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#e34c26',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>What is a Website? (Super Simple!) 🌍</h2>
           <p>
             A website is like a digital book or poster that you can see on your computer, tablet, or phone. 
             But instead of paper, it's made with special code that your web browser (like Chrome or Safari) reads and shows you!
           </p>
           <div style={{ 
             backgroundColor: '#f0f4ff', 
-            padding: '20px', 
+            padding: 'clamp(12px, 3vw, 20px)', 
             borderRadius: '10px',
-            border: '2px solid #264de4'
+            border: '2px solid #264de4',
+            fontSize: 'clamp(14px, 2.5vw, 16px)'
           }}>
-            <h3 style={{ color: '#1e3a8a', marginTop: '0' }}>Think of it like building a house:</h3>
+            <h3 style={{ 
+              color: '#1e3a8a', 
+              marginTop: '0',
+              fontSize: 'clamp(16px, 3.5vw, 20px)',
+              fontWeight: 600
+            }}>Think of it like building a house:</h3>
             <ul style={{ lineHeight: '1.8' }}>
               <li>🏗️ <strong>HTML</strong> = The frame, walls, and structure (where things go)</li>
               <li>🎨 <strong>CSS</strong> = The paint, decorations, and furniture (how things look)</li>
@@ -46,8 +62,13 @@ export default function HtmlCssBasicsPage() {
           </div>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#e34c26' }}>How Do Websites Work? 🔧</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#e34c26',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>How Do Websites Work? 🔧</h2>
           <p>
             Here's the magic behind every website you visit:
           </p>
