@@ -1,0 +1,37 @@
+{
+  "name": "codekingdom-nextjs",
+  "version": "1.0.4",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
+    "axios": "^1.13.2",
+    "bcrypt": "^6.0.0",
+    "express-async-handler": "^1.2.0",
+    "framer-motion": "^12.27.5",
+    "jsonwebtoken": "^9.0.3",
+    "mongodb": "^7.0.0",
+    "mongoose": "^9.1.5",
+    "next": "^14.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^5.5.0",
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@types/three": "^0.160.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.0",
+    "typescript": "^5.3.0"
+  }
+}
