@@ -672,9 +672,9 @@ function AdventurePage() {
             )}
             
             
-            <div className="game-container" style={{ flex: 1, display: 'flex', flexDirection: 'row', gap: '10px', overflow: 'hidden', minHeight: 0 }}>
+            <div className="game-container" style={{ flex: 1, display: 'flex', flexDirection: 'row', gap: '10px', overflow: 'auto', minHeight: 0 }}>
               {/* Left Column - Instructions and Game Grid */}
-              <div style={{ flex: '0 0 50%', display: 'flex', flexDirection: 'column', gap: '10px', overflow: 'visible', minHeight: 0 }}>
+              <div style={{ flex: '0 0 50%', display: 'flex', flexDirection: 'column', gap: '10px', overflow: 'auto', minHeight: 0 }}>
                 {/* Instructions Panel - Collapsible */}
                 <div className="instructions-panel" style={{ 
                   padding: '10px 12px',

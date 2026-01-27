@@ -67,7 +67,7 @@
   height: auto;
   min-height: calc(100vh - 150px);
   padding: 5px;
-  overflow: visible;
+  overflow: auto;
   margin-top: 10px; /* Reduced space */
 }
 
