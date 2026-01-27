@@ -125,8 +125,13 @@ export default function PythonBasicsPage() {
           </div>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#4b8bbe' }}>Understanding Code Like a Recipe 📖</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#4b8bbe',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>Understanding Code Like a Recipe 📖</h2>
           <p>
             Code is like a recipe, but for computers! Let's break down what makes code work:
           </p>
@@ -181,8 +186,13 @@ export default function PythonBasicsPage() {
           </div>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#4b8bbe' }}>Your Very First Python Program! 🎉</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#4b8bbe',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>Your Very First Python Program! 🎉</h2>
           <p>
             Let's write your first program! This is like saying "Hello!" to the computer world.
           </p>
@@ -210,11 +220,20 @@ export default function PythonBasicsPage() {
           </div>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#4b8bbe' }}>Let's Start Coding! 💻</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#4b8bbe',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>Let's Start Coding! 💻</h2>
           
           <div style={{ marginBottom: '20px' }}>
-            <h3 style={{ color: '#5a9fd4' }}>Printing Messages</h3>
+            <h3 style={{ 
+              color: '#5a9fd4',
+              fontSize: 'clamp(16px, 3.5vw, 20px)',
+              fontWeight: 600
+            }}>Printing Messages</h3>
             <p>
               <strong>What is print()?</strong> It's like telling the computer to write something on the screen. 
               Think of it as a magic pen that writes whatever you tell it!
@@ -238,7 +257,11 @@ export default function PythonBasicsPage() {
           </div>
           
           <div style={{ marginBottom: '20px' }}>
-            <h3 style={{ color: '#5a9fd4' }}>Variables - Storing Information</h3>
+            <h3 style={{ 
+              color: '#5a9fd4',
+              fontSize: 'clamp(16px, 3.5vw, 20px)',
+              fontWeight: 600
+            }}>Variables - Storing Information</h3>
             <p>
               <strong>What is a variable?</strong> Think of a variable like a labeled box where you can store something. 
               You give the box a name (like "player_name") and put something inside it (like "Alex").
@@ -275,7 +298,11 @@ export default function PythonBasicsPage() {
           </div>
           
           <div style={{ marginBottom: '20px' }}>
-            <h3 style={{ color: '#5a9fd4' }}>Math in Python</h3>
+            <h3 style={{ 
+              color: '#5a9fd4',
+              fontSize: 'clamp(16px, 3.5vw, 20px)',
+              fontWeight: 600
+            }}>Math in Python</h3>
             <p>
               Python is great at math! You can add, subtract, multiply and divide:
             </p>
