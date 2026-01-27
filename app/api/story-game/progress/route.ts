@@ -35,7 +35,11 @@ export async function GET(req: NextRequest) {
     
     // Get available items at current location
     const scene = SCENES[storyGame.currentScene as keyof typeof SCENES];
-    const locationItems = scene.locationItems[storyGame.currentLocation] || [];
+    // Type-safe access to locationItems
+    const locationItems: string[] = (() => {
+      const locationItemsObj = scene.locationItems as Record<string, string[]>;
+      return locationItemsObj[storyGame.currentLocation] || [];
+    })();
     const availableItems = locationItems.filter(itemName => {
       // Only show items that haven't been collected
       return !storyGame.inventory.some(invItem => invItem.name === itemName);
