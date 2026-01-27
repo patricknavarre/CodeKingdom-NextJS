@@ -134,6 +134,150 @@
   max-height: calc(100vh - 250px); /* Adjusted to account for the instruction/command panel */
 }
 
+/* Mobile landscape adjustments */
+@media screen and (max-height: 600px) and (orientation: landscape) {
+  .adventure-game {
+    height: auto;
+    min-height: 100vh;
+    padding: 3px;
+  }
+
+  .game-header {
+    padding: 3px 8px;
+    height: 45px;
+    margin-bottom: 5px;
+  }
+
+  .game-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .game-container {
+    flex-direction: column;
+    gap: 3px;
+    padding: 3px;
+    margin-top: 5px;
+  }
+
+  .game-top-panel {
+    flex-direction: row;
+    gap: 3px;
+    max-height: 60px;
+    margin-bottom: 3px;
+  }
+
+  .instructions-panel {
+    padding: 4px 6px;
+    max-height: 55px;
+    font-size: 0.7rem;
+  }
+
+  .instructions-panel h3 {
+    font-size: 0.85rem;
+    margin-bottom: 3px;
+  }
+
+  .instruction-steps {
+    font-size: 0.7rem;
+    line-height: 1.1;
+    padding-left: 15px;
+  }
+
+  .character-display-panel {
+    max-height: 60px;
+    width: 70px;
+    padding: 3px;
+  }
+
+  .character-preview-image {
+    width: 35px;
+    height: 35px;
+  }
+
+  .character-name {
+    font-size: 0.65rem;
+  }
+
+  .game-main-area {
+    flex-direction: column;
+    gap: 3px;
+    max-height: none;
+  }
+
+  .game-grid-container {
+    padding: 5px;
+    min-height: 200px;
+  }
+
+  .game-world, .game-grid {
+    grid-template-columns: repeat(10, 20px);
+    grid-template-rows: repeat(10, 20px);
+    gap: 1px;
+    padding: 2px;
+  }
+
+  .grid-cell {
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+  }
+
+  .command-panel {
+    padding: 8px;
+    max-height: 120px;
+    overflow-y: auto;
+  }
+
+  .command-panel h3 {
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+  }
+
+  .command-key {
+    gap: 4px;
+    margin-bottom: 5px;
+  }
+
+  .key-item {
+    padding: 3px 6px;
+    font-size: 0.7rem;
+  }
+
+  .command-textarea {
+    padding: 5px;
+    font-size: 0.75rem;
+    min-height: 40px;
+  }
+
+  .run-button {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    margin-top: 5px;
+  }
+
+  .status-panel {
+    padding: 5px 8px;
+    max-height: 100px;
+    overflow-y: auto;
+  }
+
+  .status-panel h3 {
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+  }
+
+  .status-item {
+    font-size: 0.75rem;
+    margin-bottom: 2px;
+  }
+
+  .pet-display-panel {
+    width: 60px;
+    padding: 4px;
+    max-height: 60px;
+  }
+}
+
 /* Game grid container */
 .game-grid-container {
   flex: 1;

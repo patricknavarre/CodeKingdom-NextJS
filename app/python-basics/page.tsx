@@ -11,7 +11,7 @@ export default function PythonBasicsPage() {
         padding: 'clamp(12px, 4vw, 20px)',
         maxWidth: '800px',
         margin: '0 auto',
-        fontFamily: 'Montserrat, -apple-system, BlinkMacSystemFont, sans-serif',
+        fontFamily: 'Montserrat, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important',
         fontSize: 'clamp(14px, 2.5vw, 16px)',
         lineHeight: '1.6'
       }}>
