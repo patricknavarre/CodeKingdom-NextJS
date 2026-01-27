@@ -799,7 +799,7 @@ export default function WebDevGamePage() {
                 </span>
               </button>
               <div style={{
-                maxHeight: showHowToPlay ? 'none' : '0',
+                maxHeight: showHowToPlay ? '2000px' : '0',
                 overflow: showHowToPlay ? 'visible' : 'hidden',
                 transition: 'max-height 0.3s ease-in-out',
                 display: showHowToPlay ? 'block' : 'none'
