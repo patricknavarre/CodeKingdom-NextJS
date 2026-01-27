@@ -546,7 +546,7 @@ export default function WebDevGamePage() {
     <ProtectedRoute>
       <div style={{ maxWidth: '100%', margin: '0 auto', ...backgroundStyle }}>
         <Navigation />
-        <div className="web-dev-game" style={{ height: 'calc(100vh - 60px)' }}>
+        <div className="web-dev-game" style={{ minHeight: 'calc(100vh - 60px)', height: 'auto', overflow: 'auto' }}>
           <div className="game-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flex: 1 }}>
               <h1>🌐 Web Developer Game</h1>
@@ -799,8 +799,8 @@ export default function WebDevGamePage() {
                 </span>
               </button>
               <div style={{
-                maxHeight: showHowToPlay ? '1000px' : '0',
-                overflow: 'hidden',
+                maxHeight: showHowToPlay ? 'none' : '0',
+                overflow: showHowToPlay ? 'visible' : 'hidden',
                 transition: 'max-height 0.3s ease-in-out',
                 display: showHowToPlay ? 'block' : 'none'
               }}>
