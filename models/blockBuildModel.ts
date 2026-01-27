@@ -38,7 +38,7 @@ const BlockBuildSchema = new Schema<IBlockBuild>({
 // Update lastUpdated on save
 (BlockBuildSchema as any).pre('save', function(this: IBlockBuild, next: mongoose.CallbackWithoutResult) {
   this.lastUpdated = new Date();
-  next();
+  next(undefined);
 });
 
 export default mongoose.models.BlockBuild || mongoose.model<IBlockBuild>('BlockBuild', BlockBuildSchema);
