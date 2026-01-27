@@ -332,8 +332,13 @@ export default function PythonBasicsPage() {
           </div>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#4b8bbe' }}>Making Decisions with If-Else 🤔</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#4b8bbe',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>Making Decisions with If-Else 🤔</h2>
           <p>
             Python can make decisions based on conditions:
           </p>
@@ -358,11 +363,20 @@ export default function PythonBasicsPage() {
           <p><strong>Output:</strong> <span style={{ fontFamily: 'monospace' }}>Be careful, health getting low!</span></p>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#4b8bbe' }}>Loops - Doing Things Over and Over 🔄</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#4b8bbe',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>Loops - Doing Things Over and Over 🔄</h2>
           
           <div style={{ marginBottom: '20px' }}>
-            <h3 style={{ color: '#5a9fd4' }}>For Loops</h3>
+            <h3 style={{ 
+              color: '#5a9fd4',
+              fontSize: 'clamp(16px, 3.5vw, 20px)',
+              fontWeight: 600
+            }}>For Loops</h3>
             <p>
               When you want to do something multiple times:
             </p>
@@ -391,7 +405,11 @@ export default function PythonBasicsPage() {
           </div>
           
           <div style={{ marginBottom: '20px' }}>
-            <h3 style={{ color: '#5a9fd4' }}>While Loops</h3>
+            <h3 style={{ 
+              color: '#5a9fd4',
+              fontSize: 'clamp(16px, 3.5vw, 20px)',
+              fontWeight: 600
+            }}>While Loops</h3>
             <p>
               Keep doing something while a condition is true:
             </p>
@@ -415,8 +433,13 @@ export default function PythonBasicsPage() {
           </div>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#4b8bbe' }}>Lists - Storing Multiple Things 📋</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#4b8bbe',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>Lists - Storing Multiple Things 📋</h2>
           <p>
             Lists are like treasure chests that can hold many items:
           </p>
@@ -448,8 +471,13 @@ export default function PythonBasicsPage() {
           </pre>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#4b8bbe' }}>Functions - Creating Your Own Commands 🧙‍♂️</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#4b8bbe',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>Functions - Creating Your Own Commands 🧙‍♂️</h2>
           <p>
             Functions are like your own magic spells that you can use over and over:
           </p>
@@ -484,8 +512,13 @@ export default function PythonBasicsPage() {
           </pre>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#4b8bbe' }}>Fun Python Projects for Kids 🎮</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#4b8bbe',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>Fun Python Projects for Kids 🎮</h2>
           <ul style={{ lineHeight: '1.6' }}>
             <li><strong>Number Guessing Game:</strong> Make a game where the computer picks a random number and you have to guess it!</li>
             <li><strong>Adventure Text Game:</strong> Create a story where the player makes choices that change the ending</li>
@@ -495,8 +528,13 @@ export default function PythonBasicsPage() {
           </ul>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#4b8bbe' }}>Common Beginner Mistakes (And How to Avoid Them!) ⚠️</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#4b8bbe',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>Common Beginner Mistakes (And How to Avoid Them!) ⚠️</h2>
           <div style={{ 
             backgroundColor: '#fff5f5', 
             padding: '20px', 
@@ -504,14 +542,22 @@ export default function PythonBasicsPage() {
             border: '2px solid #ff6b6b'
           }}>
             <div style={{ marginBottom: '15px' }}>
-              <h3 style={{ color: '#c0392b' }}>❌ Mistake 1: Forgetting Quotes</h3>
+              <h3 style={{ 
+                color: '#c0392b',
+                fontSize: 'clamp(16px, 3.5vw, 20px)',
+                fontWeight: 600
+              }}>❌ Mistake 1: Forgetting Quotes</h3>
               <p><strong>Wrong:</strong> <code style={{ backgroundColor: '#fee', padding: '2px 5px' }}>print(Hello)</code></p>
               <p><strong>Right:</strong> <code style={{ backgroundColor: '#efe', padding: '2px 5px' }}>print("Hello")</code></p>
               <p><em>Text needs to be in quotes, like putting it in a speech bubble!</em></p>
             </div>
             
             <div style={{ marginBottom: '15px' }}>
-              <h3 style={{ color: '#c0392b' }}>❌ Mistake 2: Wrong Indentation (Spacing)</h3>
+              <h3 style={{ 
+                color: '#c0392b',
+                fontSize: 'clamp(16px, 3.5vw, 20px)',
+                fontWeight: 600
+              }}>❌ Mistake 2: Wrong Indentation (Spacing)</h3>
               <p><strong>Wrong:</strong></p>
               <div style={{ backgroundColor: '#fee', padding: '10px', borderRadius: '5px', fontFamily: 'monospace', fontSize: '14px' }}>
                 if health &gt; 50:<br/>
@@ -526,14 +572,22 @@ export default function PythonBasicsPage() {
             </div>
             
             <div style={{ marginBottom: '15px' }}>
-              <h3 style={{ color: '#c0392b' }}>❌ Mistake 3: Forgetting Parentheses</h3>
+              <h3 style={{ 
+                color: '#c0392b',
+                fontSize: 'clamp(16px, 3.5vw, 20px)',
+                fontWeight: 600
+              }}>❌ Mistake 3: Forgetting Parentheses</h3>
               <p><strong>Wrong:</strong> <code style={{ backgroundColor: '#fee', padding: '2px 5px' }}>print "Hello"</code></p>
               <p><strong>Right:</strong> <code style={{ backgroundColor: '#efe', padding: '2px 5px' }}>print("Hello")</code></p>
               <p><em>Commands need parentheses () - think of them as the command's "action bubble"!</em></p>
             </div>
             
             <div style={{ marginBottom: '15px' }}>
-              <h3 style={{ color: '#c0392b' }}>❌ Mistake 4: Using Wrong Capital Letters</h3>
+              <h3 style={{ 
+                color: '#c0392b',
+                fontSize: 'clamp(16px, 3.5vw, 20px)',
+                fontWeight: 600
+              }}>❌ Mistake 4: Using Wrong Capital Letters</h3>
               <p><strong>Wrong:</strong> <code style={{ backgroundColor: '#fee', padding: '2px 5px' }}>Print("Hello")</code></p>
               <p><strong>Right:</strong> <code style={{ backgroundColor: '#efe', padding: '2px 5px' }}>print("Hello")</code></p>
               <p><em>Python is picky about capital letters! "print" is different from "Print".</em></p>
@@ -541,8 +595,13 @@ export default function PythonBasicsPage() {
           </div>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#4b8bbe' }}>How to Think Like a Programmer 🧠</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#4b8bbe',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>How to Think Like a Programmer 🧠</h2>
           <p>
             Programming isn't just about typing code - it's about solving problems step by step!
           </p>
@@ -552,7 +611,11 @@ export default function PythonBasicsPage() {
             borderRadius: '10px',
             border: '1px solid #4b8bbe'
           }}>
-            <h3 style={{ color: '#5a9fd4' }}>The Problem-Solving Process:</h3>
+            <h3 style={{ 
+              color: '#5a9fd4',
+              fontSize: 'clamp(16px, 3.5vw, 20px)',
+              fontWeight: 600
+            }}>The Problem-Solving Process:</h3>
             <ol style={{ lineHeight: '2' }}>
               <li><strong>Understand the Problem:</strong> What do you want the computer to do?</li>
               <li><strong>Break It Down:</strong> Split big problems into small steps (like a recipe!)</li>
@@ -574,7 +637,12 @@ export default function PythonBasicsPage() {
           marginTop: '40px',
           border: '2px dashed #4b8bbe'
         }}>
-          <h2 style={{ color: '#4b8bbe', marginTop: '0' }}>Remember! 🌟</h2>
+          <h2 style={{ 
+            color: '#4b8bbe', 
+            marginTop: '0',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            fontWeight: 600
+          }}>Remember! 🌟</h2>
           <ul style={{ lineHeight: '1.8' }}>
             <li>✅ <strong>Indentation matters!</strong> Spaces at the beginning of lines are important in Python - they're like paragraph indents in writing!</li>
             <li>✅ <strong>Python is case-sensitive:</strong> <code>name</code> and <code>Name</code> are different variables (like "cat" vs "Cat")</li>
