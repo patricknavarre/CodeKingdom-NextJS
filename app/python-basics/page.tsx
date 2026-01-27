@@ -79,8 +79,13 @@ export default function PythonBasicsPage() {
           </div>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#4b8bbe' }}>Why Learn Python? 🚀</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#4b8bbe',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>Why Learn Python? 🚀</h2>
           <ul style={{ lineHeight: '1.6' }}>
             <li>It's easy to read and write - almost like English!</li>
             <li>You can make games, websites, robots, and more!</li>
@@ -199,11 +204,12 @@ export default function PythonBasicsPage() {
             <div style={{ 
               backgroundColor: '#2b2b2b', 
               color: '#ffffff',
-              padding: '15px',
+              padding: 'clamp(12px, 3vw, 15px)',
               borderRadius: '8px',
               fontFamily: 'monospace',
-              fontSize: '16px',
-              marginBottom: '10px'
+              fontSize: 'clamp(12px, 2.5vw, 16px)',
+              marginBottom: '10px',
+              overflowX: 'auto'
             }}>
               print("Hello, Python adventurer!")
             </div>
@@ -233,11 +239,12 @@ export default function PythonBasicsPage() {
             <div style={{ 
               backgroundColor: '#2b2b2b', 
               color: '#ffffff',
-              padding: '15px',
+              padding: 'clamp(12px, 3vw, 15px)',
               borderRadius: '8px',
               fontFamily: 'monospace',
-              fontSize: '16px',
-              marginBottom: '10px'
+              fontSize: 'clamp(12px, 2.5vw, 16px)',
+              marginBottom: '10px',
+              overflowX: 'auto'
             }}>
               player_name = "Alex"<br/>
               player_level = 5<br/>
@@ -254,11 +261,12 @@ export default function PythonBasicsPage() {
             <div style={{ 
               backgroundColor: '#2b2b2b', 
               color: '#ffffff',
-              padding: '15px',
+              padding: 'clamp(12px, 3vw, 15px)',
               borderRadius: '8px',
               fontFamily: 'monospace',
-              fontSize: '16px',
-              marginBottom: '10px'
+              fontSize: 'clamp(12px, 2.5vw, 16px)',
+              marginBottom: '10px',
+              overflowX: 'auto'
             }}>
               # Adding<br/>
               print(5 + 3)  # 8<br/>
@@ -313,11 +321,12 @@ export default function PythonBasicsPage() {
             <div style={{ 
               backgroundColor: '#2b2b2b', 
               color: '#ffffff',
-              padding: '15px',
+              padding: 'clamp(12px, 3vw, 15px)',
               borderRadius: '8px',
               fontFamily: 'monospace',
-              fontSize: '16px',
-              marginBottom: '10px'
+              fontSize: 'clamp(12px, 2.5vw, 16px)',
+              marginBottom: '10px',
+              overflowX: 'auto'
             }}>
               # Count from 1 to 5<br/>
               for number in range(1, 6):<br/>
@@ -341,11 +350,12 @@ export default function PythonBasicsPage() {
             <div style={{ 
               backgroundColor: '#2b2b2b', 
               color: '#ffffff',
-              padding: '15px',
+              padding: 'clamp(12px, 3vw, 15px)',
               borderRadius: '8px',
               fontFamily: 'monospace',
-              fontSize: '16px',
-              marginBottom: '10px'
+              fontSize: 'clamp(12px, 2.5vw, 16px)',
+              marginBottom: '10px',
+              overflowX: 'auto'
             }}>
               health = 100<br/>
               while health &gt; 0:<br/>
