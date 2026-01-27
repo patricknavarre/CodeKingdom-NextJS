@@ -200,7 +200,10 @@ export async function POST(req: NextRequest) {
       updatedInventory: updatedInventory.map(i => i.name),
       availableItems: finalAvailableItems,
       sceneConfig: scene.locationItems,
-      locationItemsConfig: scene.locationItems[updatedLocation]
+      locationItemsConfig: (() => {
+        const locationItemsObj = scene.locationItems as Record<string, string[]>;
+        return locationItemsObj[updatedLocation] || [];
+      })()
     });
 
     return Response.json({
