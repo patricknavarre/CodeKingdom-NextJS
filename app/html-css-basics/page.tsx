@@ -92,18 +92,24 @@ export default function HtmlCssBasicsPage() {
           </div>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#e34c26' }}>How Do I Create My Own Website? 🚀</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#e34c26',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>How Do I Create My Own Website? 🚀</h2>
           <p>
             <strong>Great news!</strong> You can practice making websites right here in CodeKingdom! 
             No need to download anything or set up complicated tools.
           </p>
           <div style={{ 
             backgroundColor: '#e6f7ff', 
-            padding: '20px', 
+            padding: 'clamp(12px, 3vw, 20px)', 
             borderRadius: '10px',
             border: '2px solid #4b8bbe',
-            marginTop: '15px'
+            marginTop: '15px',
+            fontSize: 'clamp(14px, 2.5vw, 16px)'
           }}>
             <p><strong>💡 Where to Practice:</strong></p>
             <ul style={{ lineHeight: '1.8' }}>
@@ -118,33 +124,45 @@ export default function HtmlCssBasicsPage() {
           </div>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#e34c26' }}>What is HTML? 🏗️</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#e34c26',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>What is HTML? 🏗️</h2>
           <p>
             HTML stands for <strong>HyperText Markup Language</strong>. Think of HTML as the skeleton of a website!
             It's like the frame of a house - it tells the browser where everything goes and what it is.
           </p>
           <div style={{ 
             backgroundColor: '#fff5f5', 
-            padding: '15px', 
+            padding: 'clamp(12px, 3vw, 15px)', 
             borderRadius: '10px',
-            border: '1px solid #fcc'
+            border: '1px solid #fcc',
+            fontSize: 'clamp(14px, 2.5vw, 16px)'
           }}>
             <p><strong>Fun Fact:</strong> HTML was created by Tim Berners-Lee in 1991. That's when the World Wide Web was just starting!</p>
           </div>
         </section>
 
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#264de4' }}>What is CSS? 🎨</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#264de4',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>What is CSS? 🎨</h2>
           <p>
             CSS stands for <strong>Cascading Style Sheets</strong>. CSS is like the paint, decorations, and furniture for your website!
             It makes everything look pretty - colors, sizes, fonts, and where things are placed.
           </p>
           <div style={{ 
             backgroundColor: '#f0f4ff', 
-            padding: '15px', 
+            padding: 'clamp(12px, 3vw, 15px)', 
             borderRadius: '10px',
-            border: '1px solid #ccd'
+            border: '1px solid #ccd',
+            fontSize: 'clamp(14px, 2.5vw, 16px)'
           }}>
             <p><strong>Fun Fact:</strong> Without CSS, all websites would look like plain black text on white backgrounds - super boring!</p>
           </div>
