@@ -168,9 +168,18 @@ export default function HtmlCssBasicsPage() {
           </div>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#e34c26' }}>Why Learn HTML & CSS? 🚀</h2>
-          <ul style={{ lineHeight: '1.6' }}>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#e34c26',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>Why Learn HTML & CSS? 🚀</h2>
+          <ul style={{ 
+            lineHeight: '1.6',
+            fontSize: 'clamp(14px, 2.5vw, 16px)',
+            paddingLeft: 'clamp(20px, 4vw, 30px)'
+          }}>
             <li>You can build your own websites and show them to friends!</li>
             <li>It's the foundation of every website you visit (YouTube, games, social media!)</li>
             <li>It's like learning to read and write for the internet</li>
@@ -179,21 +188,26 @@ export default function HtmlCssBasicsPage() {
           </ul>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#e34c26' }}>Your Very First Web Page! 🎉</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#e34c26',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>Your Very First Web Page! 🎉</h2>
           <p>
             Let's create your first website! This is like building your first LEGO creation - simple but exciting!
           </p>
-          <div style={{ 
-            backgroundColor: '#2b2b2b', 
-            color: '#ffffff',
-            padding: '20px',
-            borderRadius: '8px',
-            fontFamily: 'monospace',
-            fontSize: '14px',
-            marginBottom: '15px',
-            overflowX: 'auto'
-          }}>
+            <div style={{ 
+              backgroundColor: '#2b2b2b', 
+              color: '#ffffff',
+              padding: 'clamp(12px, 3vw, 20px)',
+              borderRadius: '8px',
+              fontFamily: 'monospace',
+              fontSize: 'clamp(12px, 2.5vw, 16px)',
+              marginBottom: '15px',
+              overflowX: 'auto'
+            }}>
             &lt;!DOCTYPE html&gt;<br/>
             &lt;html&gt;<br/>
             &lt;head&gt;<br/>
@@ -209,27 +223,39 @@ export default function HtmlCssBasicsPage() {
           <p><strong>Try it:</strong> Copy this code into the Web Dev Game's editor and click "Submit" to see your website!</p>
           <div style={{ 
             backgroundColor: '#fff9e6', 
-            padding: '15px', 
+            padding: 'clamp(12px, 3vw, 15px)', 
             borderRadius: '10px',
             border: '2px dashed #ffd43b',
-            marginTop: '15px'
+            marginTop: '15px',
+            fontSize: 'clamp(14px, 2.5vw, 16px)'
           }}>
             <p><strong>🎯 Your Mission:</strong> Try changing "Hello, World!" to your own message, like "Welcome to My Awesome Page!"</p>
           </div>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#e34c26' }}>Understanding HTML Tags (The Building Blocks) 🧱</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#e34c26',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>Understanding HTML Tags (The Building Blocks) 🧱</h2>
           <p>
             HTML uses <strong>tags</strong> to tell the browser what each part of your page is. Think of tags like labels on boxes:
           </p>
           <div style={{ 
             backgroundColor: '#f0f4ff', 
-            padding: '20px', 
+            padding: 'clamp(12px, 3vw, 20px)', 
             borderRadius: '10px',
-            border: '1px solid #264de4'
+            border: '1px solid #264de4',
+            fontSize: 'clamp(14px, 2.5vw, 16px)'
           }}>
-            <h3 style={{ color: '#1e3a8a', marginTop: '0' }}>How Tags Work:</h3>
+            <h3 style={{ 
+              color: '#1e3a8a', 
+              marginTop: '0',
+              fontSize: 'clamp(16px, 3.5vw, 20px)',
+              fontWeight: 600
+            }}>How Tags Work:</h3>
             <ul style={{ lineHeight: '1.8' }}>
               <li><strong>Opening Tag:</strong> <code>&lt;h1&gt;</code> - Says "start a heading here"</li>
               <li><strong>Content:</strong> Your text goes here</li>
@@ -244,20 +270,30 @@ export default function HtmlCssBasicsPage() {
           </div>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#e34c26' }}>HTML Basics - Building Blocks 🧱</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#e34c26',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>HTML Basics - Building Blocks 🧱</h2>
           
           <div style={{ marginBottom: '20px' }}>
-            <h3 style={{ color: '#c0392b' }}>HTML Structure</h3>
+            <h3 style={{ 
+              color: '#c0392b',
+              fontSize: 'clamp(16px, 3.5vw, 20px)',
+              fontWeight: 600
+            }}>HTML Structure</h3>
             <p>
               Every HTML page starts with a basic structure. Think of it like a sandwich - you need bread (html tags) and filling (content):
             </p>
             <div style={{ 
               backgroundColor: '#fff9e6', 
-              padding: '15px', 
+              padding: 'clamp(12px, 3vw, 15px)', 
               borderRadius: '10px',
               border: '1px solid #ffd43b',
-              marginBottom: '10px'
+              marginBottom: '10px',
+              fontSize: 'clamp(14px, 2.5vw, 16px)'
             }}>
               <p><strong>📖 Breaking It Down:</strong></p>
               <ul style={{ lineHeight: '1.8' }}>
@@ -291,18 +327,23 @@ export default function HtmlCssBasicsPage() {
           </div>
           
           <div style={{ marginBottom: '20px' }}>
-            <h3 style={{ color: '#c0392b' }}>Headings - Making Titles</h3>
+            <h3 style={{ 
+              color: '#c0392b',
+              fontSize: 'clamp(16px, 3.5vw, 20px)',
+              fontWeight: 600
+            }}>Headings - Making Titles</h3>
             <p>
               Headings are like chapter titles in a book. The bigger the number, the smaller the heading:
             </p>
             <div style={{ 
               backgroundColor: '#2b2b2b', 
               color: '#ffffff',
-              padding: '15px',
+              padding: 'clamp(12px, 3vw, 15px)',
               borderRadius: '8px',
               fontFamily: 'monospace',
-              fontSize: '14px',
-              marginBottom: '10px'
+              fontSize: 'clamp(12px, 2.5vw, 16px)',
+              marginBottom: '10px',
+              overflowX: 'auto'
             }}>
               &lt;h1&gt;This is the Biggest Heading&lt;/h1&gt;<br/>
               &lt;h2&gt;This is Smaller&lt;/h2&gt;<br/>
@@ -324,18 +365,23 @@ export default function HtmlCssBasicsPage() {
           </div>
           
           <div style={{ marginBottom: '20px' }}>
-            <h3 style={{ color: '#c0392b' }}>Paragraphs - Writing Text</h3>
+            <h3 style={{ 
+              color: '#c0392b',
+              fontSize: 'clamp(16px, 3.5vw, 20px)',
+              fontWeight: 600
+            }}>Paragraphs - Writing Text</h3>
             <p>
               Use <code>&lt;p&gt;</code> tags to write paragraphs of text:
             </p>
             <div style={{ 
               backgroundColor: '#2b2b2b', 
               color: '#ffffff',
-              padding: '15px',
+              padding: 'clamp(12px, 3vw, 15px)',
               borderRadius: '8px',
               fontFamily: 'monospace',
-              fontSize: '14px',
-              marginBottom: '10px'
+              fontSize: 'clamp(12px, 2.5vw, 16px)',
+              marginBottom: '10px',
+              overflowX: 'auto'
             }}>
               &lt;p&gt;This is my first paragraph!&lt;/p&gt;<br/>
               &lt;p&gt;This is another paragraph. HTML is fun!&lt;/p&gt;
@@ -343,18 +389,23 @@ export default function HtmlCssBasicsPage() {
           </div>
           
           <div style={{ marginBottom: '20px' }}>
-            <h3 style={{ color: '#c0392b' }}>Links - Connecting Pages</h3>
+            <h3 style={{ 
+              color: '#c0392b',
+              fontSize: 'clamp(16px, 3.5vw, 20px)',
+              fontWeight: 600
+            }}>Links - Connecting Pages</h3>
             <p>
               Links let you jump to other pages or websites:
             </p>
             <div style={{ 
               backgroundColor: '#2b2b2b', 
               color: '#ffffff',
-              padding: '15px',
+              padding: 'clamp(12px, 3vw, 15px)',
               borderRadius: '8px',
               fontFamily: 'monospace',
-              fontSize: '14px',
-              marginBottom: '10px'
+              fontSize: 'clamp(12px, 2.5vw, 16px)',
+              marginBottom: '10px',
+              overflowX: 'auto'
             }}>
               &lt;a href="https://www.example.com"&gt;Click here to visit Example&lt;/a&gt;
             </div>
@@ -369,11 +420,12 @@ export default function HtmlCssBasicsPage() {
             <div style={{ 
               backgroundColor: '#2b2b2b', 
               color: '#ffffff',
-              padding: '15px',
+              padding: 'clamp(12px, 3vw, 15px)',
               borderRadius: '8px',
               fontFamily: 'monospace',
-              fontSize: '14px',
-              marginBottom: '10px'
+              fontSize: 'clamp(12px, 2.5vw, 16px)',
+              marginBottom: '10px',
+              overflowX: 'auto'
             }}>
               &lt;!-- Unordered list (bullets) --&gt;<br/>
               &lt;ul&gt;<br/>
@@ -399,11 +451,12 @@ export default function HtmlCssBasicsPage() {
             <div style={{ 
               backgroundColor: '#2b2b2b', 
               color: '#ffffff',
-              padding: '15px',
+              padding: 'clamp(12px, 3vw, 15px)',
               borderRadius: '8px',
               fontFamily: 'monospace',
-              fontSize: '14px',
-              marginBottom: '10px'
+              fontSize: 'clamp(12px, 2.5vw, 16px)',
+              marginBottom: '10px',
+              overflowX: 'auto'
             }}>
               &lt;img src="picture.jpg" alt="A cool picture" /&gt;
             </div>
@@ -411,8 +464,13 @@ export default function HtmlCssBasicsPage() {
           </div>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#264de4' }}>CSS Basics - Making It Pretty! 🎨</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#264de4',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>CSS Basics - Making It Pretty! 🎨</h2>
           
           <div style={{ marginBottom: '20px' }}>
             <h3 style={{ color: '#1e3a8a' }}>How CSS Works</h3>
@@ -423,11 +481,12 @@ export default function HtmlCssBasicsPage() {
             <div style={{ 
               backgroundColor: '#2b2b2b', 
               color: '#ffffff',
-              padding: '15px',
+              padding: 'clamp(12px, 3vw, 15px)',
               borderRadius: '8px',
               fontFamily: 'monospace',
-              fontSize: '14px',
-              marginBottom: '10px'
+              fontSize: 'clamp(12px, 2.5vw, 16px)',
+              marginBottom: '10px',
+              overflowX: 'auto'
             }}>
               &lt;style&gt;<br/>
               &nbsp;&nbsp;h1 {'{'}<br/>
@@ -446,11 +505,12 @@ export default function HtmlCssBasicsPage() {
             <div style={{ 
               backgroundColor: '#2b2b2b', 
               color: '#ffffff',
-              padding: '15px',
+              padding: 'clamp(12px, 3vw, 15px)',
               borderRadius: '8px',
               fontFamily: 'monospace',
-              fontSize: '14px',
-              marginBottom: '10px'
+              fontSize: 'clamp(12px, 2.5vw, 16px)',
+              marginBottom: '10px',
+              overflowX: 'auto'
             }}>
               h1 {'{'}<br/>
               &nbsp;&nbsp;color: red;        /* Using color name */<br/>
@@ -469,11 +529,12 @@ export default function HtmlCssBasicsPage() {
             <div style={{ 
               backgroundColor: '#2b2b2b', 
               color: '#ffffff',
-              padding: '15px',
+              padding: 'clamp(12px, 3vw, 15px)',
               borderRadius: '8px',
               fontFamily: 'monospace',
-              fontSize: '14px',
-              marginBottom: '10px'
+              fontSize: 'clamp(12px, 2.5vw, 16px)',
+              marginBottom: '10px',
+              overflowX: 'auto'
             }}>
               h1 {'{'}<br/>
               &nbsp;&nbsp;text-align: center;   /* Center the text */<br/>
@@ -491,11 +552,12 @@ export default function HtmlCssBasicsPage() {
             <div style={{ 
               backgroundColor: '#2b2b2b', 
               color: '#ffffff',
-              padding: '15px',
+              padding: 'clamp(12px, 3vw, 15px)',
               borderRadius: '8px',
               fontFamily: 'monospace',
-              fontSize: '14px',
-              marginBottom: '10px'
+              fontSize: 'clamp(12px, 2.5vw, 16px)',
+              marginBottom: '10px',
+              overflowX: 'auto'
             }}>
               body {'{'}<br/>
               &nbsp;&nbsp;background-color: lightblue;<br/>
@@ -515,11 +577,12 @@ export default function HtmlCssBasicsPage() {
             <div style={{ 
               backgroundColor: '#2b2b2b', 
               color: '#ffffff',
-              padding: '15px',
+              padding: 'clamp(12px, 3vw, 15px)',
               borderRadius: '8px',
               fontFamily: 'monospace',
-              fontSize: '14px',
-              marginBottom: '10px'
+              fontSize: 'clamp(12px, 2.5vw, 16px)',
+              marginBottom: '10px',
+              overflowX: 'auto'
             }}>
               p {'{'}<br/>
               &nbsp;&nbsp;font-size: 18px;  /* 18 pixels tall */<br/>
@@ -532,8 +595,13 @@ export default function HtmlCssBasicsPage() {
           </div>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#e34c26' }}>Putting It All Together! 🎯</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#e34c26',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>Putting It All Together! 🎯</h2>
           <p>
             Here's a complete example showing HTML and CSS working together:
           </p>
@@ -575,7 +643,11 @@ export default function HtmlCssBasicsPage() {
             &lt;/html&gt;
           </div>
           <p><strong>What this does:</strong></p>
-          <ul style={{ lineHeight: '1.6' }}>
+          <ul style={{ 
+            lineHeight: '1.6',
+            fontSize: 'clamp(14px, 2.5vw, 16px)',
+            paddingLeft: 'clamp(20px, 4vw, 30px)'
+          }}>
             <li>Sets the background to light blue</li>
             <li>Makes the h1 heading blue, centered, and big</li>
             <li>Makes paragraphs dark green and 18px tall</li>
@@ -636,8 +708,13 @@ export default function HtmlCssBasicsPage() {
           </div>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#264de4' }}>Common CSS Properties Cheat Sheet 🎨</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#264de4',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>Common CSS Properties Cheat Sheet 🎨</h2>
           <div style={{ 
             backgroundColor: '#f8f8f8', 
             padding: '15px', 
@@ -693,9 +770,18 @@ export default function HtmlCssBasicsPage() {
           </div>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#e34c26' }}>Fun Web Projects for Kids 🎮</h2>
-          <ul style={{ lineHeight: '1.6' }}>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#e34c26',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>Fun Web Projects for Kids 🎮</h2>
+          <ul style={{ 
+            lineHeight: '1.6',
+            fontSize: 'clamp(14px, 2.5vw, 16px)',
+            paddingLeft: 'clamp(20px, 4vw, 30px)'
+          }}>
             <li><strong>Personal Portfolio:</strong> Create a page about yourself with your hobbies, favorite games, and photos!</li>
             <li><strong>Game Review Site:</strong> Make a website reviewing your favorite video games</li>
             <li><strong>Pet Page:</strong> Create a page all about your pet (or dream pet!) with pictures and stories</li>
@@ -705,8 +791,13 @@ export default function HtmlCssBasicsPage() {
           </ul>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#e34c26' }}>Common Beginner Mistakes (And How to Fix Them!) ⚠️</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#e34c26',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>Common Beginner Mistakes (And How to Fix Them!) ⚠️</h2>
           <div style={{ 
             backgroundColor: '#fff5f5', 
             padding: '20px', 
@@ -750,16 +841,22 @@ export default function HtmlCssBasicsPage() {
           </div>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#264de4' }}>How to Think Like a Web Developer 🧠</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#264de4',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>How to Think Like a Web Developer 🧠</h2>
           <p>
             Building websites is like being an architect and an artist at the same time!
           </p>
           <div style={{ 
             backgroundColor: '#f0f4ff', 
-            padding: '20px', 
+            padding: 'clamp(12px, 3vw, 20px)', 
             borderRadius: '10px',
-            border: '1px solid #264de4'
+            border: '1px solid #264de4',
+            fontSize: 'clamp(14px, 2.5vw, 16px)'
           }}>
             <h3 style={{ color: '#1e3a8a' }}>The Web Development Process:</h3>
             <ol style={{ lineHeight: '2' }}>
@@ -776,8 +873,13 @@ export default function HtmlCssBasicsPage() {
           </div>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#e34c26' }}>HTML vs CSS - What's the Difference? 🤔</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#e34c26',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>HTML vs CSS - What's the Difference? 🤔</h2>
           <div style={{ 
             backgroundColor: '#fff9e6', 
             padding: '20px', 
@@ -788,7 +890,11 @@ export default function HtmlCssBasicsPage() {
               <div style={{ backgroundColor: '#fff5f5', padding: '15px', borderRadius: '8px', border: '2px solid #e34c26' }}>
                 <h3 style={{ color: '#c0392b', marginTop: '0' }}>HTML (Structure) 🏗️</h3>
                 <p><strong>What it does:</strong> Tells the browser WHAT is on the page</p>
-                <ul style={{ lineHeight: '1.6' }}>
+                <ul style={{ 
+            lineHeight: '1.6',
+            fontSize: 'clamp(14px, 2.5vw, 16px)',
+            paddingLeft: 'clamp(20px, 4vw, 30px)'
+          }}>
                   <li>Creates headings</li>
                   <li>Adds paragraphs</li>
                   <li>Puts in images</li>
@@ -801,7 +907,11 @@ export default function HtmlCssBasicsPage() {
               <div style={{ backgroundColor: '#f0f4ff', padding: '15px', borderRadius: '8px', border: '2px solid #264de4' }}>
                 <h3 style={{ color: '#1e3a8a', marginTop: '0' }}>CSS (Style) 🎨</h3>
                 <p><strong>What it does:</strong> Tells the browser HOW things should look</p>
-                <ul style={{ lineHeight: '1.6' }}>
+                <ul style={{ 
+            lineHeight: '1.6',
+            fontSize: 'clamp(14px, 2.5vw, 16px)',
+            paddingLeft: 'clamp(20px, 4vw, 30px)'
+          }}>
                   <li>Changes colors</li>
                   <li>Sets font sizes</li>
                   <li>Moves things around</li>
@@ -824,7 +934,12 @@ export default function HtmlCssBasicsPage() {
           marginTop: '40px',
           border: '2px dashed #e34c26'
         }}>
-          <h2 style={{ color: '#e34c26', marginTop: '0' }}>Remember! 🌟</h2>
+          <h2 style={{ 
+            color: '#e34c26', 
+            marginTop: '0',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            fontWeight: 600
+          }}>Remember! 🌟</h2>
           <ul style={{ lineHeight: '1.8' }}>
             <li>✅ <strong>Always close your HTML tags!</strong> <code>&lt;tag&gt;</code> needs <code>&lt;/tag&gt;</code> (like opening and closing a box)</li>
             <li>✅ <strong>CSS properties end with semicolons:</strong> <code>color: blue;</code> (like periods in sentences)</li>
