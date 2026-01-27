@@ -655,8 +655,13 @@ export default function HtmlCssBasicsPage() {
           </ul>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#264de4' }}>Common HTML Tags Cheat Sheet 📝</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#264de4',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>Common HTML Tags Cheat Sheet 📝</h2>
           <div style={{ 
             backgroundColor: '#f8f8f8', 
             padding: '15px', 
