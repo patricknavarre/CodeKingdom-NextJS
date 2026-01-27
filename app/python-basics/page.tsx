@@ -94,18 +94,24 @@ export default function PythonBasicsPage() {
           </ul>
         </section>
         
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ color: '#4b8bbe' }}>How Do I Write Python Code? 🖥️</h2>
+        <section style={{ marginBottom: 'clamp(20px, 4vw, 30px)' }}>
+          <h2 style={{ 
+            color: '#4b8bbe',
+            fontSize: 'clamp(18px, 4vw, 24px)',
+            marginBottom: 'clamp(12px, 3vw, 16px)',
+            fontWeight: 600
+          }}>How Do I Write Python Code? 🖥️</h2>
           <p>
             <strong>Good news!</strong> You don't need to install anything special to start learning Python here in CodeKingdom! 
             You can practice right in our games and see your code work immediately.
           </p>
           <div style={{ 
             backgroundColor: '#fff9e6', 
-            padding: '15px', 
+            padding: 'clamp(12px, 3vw, 15px)', 
             borderRadius: '10px',
             border: '2px solid #ffd43b',
-            marginTop: '15px'
+            marginTop: '15px',
+            fontSize: 'clamp(14px, 2.5vw, 16px)'
           }}>
             <p><strong>💡 Where to Practice:</strong></p>
             <ul style={{ lineHeight: '1.8' }}>
@@ -130,7 +136,12 @@ export default function PythonBasicsPage() {
             borderRadius: '10px',
             border: '1px solid #4b8bbe'
           }}>
-            <h3 style={{ color: '#5a9fd4', marginTop: '0' }}>1. Instructions (Lines of Code)</h3>
+            <h3 style={{ 
+              color: '#5a9fd4', 
+              marginTop: '0',
+              fontSize: 'clamp(16px, 3.5vw, 20px)',
+              fontWeight: 600
+            }}>1. Instructions (Lines of Code)</h3>
             <p>
               Each line of code is like one step in a recipe. The computer reads them one by one, from top to bottom.
             </p>
@@ -148,12 +159,22 @@ export default function PythonBasicsPage() {
               print("Step 3: Done!")
             </div>
             
-            <h3 style={{ color: '#5a9fd4', marginTop: '20px' }}>2. Commands (Functions)</h3>
+            <h3 style={{ 
+              color: '#5a9fd4', 
+              marginTop: '20px',
+              fontSize: 'clamp(16px, 3.5vw, 20px)',
+              fontWeight: 600
+            }}>2. Commands (Functions)</h3>
             <p>
               Commands are special words that tell the computer to do something specific. <code>print()</code> is a command that makes the computer show text on the screen.
             </p>
             
-            <h3 style={{ color: '#5a9fd4', marginTop: '20px' }}>3. Data (Information)</h3>
+            <h3 style={{ 
+              color: '#5a9fd4', 
+              marginTop: '20px',
+              fontSize: 'clamp(16px, 3.5vw, 20px)',
+              fontWeight: 600
+            }}>3. Data (Information)</h3>
             <p>
               Data is the information your code works with - like numbers, words, or lists. Think of it as the ingredients in your recipe!
             </p>
