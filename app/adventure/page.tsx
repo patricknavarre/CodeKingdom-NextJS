@@ -125,6 +125,7 @@ function AdventurePage() {
     }, [level]);
     const [speechBubble, setSpeechBubble] = useState<{ message: string; visible: boolean }>({ message: '', visible: false });
     const [bubblePosition, setBubblePosition] = useState<{ top: number; left: number } | null>(null);
+    const [showHowToPlay, setShowHowToPlay] = useState(true); // State for collapsible instructions
     const gridRef = useRef<HTMLDivElement>(null);
     
     // Update bubble position when character moves or bubble appears
@@ -673,23 +674,49 @@ function AdventurePage() {
             
             <div className="game-container" style={{ flex: 1, display: 'flex', flexDirection: 'row', gap: '10px', overflow: 'hidden', minHeight: 0 }}>
               {/* Left Column - Instructions and Game Grid */}
-              <div style={{ flex: '0 0 50%', display: 'flex', flexDirection: 'column', gap: '10px', overflow: 'hidden' }}>
-                {/* Instructions Panel */}
+              <div style={{ flex: '0 0 50%', display: 'flex', flexDirection: 'column', gap: '10px', overflow: 'visible', minHeight: 0 }}>
+                {/* Instructions Panel - Collapsible */}
                 <div className="instructions-panel" style={{ 
                   padding: '10px 12px',
                   overflowY: 'auto',
                   flexShrink: 0,
-                  maxHeight: '150px'
+                  maxHeight: showHowToPlay ? '200px' : '40px',
+                  transition: 'max-height 0.3s ease',
+                  backgroundColor: 'white',
+                  borderRadius: '6px',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                  borderLeft: '3px solid #27ae60'
                 }}>
-                  <h3>How to Play</h3>
-                  <ol className="instruction-steps">
-                    <li>Type commands in the box on the right (you can use multiple commands separated by commas, like "turn right, move 2")</li>
-                    <li>Use <code>move 2</code> to move 2 spaces forward</li>
-                    <li>Use <code>turn right</code>, <code>turn left</code>, <code>turn up</code>, or <code>turn down</code> to change direction</li>
-                    <li>Use <code>collect</code> when on a diamond to collect it</li>
-                    <li>Use <code>say Hello!</code> to make your character say something in a speech bubble!</li>
-                    <li>Collect all 3 diamonds to complete the level!</li>
-                  </ol>
+                  <div 
+                    style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center',
+                      cursor: 'pointer',
+                      userSelect: 'none'
+                    }}
+                    onClick={() => setShowHowToPlay(!showHowToPlay)}
+                  >
+                    <h3 style={{ margin: 0, color: '#27ae60' }}>How to Play</h3>
+                    <span style={{ 
+                      fontSize: '1.2rem', 
+                      color: '#27ae60',
+                      transition: 'transform 0.3s ease',
+                      transform: showHowToPlay ? 'rotate(180deg)' : 'rotate(0deg)'
+                    }}>
+                      ▼
+                    </span>
+                  </div>
+                  {showHowToPlay && (
+                    <ol className="instruction-steps" style={{ marginTop: '10px', marginBottom: 0 }}>
+                      <li>Type commands in the box on the right (you can use multiple commands separated by commas, like "turn right, move 2")</li>
+                      <li>Use <code>move 2</code> to move 2 spaces forward</li>
+                      <li>Use <code>turn right</code>, <code>turn left</code>, <code>turn up</code>, or <code>turn down</code> to change direction</li>
+                      <li>Use <code>collect</code> when on a diamond to collect it</li>
+                      <li>Use <code>say Hello!</code> to make your character say something in a speech bubble!</li>
+                      <li>Collect all 3 diamonds to complete the level!</li>
+                    </ol>
+                  )}
                 </div>
                 
                 {/* Game Grid */}
@@ -702,9 +729,10 @@ function AdventurePage() {
                   borderRadius: '8px',
                   padding: '10px',
                   boxShadow: 'inset 0 0 10px rgba(52, 152, 219, 0.2)',
-                  overflow: 'visible',
-                  minHeight: 0,
-                  position: 'relative'
+                  overflow: 'auto',
+                  minHeight: '300px',
+                  position: 'relative',
+                  marginTop: 'auto'
                 }}>
                   <div className="game-grid" ref={gridRef} style={{ position: 'relative' }}>
                     {grid.map((row, rowIndex) => (
