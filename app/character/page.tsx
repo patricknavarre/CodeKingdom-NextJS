@@ -12,7 +12,7 @@ const boyCharacter = '/images/characters/Boy_Character_BrownHair.png';
 const brownGirlCharacter = '/images/characters/Brown_Girl_Character_BlackHair.png';
 const brownBoyCharacter = '/images/characters/Brown_Boy_Character_BlackHair.png';
 const blondeGirlCharacter = '/images/characters/Girl_Character_BlondeHair.png';
-const blondeBoyCharacter = '/images/characters/Boy_Character_BlondeHair.png'; // <-- add file in public/images/characters
+const blondeBoyCharacter = '/images/characters/Boy_Character_BlondeHair_NEW.png'; // <-- new file in public/images/characters
 const girlCharacterHoodie = '/images/characters/Girl_Character_In_PinkHoodie.png';
 const girlCharacterHoodieSneakers = '/images/characters/Girl_Character_In_PinkHoodie_WhiteSneakers.png';
 
