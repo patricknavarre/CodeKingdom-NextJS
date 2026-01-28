@@ -67,21 +67,48 @@ const CHALLENGES: Challenge[] = [
   },
   {
     id: 4,
-    title: 'Build a House',
-    description: 'Create a complete house structure',
-    challenge: 'Build a house with walls and a roof',
-    requirements: { minBlocks: 20, structure: 'house' },
+    title: 'Build a Simple Pyramid',
+    description: 'Use loops to build a small pyramid',
+    challenge: 'Create a pyramid 4 blocks wide at the base using a for loop',
+    requirements: { minBlocks: 10, useLoop: true },
     xpReward: 100,
-    coinsReward: 50
+    coinsReward: 40
   },
   {
     id: 5,
-    title: 'Pyramid with Loops',
-    description: 'Use loops to build a pyramid',
-    challenge: 'Create a pyramid using a for loop',
-    requirements: { minBlocks: 15, useLoop: true },
+    title: 'Build a Bridge',
+    description: 'Create a bridge connecting two points',
+    challenge: 'Build a bridge with two towers and blocks connecting them',
+    requirements: { minBlocks: 15 },
     xpReward: 125,
+    coinsReward: 50
+  },
+  {
+    id: 6,
+    title: 'Build a Staircase',
+    description: 'Create stairs going upward',
+    challenge: 'Build a staircase that goes up 5 steps using a loop',
+    requirements: { minBlocks: 15, useLoop: true },
+    xpReward: 150,
     coinsReward: 60
+  },
+  {
+    id: 7,
+    title: 'Build a Castle Tower',
+    description: 'Create a tall defensive tower',
+    challenge: 'Build a tall tower with walls around it (at least 25 blocks)',
+    requirements: { minBlocks: 25 },
+    xpReward: 200,
+    coinsReward: 75
+  },
+  {
+    id: 8,
+    title: 'Build a House',
+    description: 'Create a complete house structure',
+    challenge: 'Build a house with four walls and a roof (at least 30 blocks)',
+    requirements: { minBlocks: 30, structure: 'house' },
+    xpReward: 300,
+    coinsReward: 100
   }
 ];
 
@@ -1097,14 +1124,29 @@ except Exception as e:
         'Example: create_wall(length=10) creates 10 blocks from (0,0,0) to (9,0,0).'
       ],
       4: [
-        'Build walls for the house structure, then add a roof on top.',
-        'Use multiple create_wall() calls to build the four walls of a house.',
-        'Then use place_block() or build_tower() to add a roof on top of the walls.'
+        'Use a for loop to build a pyramid layer by layer.',
+        'Try: for i in range(4): build_tower(height=4-i, x=i, z=i)',
+        'Each layer of the pyramid should be smaller than the one below it. Start with a 4-block base and decrease by 1 each layer.'
       ],
       5: [
-        'Use a for loop to build a pyramid layer by layer.',
-        'Try: for i in range(5): build_tower(height=5-i, x=i, z=i)',
-        'Each layer of the pyramid should be smaller than the one below it.'
+        'Build two towers, then connect them with blocks.',
+        'Try: build_tower(height=3, x=0, z=0) and build_tower(height=3, x=5, z=0)',
+        'Then use place_block() or a loop to place blocks between the towers at the same height.'
+      ],
+      6: [
+        'Use a for loop to place blocks that go up one step at a time.',
+        'Try: for i in range(5): place_block(i, i, 0, "red")',
+        'Each step should be one block higher (y coordinate increases) and one block forward (x coordinate increases).'
+      ],
+      7: [
+        'Build a tall central tower, then add walls around it.',
+        'Start with build_tower(height=8) for the center, then use create_wall() to build walls around it.',
+        'You can use multiple create_wall() calls at different positions to create a square or rectangular base.'
+      ],
+      8: [
+        'Build four walls to form the base of the house, then add a roof on top.',
+        'Use create_wall() to build each of the four walls. Try walls at different positions and directions.',
+        'Then use place_block() or build_tower() to add a roof on top of the walls. The roof should be at a higher y coordinate than the walls.'
       ]
     };
     return hints[challengeId] || ['Keep trying! You can do it!'];
