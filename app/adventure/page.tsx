@@ -287,6 +287,11 @@ function AdventurePage() {
     };
     
     const completeLevel = () => {
+      // Safety check: only allow completion when all diamonds are collected
+      if (diamonds < 3) {
+        addToLog('You need all 3 diamonds before you can finish the level.');
+        return;
+      }
       const currentReward = getRewardForLevel(level);
       setRewardItem(currentReward);
       
