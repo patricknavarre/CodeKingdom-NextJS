@@ -9,6 +9,7 @@ import '@/styles/AdventureGamePage.css';
 // Image paths for Next.js public folder
 const pinkHoodie = '/images/items/Pink_Hoodie.png';
 const whiteSneakers = '/images/items/WhiteSneakers.png';
+const stanleyBlue = '/images/items/Accessory_Stanley_Blue.png';
 const girlCharacter = '/images/characters/Girl_Character_BrownHair.png';
 const boyCharacter = '/images/characters/Boy_Character_BrownHair.png';
 const brownGirlCharacter = '/images/characters/Brown_Girl_Character_BlackHair.png';
@@ -140,6 +141,9 @@ function AdventurePage() {
     const getRewardForLevel = (currentLevel: number) => {
       if (currentLevel === 2) {
         return { name: 'White Sneakers', image: whiteSneakers };
+      }
+      if (currentLevel === 3) {
+        return { name: 'Stanley Blue Water Bottle', image: stanleyBlue };
       }
       // Generic reward display for levels without an item reward
       return { name: 'Level Complete', image: pinkHoodie };
@@ -340,23 +344,38 @@ function AdventurePage() {
       
       // Only add item if player doesn't already have it and this level has an item reward
       // Note: Level 1 no longer grants a Pink Hoodie; rewards are coins/XP only.
-      if (!alreadyHasItem && level === 2) {
+      if (!alreadyHasItem && (level === 2 || level === 3)) {
         addToLog(`You received ${currentReward.name}! 🎁`);
         
         // Show reward modal
         setShowReward(true);
         
-        // Add the reward item to the character's inventory (currently Level 2 only)
-        const newAccessory: Accessory = {
-          id: 'white-sneakers-' + Date.now(),
-          name: 'White Sneakers',
-          type: 'tool' as const,
-          image: whiteSneakers,
-          description: 'Cool white sneakers earned from the Code Grid Adventure game',
-          rarity: 'rare' as const,
-          isEquipped: false,
-          source: 'adventure' as const
-        };
+        // Add the reward item to the character's inventory
+        let newAccessory: Accessory;
+        if (level === 2) {
+          newAccessory = {
+            id: 'white-sneakers-' + Date.now(),
+            name: 'White Sneakers',
+            type: 'tool' as const,
+            image: whiteSneakers,
+            description: 'Cool white sneakers earned from the Code Grid Adventure game',
+            rarity: 'rare' as const,
+            isEquipped: false,
+            source: 'adventure' as const
+          };
+        } else {
+          // Level 3 - Stanley Blue Water Bottle
+          newAccessory = {
+            id: 'stanley-blue-' + Date.now(),
+            name: 'Stanley Blue Water Bottle',
+            type: 'tool' as const,
+            image: stanleyBlue,
+            description: 'Stay hydrated in style! Earned from the Code Grid Adventure game',
+            rarity: 'rare' as const,
+            isEquipped: false,
+            source: 'adventure' as const
+          };
+        }
         
         addAccessory(newAccessory);
       } else {

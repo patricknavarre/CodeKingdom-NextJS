@@ -18,6 +18,7 @@ const lipBalm = '/images/items/LipBalm.png';
 const pinkSkateboard = '/images/items/PinkSkateboard.png';
 const sharkSkateboard = '/images/items/SharkSkateboard.png';
 const sharkHockeyStick = '/images/items/SharkHockeyStick.png';
+const stanleyBlue = '/images/items/Accessory_Stanley_Blue.png';
 
 interface ShopItem {
   id: string;
@@ -144,6 +145,16 @@ const shopItems: ShopItem[] = [
     image: sharkHockeyStick,
     description: 'A powerful shark-themed hockey stick for scoring goals in style!',
     price: 125,
+    rarity: 'rare',
+    category: 'accessories'
+  },
+  {
+    id: 'stanley-blue',
+    name: 'Stanley Blue Water Bottle',
+    type: 'tool',
+    image: stanleyBlue,
+    description: 'Stay hydrated in style with this trendy blue Stanley water bottle!',
+    price: 150,
     rarity: 'rare',
     category: 'accessories'
   },
