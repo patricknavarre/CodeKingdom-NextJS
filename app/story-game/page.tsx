@@ -445,17 +445,17 @@ export default function StoryGamePage() {
                   <div className="how-to-play-content" style={{ display: 'block' }}>
                     <ol>
                       <li>Write Python code in the editor below</li>
-                      <li><strong>Move to different locations</strong> to find items! Use <code>move_to("forest_clearing")</code> to explore</li>
-                      <li>When you see a glowing item in the scene, use <code>collect_item("key")</code> to collect it</li>
+                      <li><strong>Move to different locations</strong> to find items! Use <code>move_to("some_location")</code> to explore</li>
+                      <li>When you see a glowing item in the scene, use <code>collect_item("item_name")</code> to collect it</li>
                       <li>Use <code>if "key" in inventory: open_door()</code> to make decisions</li>
                       <li>Click the <strong>"▶ Run Code"</strong> button to execute</li>
                       <li>Watch your character move and collect items!</li>
                     </ol>
                     <div className="quest-hint">
                       <strong>🎯 Your Quest:</strong>
-                      <p>To find the key, you need to <strong>move to the forest clearing</strong>!</p>
-                      <p><strong>Step 1:</strong> Run <code>move_to("forest_clearing")</code></p>
-                      <p><strong>Step 2:</strong> When you see the glowing key, run <code>collect_item("key")</code></p>
+                      <p>There is a hidden key somewhere in the forest. You need to <strong>move through different locations</strong> until you discover it.</p>
+                      <p><strong>Step 1:</strong> Use <code>move_to("location_name")</code> to travel around the map.</p>
+                      <p><strong>Step 2:</strong> When you see a glowing key, run <code>collect_item("key")</code> to pick it up.</p>
                       <p><strong>Step 3:</strong> Then use <code>if "key" in inventory: open_door()</code> to open the door!</p>
                     </div>
                     {availableItems.length > 0 && (
@@ -473,12 +473,12 @@ export default function StoryGamePage() {
                         <div className="location-guide">
                           <p><strong>📍 Available Locations:</strong></p>
                           <ul>
-                            <li><code>forest_path</code> - Has a map</li>
-                            <li><code>forest_clearing</code> - <strong>Has the KEY! 🗝️</strong></li>
-                            <li><code>forest_exit</code> - The door you need to open</li>
+                            <li><code>forest_path</code></li>
+                            <li><code>forest_clearing</code></li>
+                            <li><code>forest_exit</code></li>
                           </ul>
                         </div>
-                        <p className="hint-emphasis">💡 <strong>Try this:</strong> Run <code>move_to("forest_clearing")</code> to find the key!</p>
+                        <p className="hint-emphasis">💡 <strong>Try this:</strong> Experiment with different calls to <code>move_to("some_location")</code> until you spot something glowing.</p>
                       </div>
                     )}
                     {/* Debug info - remove in production */}
