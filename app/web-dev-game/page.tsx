@@ -530,6 +530,31 @@ export default function WebDevGamePage() {
   // 'html' = show only HTML editor bigger, 'css' = show only CSS editor bigger, null = show both
   const [expandedEditor, setExpandedEditor] = useState<'html' | 'css' | null>(null);
 
+  // Persist current level so players resume the Web Dev Game where they left off
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const savedLevel = window.localStorage.getItem('webdev-current-level');
+      if (savedLevel !== null) {
+        const parsed = parseInt(savedLevel, 10);
+        if (!isNaN(parsed) && parsed >= 0 && parsed < levels.length) {
+          setCurrentLevel(parsed);
+        }
+      }
+    } catch (e) {
+      console.warn('Unable to load saved Web Dev Game level:', e);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem('webdev-current-level', String(currentLevel));
+    } catch (e) {
+      console.warn('Unable to save Web Dev Game level:', e);
+    }
+  }, [currentLevel]);
+
   // Initialize code when level changes
   useEffect(() => {
     if (level) {
