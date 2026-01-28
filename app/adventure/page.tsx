@@ -551,8 +551,8 @@ function AdventurePage() {
           <Navigation />
           <div className="adventure-game" style={{ height: 'calc(100vh - 100px)', display: 'flex', flexDirection: 'column', overflow: 'auto', paddingBottom: '20px' }}>
             <div style={{ marginBottom: '8px', flexShrink: 0 }}>
-              <h1 style={{ margin: 0, fontSize: '1.6rem' }}>Code Adventure</h1>
-              <p style={{ margin: '4px 0 0 0', fontSize: '0.9rem', color: '#666' }}>Control your character with code to collect diamonds!</p>
+              <h1 style={{ margin: 0, fontSize: '1.6rem' }}>Code Grid Adventure</h1>
+              <p style={{ margin: '4px 0 0 0', fontSize: '0.9rem', color: '#666' }}>Use code to navigate the grid, avoid walls, and collect all the diamonds!</p>
             </div>
             
             {/* Diamond Celebration Modal */}
@@ -819,7 +819,7 @@ function AdventurePage() {
                     <div className="key-item" style={{ backgroundColor: '#f8f9fa', padding: '4px 8px', borderRadius: '3px', fontSize: '0.85rem' }}>collect</div>
                     <div className="key-item" style={{ backgroundColor: '#f8f9fa', padding: '4px 8px', borderRadius: '3px', fontSize: '0.85rem' }}>say &lt;message&gt;</div>
                   </div>
-                  <div className="command-input">
+                    <div className="command-input">
                     <div className="command-buttons" style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginBottom: '8px' }}>
                       <button 
                         onClick={() => {
@@ -912,7 +912,9 @@ function AdventurePage() {
                         }
                       }}
                     />
-                    <div className="command-tip" style={{ fontSize: '0.8rem', color: '#666', marginTop: '6px' }}>Tip: Press Enter to run your code! You can type multiple commands separated by commas (e.g., "turn right, move 2")</div>
+                    <div className="command-tip" style={{ fontSize: '0.8rem', color: '#666', marginTop: '6px' }}>
+                      Tip: You can **click the command buttons above** or **type your own commands** (separate multiple commands with commas, e.g. "turn right, move 2").
+                    </div>
                     <button 
                       onClick={executeCommand}
                       className="run-button"

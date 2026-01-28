@@ -77,7 +77,7 @@ export default function Navigation() {
           onClick={closeMenu} 
           className="nav-link adventure nav-sub-link"
         >
-          🎯 Adventure Game
+          🎯 Code Grid Adventure
         </Link>
         <Link 
           href="/web-dev-game" 
