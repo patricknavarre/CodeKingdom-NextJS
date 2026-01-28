@@ -85,6 +85,7 @@ export default function StoryGamePage() {
   const [lastRewards, setLastRewards] = useState({ coins: 0, experience: 0 });
   const [availableItems, setAvailableItems] = useState<string[]>([]);
   const [collectedItem, setCollectedItem] = useState<string | null>(null);
+  const [showCharacterCollectEffect, setShowCharacterCollectEffect] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(true); // Start expanded by default
 
   // Get character image
@@ -248,6 +249,9 @@ export default function StoryGamePage() {
           setCollectedItem(itemName);
           setTimeout(() => setCollectedItem(null), 2000);
         }
+        // Trigger a short sparkle effect near the character
+        setShowCharacterCollectEffect(true);
+        setTimeout(() => setShowCharacterCollectEffect(false), 800);
       }
 
       // Show detailed feedback
@@ -636,6 +640,12 @@ export default function StoryGamePage() {
                       alt="Pet"
                       className="pet-sprite"
                     />
+                  )}
+                  {/* Sparkle effect when collecting items */}
+                  {showCharacterCollectEffect && (
+                    <div className="character-collect-effect">
+                      ✨
+                    </div>
                   )}
                   {/* Display equipped accessories */}
                   {equippedAccessories.map((accessory, idx) => (
