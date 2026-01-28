@@ -198,6 +198,22 @@ export default function BlockBuilderPage() {
         sceneRef.current.appendChild(renderer.domElement);
         rendererRef.current = renderer;
 
+        // Fun cursor for orbit controls so kids know they can drag to rotate the grid
+        const canvasEl = renderer.domElement;
+        canvasEl.style.cursor = 'grab';
+        const handleMouseDown = () => {
+          canvasEl.style.cursor = 'grabbing';
+        };
+        const handleMouseUp = () => {
+          canvasEl.style.cursor = 'grab';
+        };
+        const handleMouseLeave = () => {
+          canvasEl.style.cursor = 'grab';
+        };
+        canvasEl.addEventListener('mousedown', handleMouseDown);
+        window.addEventListener('mouseup', handleMouseUp);
+        canvasEl.addEventListener('mouseleave', handleMouseLeave);
+
         // Controls
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
@@ -380,6 +396,12 @@ export default function BlockBuilderPage() {
           if (animationId) {
             cancelAnimationFrame(animationId);
           }
+          if (renderer && renderer.domElement) {
+            const canvas = renderer.domElement;
+            canvas.removeEventListener('mousedown', handleMouseDown);
+            canvas.removeEventListener('mouseleave', handleMouseLeave);
+          }
+          window.removeEventListener('mouseup', handleMouseUp);
           if (renderer && renderer.domElement && renderer.domElement.parentNode) {
             renderer.domElement.parentNode.removeChild(renderer.domElement);
           }
