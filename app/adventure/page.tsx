@@ -109,6 +109,32 @@ function AdventurePage() {
     const [commandSequence, setCommandSequence] = useState<string[]>([]);
     const [diamondsCollectedThisSequence, setDiamondsCollectedThisSequence] = useState(0);
     
+    // Load saved level from localStorage so players resume where they left off
+    useEffect(() => {
+      if (typeof window === 'undefined') return;
+      try {
+        const saved = window.localStorage.getItem('codegrid-current-level');
+        if (saved) {
+          const parsed = parseInt(saved, 10);
+          if (!isNaN(parsed) && parsed >= 1) {
+            setLevel(parsed);
+          }
+        }
+      } catch (e) {
+        console.warn('Unable to load saved Code Grid Adventure level:', e);
+      }
+    }, []);
+
+    // Persist level whenever it changes
+    useEffect(() => {
+      if (typeof window === 'undefined') return;
+      try {
+        window.localStorage.setItem('codegrid-current-level', String(level));
+      } catch (e) {
+        console.warn('Unable to save Code Grid Adventure level:', e);
+      }
+    }, [level]);
+
     // Determine reward based on level
     // Note: Level 1 no longer grants the Pink Hoodie (available in the shop instead).
     const getRewardForLevel = (currentLevel: number) => {
