@@ -1146,6 +1146,7 @@ except Exception as e:
                         <li>Use commands like <code>place_block(x, y, z, "color")</code> to place individual blocks</li>
                         <li>Use <code>build_tower(height=5)</code> to quickly build vertical structures</li>
                         <li>Use <code>create_wall(length=10)</code> to build horizontal walls</li>
+                        <li><strong>Coordinates guide:</strong> <code>x</code> is left ↔ right, <code>y</code> is up ↕ down (height), and <code>z</code> is forward ↔ back on the grid. The X/Z numbers around the grid match these values.</li>
                         <li>Click <strong>"▶ Run Code"</strong> or press <strong>Ctrl+Enter</strong> to execute your code</li>
                         <li>Watch your blocks appear in the <strong>3D World</strong> on the right!</li>
                         <li>Complete challenges to earn XP, coins, and points!</li>
