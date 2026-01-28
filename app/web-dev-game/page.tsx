@@ -533,6 +533,58 @@ export default function WebDevGamePage() {
     }
   }, [currentLevel]);
 
+  // Helper to combine HTML and CSS into a full document string
+  const buildFullHtml = () => {
+    let fullHtml = htmlCode;
+    
+    // Check if CSS code has actual CSS rules (not just comments or empty)
+    const hasActualCSS = cssCode && cssCode.trim() && 
+      !cssCode.replace(/\/\*[\s\S]*?\*\//g, '').trim().match(/^\/\/.*$/m) && // Not just comments
+      cssCode.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '').trim().length > 0; // Has actual CSS after removing comments
+    
+    // Check if HTML already has a style tag
+    const hasStyleTag = /<style[\s\S]*?<\/style>/gi.test(fullHtml);
+    
+    if (hasStyleTag) {
+      if (hasActualCSS) {
+        // Replace the content of existing style tag with CSS from editor
+        fullHtml = fullHtml.replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, `<style>${cssCode}</style>`);
+      }
+      // If CSS editor only has comments, keep the existing style tag as-is
+    } else {
+      // No style tag exists, add one with CSS from editor (only if there's actual CSS)
+      const cssToAdd = hasActualCSS ? `<style>${cssCode}</style>` : '';
+      
+      if (cssToAdd) {
+        if (fullHtml.includes('</head>')) {
+          // Add style tag before closing head
+          fullHtml = fullHtml.replace('</head>', `${cssToAdd}</head>`);
+        } else if (fullHtml.includes('<head>')) {
+          // Add style tag after opening head
+          fullHtml = fullHtml.replace('<head>', `<head>${cssToAdd}`);
+        } else if (fullHtml.includes('<html>')) {
+          // Add head with style if html tag exists but no head
+          fullHtml = fullHtml.replace('<html>', `<html><head>${cssToAdd}</head>`);
+        } else if (fullHtml.includes('<!DOCTYPE')) {
+          // Add after DOCTYPE
+          if (!fullHtml.includes('<html>')) {
+            fullHtml = fullHtml.replace('<!DOCTYPE html>', `<!DOCTYPE html><html><head>${cssToAdd}</head><body>`);
+            if (!fullHtml.includes('</body>')) {
+              fullHtml += '</body></html>';
+            }
+          } else {
+            fullHtml = fullHtml.replace('<html>', `<html><head>${cssToAdd}</head>`);
+          }
+        } else {
+          // No structure, wrap everything
+          fullHtml = `<!DOCTYPE html><html><head>${cssToAdd}</head><body>${fullHtml}</body></html>`;
+        }
+      }
+    }
+    
+    return fullHtml;
+  };
+
   // Update preview in real-time
   useEffect(() => {
     // Small delay to ensure iframe is ready
@@ -550,53 +602,7 @@ export default function WebDevGamePage() {
         const doc = iframe.contentDocument || iframe.contentWindow?.document;
         
         if (doc) {
-          // Combine HTML and CSS
-          let fullHtml = htmlCode;
-          
-          // Check if CSS code has actual CSS rules (not just comments or empty)
-          const hasActualCSS = cssCode && cssCode.trim() && 
-            !cssCode.replace(/\/\*[\s\S]*?\*\//g, '').trim().match(/^\/\/.*$/m) && // Not just comments
-            cssCode.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '').trim().length > 0; // Has actual CSS after removing comments
-          
-          // Check if HTML already has a style tag
-          const hasStyleTag = /<style[\s\S]*?<\/style>/gi.test(fullHtml);
-          
-          if (hasStyleTag) {
-            if (hasActualCSS) {
-              // Replace the content of existing style tag with CSS from editor
-              fullHtml = fullHtml.replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, `<style>${cssCode}</style>`);
-            }
-            // If CSS editor only has comments, keep the existing style tag as-is
-          } else {
-            // No style tag exists, add one with CSS from editor (only if there's actual CSS)
-            const cssToAdd = hasActualCSS ? `<style>${cssCode}</style>` : '';
-            
-            if (cssToAdd) {
-              if (fullHtml.includes('</head>')) {
-                // Add style tag before closing head
-                fullHtml = fullHtml.replace('</head>', `${cssToAdd}</head>`);
-              } else if (fullHtml.includes('<head>')) {
-                // Add style tag after opening head
-                fullHtml = fullHtml.replace('<head>', `<head>${cssToAdd}`);
-              } else if (fullHtml.includes('<html>')) {
-                // Add head with style if html tag exists but no head
-                fullHtml = fullHtml.replace('<html>', `<html><head>${cssToAdd}</head>`);
-              } else if (fullHtml.includes('<!DOCTYPE')) {
-                // Add after DOCTYPE
-                if (!fullHtml.includes('<html>')) {
-                  fullHtml = fullHtml.replace('<!DOCTYPE html>', `<!DOCTYPE html><html><head>${cssToAdd}</head><body>`);
-                  if (!fullHtml.includes('</body>')) {
-                    fullHtml += '</body></html>';
-                  }
-                } else {
-                  fullHtml = fullHtml.replace('<html>', `<html><head>${cssToAdd}</head>`);
-                }
-              } else {
-                // No structure, wrap everything
-                fullHtml = `<!DOCTYPE html><html><head>${cssToAdd}</head><body>${fullHtml}</body></html>`;
-              }
-            }
-          }
+          const fullHtml = buildFullHtml();
           
           try {
             doc.open();
@@ -679,6 +685,33 @@ export default function WebDevGamePage() {
     }
   };
 
+  // Determine if the user has completed all levels
+  const allLevelsCompleted = levels.every(l => completedLevels.includes(l.id));
+
+  const exportWebsite = () => {
+    if (!allLevelsCompleted) {
+      alert('Complete all levels in the Web Developer Game before exporting your website.');
+      return;
+    }
+    
+    const fullHtml = buildFullHtml();
+    
+    try {
+      const blob = new Blob([fullHtml], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'codekingdom-website.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error exporting website:', error);
+      alert('Sorry, something went wrong exporting your website.');
+    }
+  };
+
   const backgroundStyle = character.background ? {
     background: character.background.value,
     backgroundAttachment: 'fixed',
@@ -700,9 +733,16 @@ export default function WebDevGamePage() {
                 <span className="points-display">🏆 {character.points || 0} Points</span>
               </div>
             </div>
-            
-            {/* Character and Pet display */}
-            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+            {/* Export + Character and Pet display */}
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <button
+                className="btn-secondary"
+                onClick={exportWebsite}
+                disabled={!allLevelsCompleted}
+                style={{ whiteSpace: 'nowrap' }}
+              >
+                {allLevelsCompleted ? 'Export My Website' : 'Export (finish all levels)'}
+              </button>
               {/* Character display */}
               <div className="character-display-panel" style={{
                 backgroundColor: 'white',
