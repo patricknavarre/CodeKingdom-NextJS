@@ -12,6 +12,7 @@ const boyCharacter = '/images/characters/Boy_Character_BrownHair.png';
 const brownGirlCharacter = '/images/characters/Brown_Girl_Character_BlackHair.png';
 const brownBoyCharacter = '/images/characters/Brown_Boy_Character_BlackHair.png';
 const blondeGirlCharacter = '/images/characters/Girl_Character_BlondeHair.png';
+const blondeBoyCharacter = '/images/characters/Boy_Character_BlondeHair.png'; // <-- add file in public/images/characters
 const girlCharacterHoodie = '/images/characters/Girl_Character_In_PinkHoodie.png';
 const girlCharacterHoodieSneakers = '/images/characters/Girl_Character_In_PinkHoodie_WhiteSneakers.png';
 
@@ -21,7 +22,8 @@ const CHARACTERS = [
   { id: 'boy1', name: 'Boy with Brown Hair', image: boyCharacter },
   { id: 'brown-girl1', name: 'Girl with Black Hair', image: brownGirlCharacter },
   { id: 'brown-boy1', name: 'Boy with Black Hair', image: brownBoyCharacter },
-  { id: 'blonde-girl1', name: 'Girl with Blonde Hair', image: blondeGirlCharacter }
+  { id: 'blonde-girl1', name: 'Girl with Blonde Hair', image: blondeGirlCharacter },
+  { id: 'blonde-boy1', name: 'Boy with Blonde Hair', image: blondeBoyCharacter }
 ];
 
 export default function CharacterPage() {

@@ -14,6 +14,7 @@ const boyCharacter = '/images/characters/Boy_Character_BrownHair.png';
 const brownGirlCharacter = '/images/characters/Brown_Girl_Character_BlackHair.png';
 const brownBoyCharacter = '/images/characters/Brown_Boy_Character_BlackHair.png';
 const blondeGirlCharacter = '/images/characters/Girl_Character_BlondeHair.png';
+const blondeBoyCharacter = '/images/characters/Boy_Character_BlondeHair.png'; // new blonde boy base
 const girlHoodieCharacter = '/images/characters/Girl_Character_In_PinkHoodie.png';
 const girlHoodieSneakersCharacter = '/images/characters/Girl_Character_In_PinkHoodie_WhiteSneakers.png';
 const PetAxolotyl = '/images/items/Pet_Axolotyl.png';
@@ -110,6 +111,7 @@ export default function StoryGamePage() {
     if (character.id === 'brown-boy1') return brownBoyCharacter;
     if (character.id === 'brown-girl1') return brownGirlCharacter;
     if (character.id === 'blonde-girl1') return blondeGirlCharacter;
+    if (character.id === 'blonde-boy1') return blondeBoyCharacter;
     return girlCharacter;
   };
 
