@@ -80,6 +80,13 @@ export default function Navigation() {
           🎯 Code Grid Adventure
         </Link>
         <Link 
+          href="/side-scroller" 
+          onClick={closeMenu} 
+          className="nav-link adventure nav-sub-link"
+        >
+          🏃‍♂️ Side Scroller Run
+        </Link>
+        <Link 
           href="/web-dev-game" 
           onClick={closeMenu} 
           className="nav-link webdev nav-sub-link"
