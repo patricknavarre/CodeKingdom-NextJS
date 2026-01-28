@@ -38,7 +38,7 @@
   overflow: hidden;
 }
 
-.character {
+.character-page .character {
   font-size: 80px;
   position: relative;
   height: 200px;
