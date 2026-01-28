@@ -220,7 +220,7 @@ export default function BlockBuilderPage() {
         scene.add(gridHelper);
 
         // Coordinate labels along X (left-right) and Z (forward-back) axes to help players place blocks
-        const createNumberSprite = (text: string) => {
+        const createLabelSprite = (text: string, scale: number = 0.6) => {
           const size = 128;
           const canvas = document.createElement('canvas');
           canvas.width = size;
@@ -239,13 +239,13 @@ export default function BlockBuilderPage() {
           const texture = new THREE.CanvasTexture(canvas);
           const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
           const sprite = new THREE.Sprite(material);
-          sprite.scale.set(0.6, 0.6, 0.6);
+          sprite.scale.set(scale, scale, scale);
           return sprite;
         };
 
         // Labels assume blocks are placed at integer coordinates 0–9 on x and z, matching the grid
         for (let x = 0; x <= 9; x++) {
-          const sprite = createNumberSprite(String(x));
+          const sprite = createLabelSprite(String(x), 0.55);
           if (sprite) {
             sprite.position.set(x, 0.01, -1.1); // just in front of the grid
             scene.add(sprite);
@@ -253,11 +253,30 @@ export default function BlockBuilderPage() {
         }
 
         for (let z = 0; z <= 9; z++) {
-          const sprite = createNumberSprite(String(z));
+          const sprite = createLabelSprite(String(z), 0.55);
           if (sprite) {
             sprite.position.set(-1.1, 0.01, z); // along the left edge of the grid
             scene.add(sprite);
           }
+        }
+
+        // Axis labels to show which direction is X, Z, and Y
+        const xLabel = createLabelSprite('X', 0.7);
+        if (xLabel) {
+          xLabel.position.set(9.8, 0.02, -2); // near front-right corner
+          scene.add(xLabel);
+        }
+
+        const zLabel = createLabelSprite('Z', 0.7);
+        if (zLabel) {
+          zLabel.position.set(-2, 0.02, 9.8); // near back-left corner
+          scene.add(zLabel);
+        }
+
+        const yLabel = createLabelSprite('Y', 0.7);
+        if (yLabel) {
+          yLabel.position.set(-2, 3, -2); // off to the side, floating upward
+          scene.add(yLabel);
         }
 
         // Ground
