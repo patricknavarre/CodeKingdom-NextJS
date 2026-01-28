@@ -110,13 +110,13 @@ function AdventurePage() {
     const [diamondsCollectedThisSequence, setDiamondsCollectedThisSequence] = useState(0);
     
     // Determine reward based on level
+    // Note: Level 1 no longer grants the Pink Hoodie (available in the shop instead).
     const getRewardForLevel = (currentLevel: number) => {
-      if (currentLevel === 1) {
-        return { name: 'Pink Hoodie', image: pinkHoodie };
-      } else if (currentLevel === 2) {
+      if (currentLevel === 2) {
         return { name: 'White Sneakers', image: whiteSneakers };
       }
-      return { name: 'Pink Hoodie', image: pinkHoodie }; // Default
+      // Generic reward display for levels without an item reward
+      return { name: 'Level Complete', image: pinkHoodie };
     };
     
     const [rewardItem, setRewardItem] = useState(getRewardForLevel(1));
@@ -214,9 +214,13 @@ function AdventurePage() {
             addToLog('You are standing on a diamond! Use "collect" to pick it up.');
           }
           
-          // Check for goal
-          if (grid[newY][newX] === 3 && diamonds === 3) {
-            completeLevel();
+          // Check for goal flag (🏁)
+          if (grid[newY][newX] === 3) {
+            if (diamonds === 3) {
+              completeLevel();
+            } else {
+              addToLog('You found the finish flag, but you need all 3 diamonds before you can finish the level.');
+            }
           }
           
           resolve();
@@ -276,12 +280,9 @@ function AdventurePage() {
         setShowDiamondCelebration(false);
       }, 2000);
       
-      // Check if all diamonds are collected
+      // If all diamonds are collected, prompt player to reach the flag instead of auto-completing
       if (newDiamondCount === 3) {
-        // Small delay before showing level completion
-        setTimeout(() => {
-          completeLevel();
-        }, 2500);
+        addToLog('Great job! You collected all 3 diamonds. Now move to the finish flag (🏁) to complete the level.');
       }
     };
     
@@ -306,50 +307,25 @@ function AdventurePage() {
       addExperience(100);
       addPoints(levelCompletionPoints);
       
-      // Only add item if player doesn't already have it
-      if (!alreadyHasItem) {
+      // Only add item if player doesn't already have it and this level has an item reward
+      // Note: Level 1 no longer grants a Pink Hoodie; rewards are coins/XP only.
+      if (!alreadyHasItem && level === 2) {
         addToLog(`You received ${currentReward.name}! 🎁`);
         
         // Show reward modal
         setShowReward(true);
         
-        // Add the reward item to the character's inventory based on level
-        let newAccessory: Accessory;
-        if (level === 1) {
-          newAccessory = {
-            id: 'pink-hoodie-' + Date.now(),
-            name: 'Pink Hoodie',
-            type: 'hat' as const,
-            image: pinkHoodie,
-            description: 'A stylish pink hoodie earned from Level 1',
-            rarity: 'rare' as const,
-            isEquipped: false,
-            source: 'adventure' as const
-          };
-        } else if (level === 2) {
-          newAccessory = {
-            id: 'white-sneakers-' + Date.now(),
-            name: 'White Sneakers',
-            type: 'tool' as const,
-            image: whiteSneakers,
-            description: 'Cool white sneakers earned from Level 2',
-            rarity: 'rare' as const,
-            isEquipped: false,
-            source: 'adventure' as const
-          };
-        } else {
-          // Default fallback
-          newAccessory = {
-            id: 'pink-hoodie-' + Date.now(),
-            name: 'Pink Hoodie',
-            type: 'hat' as const,
-            image: pinkHoodie,
-            description: 'A stylish pink hoodie earned from the adventure game',
-            rarity: 'rare' as const,
-            isEquipped: false,
-            source: 'adventure' as const
-          };
-        }
+        // Add the reward item to the character's inventory (currently Level 2 only)
+        const newAccessory: Accessory = {
+          id: 'white-sneakers-' + Date.now(),
+          name: 'White Sneakers',
+          type: 'tool' as const,
+          image: whiteSneakers,
+          description: 'Cool white sneakers earned from the Code Grid Adventure game',
+          rarity: 'rare' as const,
+          isEquipped: false,
+          source: 'adventure' as const
+        };
         
         addAccessory(newAccessory);
       } else {
