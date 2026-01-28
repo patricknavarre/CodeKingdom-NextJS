@@ -28,10 +28,18 @@ interface Obstacle {
 
 const WORLD_WIDTH = 100;
 const GROUND_Y = 0;
-const GRAVITY = -160; // units per second^2
-const JUMP_VELOCITY = 65; // units per second
+// Physics tuned so jumps feel more “Mario-like” and reach coins comfortably
+const GRAVITY = -600; // units per second^2 (negative = pulls down)
+const JUMP_VELOCITY = 220; // units per second (upward)
 const MOVE_SPEED = 45; // horizontal units per second
 const CHARACTER_WIDTH = 8; // in world units
+
+type GameMode = 'play' | 'code';
+
+type ScriptAction =
+  | { type: 'run'; steps: number }
+  | { type: 'jump' }
+  | { type: 'wait'; seconds: number };
 
 const initialCoins: Coin[] = [
   { x: 22, y: 16, collected: false },
@@ -53,12 +61,28 @@ export default function SideScrollerPage() {
   // Character position (x is 0–100, y is height above ground)
   const [renderX, setRenderX] = useState(10);
   const [renderY, setRenderY] = useState(0);
+  const [mode, setMode] = useState<GameMode>('code'); // default to learning mode
   const [coins, setCoins] = useState<Coin[]>(initialCoins);
   const [collectedCount, setCollectedCount] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
   const [hasWon, setHasWon] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [statusType, setStatusType] = useState<'success' | 'error' | null>(null);
+  const [isRunningScript, setIsRunningScript] = useState(false);
+  const [codeText, setCodeText] = useState(
+    [
+      '# Code your run! Examples:',
+      '# run(4)',
+      '# jump()',
+      '# run(3)',
+      '',
+      'run(4)',
+      'jump()',
+      'run(3)',
+      'jump()',
+      'run(6)'
+    ].join('\n')
+  );
 
   // Physics & input refs
   const xRef = useRef(10);
@@ -69,6 +93,15 @@ export default function SideScrollerPage() {
   const gameOverRef = useRef(false);
   const hasWonRef = useRef(false);
   const rewardGivenRef = useRef(false);
+  const modeRef = useRef<GameMode>('code');
+
+  // Script control refs
+  const scriptActionsRef = useRef<ScriptAction[]>([]);
+  const currentActionIndexRef = useRef(0);
+  const isRunningScriptRef = useRef(false);
+  const jumpStartedRef = useRef(false);
+  const waitTimeLeftRef = useRef(0);
+  const targetRunXRef = useRef<number | null>(null);
 
   // Sync flags
   useEffect(() => {
@@ -78,6 +111,14 @@ export default function SideScrollerPage() {
   useEffect(() => {
     hasWonRef.current = hasWon;
   }, [hasWon]);
+
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
+
+  useEffect(() => {
+    isRunningScriptRef.current = isRunningScript;
+  }, [isRunningScript]);
 
   const resetGame = () => {
     xRef.current = 10;
@@ -90,7 +131,13 @@ export default function SideScrollerPage() {
     setCollectedCount(0);
     setIsGameOver(false);
     setHasWon(false);
+    setIsRunningScript(false);
     rewardGivenRef.current = false;
+    scriptActionsRef.current = [];
+    currentActionIndexRef.current = 0;
+    jumpStartedRef.current = false;
+    waitTimeLeftRef.current = 0;
+    targetRunXRef.current = null;
     setStatusMessage(null);
     setStatusType(null);
   };
@@ -98,6 +145,15 @@ export default function SideScrollerPage() {
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // In code mode we only listen for restart (R); movement comes from the script
+      if (modeRef.current === 'code') {
+        if (e.key.toLowerCase() === 'r') {
+          e.preventDefault();
+          resetGame();
+        }
+        return;
+      }
+
       if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') {
         e.preventDefault();
         keysRef.current.left = true;
@@ -121,6 +177,9 @@ export default function SideScrollerPage() {
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
+      if (modeRef.current === 'code') {
+        return;
+      }
       if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') {
         keysRef.current.left = false;
       }
@@ -152,8 +211,67 @@ export default function SideScrollerPage() {
         let y = yRef.current;
         let vy = velocityYRef.current;
 
+        const currentMode = modeRef.current;
+
         // Horizontal movement
-        const moveDir = (keysRef.current.right ? 1 : 0) - (keysRef.current.left ? 1 : 0);
+        let moveDir = 0;
+        if (currentMode === 'play') {
+          moveDir = (keysRef.current.right ? 1 : 0) - (keysRef.current.left ? 1 : 0);
+        } else if (currentMode === 'code' && isRunningScriptRef.current) {
+          const actions = scriptActionsRef.current;
+          const index = currentActionIndexRef.current;
+
+          if (index < actions.length) {
+            const action = actions[index];
+
+            if (action.type === 'wait') {
+              if (waitTimeLeftRef.current <= 0) {
+                waitTimeLeftRef.current = action.seconds;
+              }
+              waitTimeLeftRef.current -= deltaSeconds;
+              if (waitTimeLeftRef.current <= 0) {
+                currentActionIndexRef.current += 1;
+                waitTimeLeftRef.current = 0;
+              }
+            } else if (action.type === 'run') {
+              if (targetRunXRef.current == null) {
+                const stepSize = 6; // world units per "step"
+                targetRunXRef.current = Math.min(
+                  WORLD_WIDTH - CHARACTER_WIDTH / 2,
+                  Math.max(CHARACTER_WIDTH / 2, x + action.steps * stepSize)
+                );
+              }
+              if (targetRunXRef.current !== null) {
+                if (Math.abs(targetRunXRef.current - x) < 0.5) {
+                  x = targetRunXRef.current;
+                  targetRunXRef.current = null;
+                  currentActionIndexRef.current += 1;
+                } else {
+                  moveDir = targetRunXRef.current > x ? 1 : -1;
+                }
+              }
+            } else if (action.type === 'jump') {
+              if (!jumpStartedRef.current && onGroundRef.current) {
+                vy = JUMP_VELOCITY;
+                jumpStartedRef.current = true;
+                onGroundRef.current = false;
+              } else if (jumpStartedRef.current && onGroundRef.current) {
+                // Landed after jump, move to next action
+                jumpStartedRef.current = false;
+                currentActionIndexRef.current += 1;
+              }
+            }
+          } else {
+            // No more actions – stop script
+            isRunningScriptRef.current = false;
+            setIsRunningScript(false);
+            if (!hasWonRef.current && !gameOverRef.current) {
+              setStatusMessage('Program finished! Adjust your steps or jumps and try again.');
+              setStatusType('error');
+            }
+          }
+        }
+
         x += moveDir * MOVE_SPEED * deltaSeconds;
         x = Math.max(0 + CHARACTER_WIDTH / 2, Math.min(WORLD_WIDTH - CHARACTER_WIDTH / 2, x));
 
@@ -243,6 +361,66 @@ export default function SideScrollerPage() {
     return () => cancelAnimationFrame(animationId);
   }, [addCoins, addExperience, addPoints, collectedCount]);
 
+  // Parse and start script in code mode
+  const runScript = () => {
+    resetGame();
+    const lines = codeText.split('\n');
+    const actions: ScriptAction[] = [];
+    let lineNumber = 0;
+
+    for (const rawLine of lines) {
+      lineNumber += 1;
+      const line = rawLine.trim();
+      if (!line || line.startsWith('#')) continue;
+
+      const runMatch = line.match(/^run\((\d+)\)\s*$/i);
+      if (runMatch) {
+        const steps = parseInt(runMatch[1], 10);
+        if (steps <= 0) {
+          setStatusMessage(`Line ${lineNumber}: run() needs a positive number of steps.`);
+          setStatusType('error');
+          return;
+        }
+        actions.push({ type: 'run', steps });
+        continue;
+      }
+
+      if (/^jump\(\)\s*$/i.test(line)) {
+        actions.push({ type: 'jump' });
+        continue;
+      }
+
+      const waitMatch = line.match(/^wait\((\d+(\.\d+)?)\)\s*$/i);
+      if (waitMatch) {
+        const seconds = parseFloat(waitMatch[1]);
+        if (seconds < 0) {
+          setStatusMessage(`Line ${lineNumber}: wait() cannot be negative.`);
+          setStatusType('error');
+          return;
+        }
+        actions.push({ type: 'wait', seconds });
+        continue;
+      }
+
+      setStatusMessage(`I don't understand line ${lineNumber}: "${line}". Try run(3), jump(), or wait(1).`);
+      setStatusType('error');
+      return;
+    }
+
+    if (actions.length === 0) {
+      setStatusMessage('Add some commands first (like run(3) or jump()).');
+      setStatusType('error');
+      return;
+    }
+
+    scriptActionsRef.current = actions;
+    currentActionIndexRef.current = 0;
+    isRunningScriptRef.current = true;
+    setIsRunningScript(true);
+    setStatusMessage('Running your program...');
+    setStatusType(null);
+  };
+
   const collectedTotal = coins.filter(c => c.collected).length;
   const totalCoins = coins.length;
 
@@ -260,6 +438,7 @@ export default function SideScrollerPage() {
 
   // Helpers for mobile controls
   const pressLeft = () => {
+    if (modeRef.current === 'code') return;
     keysRef.current.left = true;
     setTimeout(() => {
       keysRef.current.left = false;
@@ -267,6 +446,7 @@ export default function SideScrollerPage() {
   };
 
   const pressRight = () => {
+    if (modeRef.current === 'code') return;
     keysRef.current.right = true;
     setTimeout(() => {
       keysRef.current.right = false;
@@ -274,6 +454,10 @@ export default function SideScrollerPage() {
   };
 
   const pressJump = () => {
+    if (modeRef.current === 'code') {
+      // In code mode, jump is controlled by the script
+      return;
+    }
     if (onGroundRef.current && !gameOverRef.current && !hasWonRef.current) {
       velocityYRef.current = JUMP_VELOCITY;
       onGroundRef.current = false;
@@ -306,24 +490,138 @@ export default function SideScrollerPage() {
 
           <main className="side-scroller-main">
             <section className="side-scroller-game-card">
+              <div className="side-scroller-mode-toggle" style={{ marginBottom: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+                <div style={{ fontSize: '0.9rem' }}>
+                  <strong>{mode === 'code' ? 'Code Mode' : 'Free Play Mode'}</strong>{' '}
+                  {mode === 'code'
+                    ? '- write commands to control your run.'
+                    : '- use keys or buttons to control your character.'}
+                </div>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  <button
+                    type="button"
+                    className="side-scroller-btn"
+                    style={mode === 'code' ? { opacity: 1 } : { opacity: 0.6 }}
+                    onClick={() => {
+                      setMode('code');
+                      resetGame();
+                    }}
+                  >
+                    💻 Code My Run
+                  </button>
+                  <button
+                    type="button"
+                    className="side-scroller-btn secondary"
+                    style={mode === 'play' ? { opacity: 1 } : { opacity: 0.6 }}
+                    onClick={() => {
+                      setMode('play');
+                      resetGame();
+                    }}
+                  >
+                    🎮 Free Run
+                  </button>
+                </div>
+              </div>
+
               <div className="side-scroller-instructions">
                 <h2>How to Play</h2>
                 <ul>
-                  <li>
-                    Use <span className="side-scroller-key">←</span> /{' '}
-                    <span className="side-scroller-key">A</span> and{' '}
-                    <span className="side-scroller-key">→</span> /{' '}
-                    <span className="side-scroller-key">D</span> to run left &amp; right.
-                  </li>
-                  <li>
-                    Press <span className="side-scroller-key">Space</span>,{' '}
-                    <span className="side-scroller-key">↑</span> or{' '}
-                    <span className="side-scroller-key">W</span> to jump over obstacles.
-                  </li>
-                  <li>Collect as many glowing coins as you can and reach the flag at the right side.</li>
-                  <li>Earn coins, XP, and points each time you reach the flag!</li>
+                  {mode === 'play' ? (
+                    <>
+                      <li>
+                        Use <span className="side-scroller-key">←</span> /{' '}
+                        <span className="side-scroller-key">A</span> and{' '}
+                        <span className="side-scroller-key">→</span> /{' '}
+                        <span className="side-scroller-key">D</span> to run left &amp; right.
+                      </li>
+                      <li>
+                        Press <span className="side-scroller-key">Space</span>,{' '}
+                        <span className="side-scroller-key">↑</span> or{' '}
+                        <span className="side-scroller-key">W</span> to jump over obstacles.
+                      </li>
+                      <li>Collect as many glowing coins as you can and reach the flag at the right side.</li>
+                      <li>Earn coins, XP, and points each time you reach the flag!</li>
+                    </>
+                  ) : (
+                    <>
+                      <li>Write a short “program” that tells your character how to run.</li>
+                      <li>
+                        Use commands like <code>run(3)</code>, <code>jump()</code>, and{' '}
+                        <code>wait(1)</code>. Each command goes on its own line.
+                      </li>
+                      <li>
+                        Click <strong>Run Program</strong> to watch your character follow your code from start to
+                        finish.
+                      </li>
+                      <li>Collect coins and reach the flag using as few commands as you can!</li>
+                    </>
+                  )}
                 </ul>
               </div>
+
+              {mode === 'code' && (
+                <div style={{ marginTop: '8px', display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '8px' }}>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <h3 style={{ margin: '0 0 4px', fontSize: '0.95rem' }}>Command Editor</h3>
+                      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                        <button
+                          type="button"
+                          className="side-scroller-btn secondary"
+                          onClick={() => setCodeText(prev => prev + '\nrun(3)')}
+                        >
+                          + run(3)
+                        </button>
+                        <button
+                          type="button"
+                          className="side-scroller-btn secondary"
+                          onClick={() => setCodeText(prev => prev + '\njump()')}
+                        >
+                          + jump()
+                        </button>
+                        <button
+                          type="button"
+                          className="side-scroller-btn secondary"
+                          onClick={() => setCodeText(prev => prev + '\nwait(1)')}
+                        >
+                          + wait(1)
+                        </button>
+                      </div>
+                    </div>
+                    <textarea
+                      value={codeText}
+                      onChange={e => setCodeText(e.target.value)}
+                      spellCheck={false}
+                      style={{
+                        width: '100%',
+                        minHeight: '110px',
+                        borderRadius: '10px',
+                        border: '1px solid #bdc3c7',
+                        padding: '8px',
+                        fontFamily: 'monospace',
+                        fontSize: '0.85rem',
+                        boxSizing: 'border-box',
+                        resize: 'vertical'
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <h3 style={{ margin: '0 0 4px', fontSize: '0.95rem' }}>Commands you can use</h3>
+                    <ul style={{ margin: 0, paddingLeft: 18, fontSize: '0.85rem', lineHeight: 1.4 }}>
+                      <li>
+                        <code>run(3)</code> – move forward 3 steps.
+                      </li>
+                      <li>
+                        <code>jump()</code> – jump once (use before an obstacle or gap).
+                      </li>
+                      <li>
+                        <code>wait(1)</code> – pause for 1 second before the next command.
+                      </li>
+                      <li>Put one command on each line.</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
 
               <div className="side-scroller-world">
                 {/* Character */}
@@ -331,7 +629,8 @@ export default function SideScrollerPage() {
                   className="side-scroller-character"
                   style={{
                     left: `${renderX}%`,
-                    transform: `translate(-50%, ${renderY}px)`
+                    // Positive renderY = jumping up, so we move visually upward with a negative translateY
+                    transform: `translate(-50%, ${-renderY}px)`
                   }}
                 >
                   <div className="side-scroller-character-inner">
@@ -391,17 +690,42 @@ export default function SideScrollerPage() {
                   <span>
                     {isGameOver && 'Game Over — press R or tap "Play Again"'}
                     {hasWon && !isGameOver && 'Nice run! Try to collect every coin.'}
-                    {!isGameOver && !hasWon && 'Run, jump, and reach the flag!'}
+                    {!isGameOver &&
+                      !hasWon &&
+                      (mode === 'play'
+                        ? 'Run, jump, and reach the flag!'
+                        : 'Write your program, then click Run Program.')}
                   </span>
                 </div>
                 <div className="side-scroller-controls">
-                  <button
-                    type="button"
-                    className="side-scroller-btn secondary"
-                    onClick={resetGame}
-                  >
-                    🔁 Play Again
-                  </button>
+                  {mode === 'code' ? (
+                    <>
+                      <button
+                        type="button"
+                        className="side-scroller-btn"
+                        onClick={runScript}
+                        disabled={isRunningScript}
+                      >
+                        ▶ Run Program
+                      </button>
+                      <button
+                        type="button"
+                        className="side-scroller-btn secondary"
+                        onClick={resetGame}
+                        disabled={isRunningScript}
+                      >
+                        🔁 Reset
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      className="side-scroller-btn secondary"
+                      onClick={resetGame}
+                    >
+                      🔁 Play Again
+                    </button>
+                  )}
                   <button
                     type="button"
                     className="side-scroller-btn"
