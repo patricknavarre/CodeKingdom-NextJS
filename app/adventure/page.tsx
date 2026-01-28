@@ -10,6 +10,7 @@ import '@/styles/AdventureGamePage.css';
 const pinkHoodie = '/images/items/Pink_Hoodie.png';
 const whiteSneakers = '/images/items/WhiteSneakers.png';
 const stanleyBlue = '/images/items/Accessory_Stanley_Blue.png';
+const owallaPink = '/images/items/Accessory_Owalla_Pink.png';
 const girlCharacter = '/images/characters/Girl_Character_BrownHair.png';
 const boyCharacter = '/images/characters/Boy_Character_BrownHair.png';
 const brownGirlCharacter = '/images/characters/Brown_Girl_Character_BlackHair.png';
@@ -144,6 +145,9 @@ function AdventurePage() {
       }
       if (currentLevel === 3) {
         return { name: 'Stanley Blue Water Bottle', image: stanleyBlue };
+      }
+      if (currentLevel === 4) {
+        return { name: 'Owalla Pink Water Bottle', image: owallaPink };
       }
       // Generic reward display for levels without an item reward
       return { name: 'Level Complete', image: pinkHoodie };
@@ -344,7 +348,7 @@ function AdventurePage() {
       
       // Only add item if player doesn't already have it and this level has an item reward
       // Note: Level 1 no longer grants a Pink Hoodie; rewards are coins/XP only.
-      if (!alreadyHasItem && (level === 2 || level === 3)) {
+      if (!alreadyHasItem && (level === 2 || level === 3 || level === 4)) {
         addToLog(`You received ${currentReward.name}! 🎁`);
         
         // Show reward modal
@@ -363,7 +367,7 @@ function AdventurePage() {
             isEquipped: false,
             source: 'adventure' as const
           };
-        } else {
+        } else if (level === 3) {
           // Level 3 - Stanley Blue Water Bottle
           newAccessory = {
             id: 'stanley-blue-' + Date.now(),
@@ -371,6 +375,18 @@ function AdventurePage() {
             type: 'tool' as const,
             image: stanleyBlue,
             description: 'Stay hydrated in style! Earned from the Code Grid Adventure game',
+            rarity: 'rare' as const,
+            isEquipped: false,
+            source: 'adventure' as const
+          };
+        } else {
+          // Level 4 - Owalla Pink Water Bottle
+          newAccessory = {
+            id: 'owalla-pink-' + Date.now(),
+            name: 'Owalla Pink Water Bottle',
+            type: 'tool' as const,
+            image: owallaPink,
+            description: 'A super cute pink Owalla bottle—earned from the Code Grid Adventure game!',
             rarity: 'rare' as const,
             isEquipped: false,
             source: 'adventure' as const

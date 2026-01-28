@@ -19,6 +19,7 @@ const pinkSkateboard = '/images/items/PinkSkateboard.png';
 const sharkSkateboard = '/images/items/SharkSkateboard.png';
 const sharkHockeyStick = '/images/items/SharkHockeyStick.png';
 const stanleyBlue = '/images/items/Accessory_Stanley_Blue.png';
+const owallaPink = '/images/items/Accessory_Owalla_Pink.png';
 
 interface ShopItem {
   id: string;
@@ -154,6 +155,16 @@ const shopItems: ShopItem[] = [
     type: 'tool',
     image: stanleyBlue,
     description: 'Stay hydrated in style with this trendy blue Stanley water bottle!',
+    price: 150,
+    rarity: 'rare',
+    category: 'accessories'
+  },
+  {
+    id: 'owalla-pink',
+    name: 'Owalla Pink Water Bottle',
+    type: 'tool',
+    image: owallaPink,
+    description: 'A super cute pink Owalla bottle—perfect for powering through levels!',
     price: 150,
     rarity: 'rare',
     category: 'accessories'
