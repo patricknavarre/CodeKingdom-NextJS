@@ -433,6 +433,44 @@ const levels: Level[] = [
     },
     xpReward: 80,
     coinsReward: 70
+  },
+  {
+    id: 14,
+    title: 'Image Gallery',
+    description: 'Show multiple pictures in a neat grid',
+    challenge: 'Create an image gallery with at least 3 images in a row using CSS layout',
+    htmlTemplate: `<!DOCTYPE html>
+<html>
+<head>
+  <title>My Image Gallery</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+    }
+    /* Add your gallery styles here */
+  </style>
+</head>
+<body>
+  <h1>My Favorite Pictures</h1>
+  <!-- Example structure:
+  <div class="gallery">
+    <img src="https://placekitten.com/200/200" alt="Cute cat">
+    <img src="https://placekitten.com/201/200" alt="Another cat">
+    <img src="https://placekitten.com/202/200" alt="Third cat">
+  </div>
+  -->
+  
+</body>
+</html>`,
+    cssTemplate: `/* Hint: .gallery { display: flex; gap: 10px; } */`,
+    requirements: {
+      html: ['img'],
+      css: ['display: flex']
+    },
+    xpReward: 90,
+    coinsReward: 80
   }
 ];
 
