@@ -54,32 +54,65 @@ export default function LoginPage() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '20px'
+      padding: '20px',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #4ecdc4 100%)'
     }}>
       <div style={{
-        maxWidth: '400px',
+        maxWidth: '900px',
         width: '100%',
         padding: '30px',
-        backgroundColor: 'white',
-        borderRadius: '10px',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        border: '2px solid #3498db'
+        background: 'linear-gradient(135deg, #ffffff 0%, #f5f7ff 40%, #eefcff 100%)',
+        borderRadius: '18px',
+        boxShadow: '0 18px 45px rgba(15, 23, 42, 0.35)',
+        border: '3px solid rgba(255,255,255,0.9)',
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 1fr)',
+        gap: '32px'
       }}>
-        <h1 style={{
-          color: '#3498db',
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <h1 style={{
+            color: '#1f2937',
+            textAlign: 'left',
+            marginBottom: '8px',
+            fontSize: '2.1rem'
+          }}>
+            Welcome back, Coder!
+          </h1>
+          <p style={{
+            color: '#4b5563',
+            marginBottom: '18px',
+            fontSize: '1rem'
+          }}>
+            Sign in to continue your adventures, collect rewards, and unlock new coding powers.
+          </p>
+          <ul style={{ paddingLeft: '20px', margin: 0, color: '#374151', fontSize: '0.95rem', lineHeight: 1.6 }}>
+            <li>Pick up where you left off in Code Grid Adventure and the 3D Block Builder</li>
+            <li>Earn coins, XP, and items for your character as you complete challenges</li>
+            <li>Keep building your own websites in the Web Developer Game</li>
+          </ul>
+        </div>
+        <div style={{
+          padding: '20px 24px',
+          backgroundColor: 'rgba(255,255,255,0.9)',
+          borderRadius: '14px',
+          border: '1px solid rgba(148, 163, 184, 0.35)',
+          boxShadow: '0 8px 20px rgba(15, 23, 42, 0.18)'
+        }}>
+        <h2 style={{
+          color: '#1d4ed8',
           textAlign: 'center',
           marginBottom: '10px',
-          fontSize: '2rem'
+          fontSize: '1.5rem'
         }}>
-          Sign In
-        </h1>
+          Sign In to CodeKingdom
+        </h2>
         <p style={{
           textAlign: 'center',
-          color: '#666',
-          marginBottom: '30px',
-          fontSize: '1rem'
+          color: '#6b7280',
+          marginBottom: '24px',
+          fontSize: '0.95rem'
         }}>
-          Welcome back to CodeKingdom!
+          Enter your details to jump back into the kingdom.
         </p>
 
         {error && (
@@ -183,12 +216,13 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p style={{ textAlign: 'center', color: '#666' }}>
+        <p style={{ textAlign: 'center', color: '#6b7280', fontSize: '0.9rem' }}>
           Don't have an account?{' '}
-          <Link href="/register" style={{ color: '#3498db', textDecoration: 'none' }}>
+          <Link href="/register" style={{ color: '#1d4ed8', fontWeight: 600, textDecoration: 'none' }}>
             Sign up here
           </Link>
         </p>
+        </div>
       </div>
     </div>
     </PublicRoute>
