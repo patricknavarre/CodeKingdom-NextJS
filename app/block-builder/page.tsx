@@ -219,6 +219,47 @@ export default function BlockBuilderPage() {
         const gridHelper = new THREE.GridHelper(20, 20, 0x888888, 0xcccccc);
         scene.add(gridHelper);
 
+        // Coordinate labels along X (left-right) and Z (forward-back) axes to help players place blocks
+        const createNumberSprite = (text: string) => {
+          const size = 128;
+          const canvas = document.createElement('canvas');
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return null;
+          ctx.clearRect(0, 0, size, size);
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+          ctx.font = 'bold 72px Montserrat, Arial, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
+          ctx.lineWidth = 8;
+          ctx.strokeText(text, size / 2, size / 2);
+          ctx.fillText(text, size / 2, size / 2);
+          const texture = new THREE.CanvasTexture(canvas);
+          const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
+          const sprite = new THREE.Sprite(material);
+          sprite.scale.set(0.6, 0.6, 0.6);
+          return sprite;
+        };
+
+        // Labels assume blocks are placed at integer coordinates 0–9 on x and z, matching the grid
+        for (let x = 0; x <= 9; x++) {
+          const sprite = createNumberSprite(String(x));
+          if (sprite) {
+            sprite.position.set(x, 0.01, -1.1); // just in front of the grid
+            scene.add(sprite);
+          }
+        }
+
+        for (let z = 0; z <= 9; z++) {
+          const sprite = createNumberSprite(String(z));
+          if (sprite) {
+            sprite.position.set(-1.1, 0.01, z); // along the left edge of the grid
+            scene.add(sprite);
+          }
+        }
+
         // Ground
         const groundGeometry = new THREE.PlaneGeometry(20, 20);
         const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x90ee90 });
