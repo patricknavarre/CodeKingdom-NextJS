@@ -206,10 +206,10 @@ function AdventurePage() {
         
         // Small delay to allow state update
         setTimeout(() => {
-          // Check for diamonds
+          // Check for diamonds, but DON'T auto-collect
           const diamondIndex = diamondPositions.findIndex(d => d.x === newX && d.y === newY);
           if (diamondIndex !== -1 && !collectedDiamonds[diamondIndex]) {
-            collectDiamond(diamondIndex);
+            addToLog('You are standing on a diamond! Use "collect" to pick it up.');
           }
           
           // Check for goal
@@ -864,6 +864,28 @@ function AdventurePage() {
                         style={{ backgroundColor: '#3498db', color: 'white', border: 'none', padding: '3px 8px', borderRadius: '3px', fontSize: '0.8rem', cursor: 'pointer' }}
                       >
                         turn left
+                      </button>
+                      <button 
+                        onClick={() => {
+                          const input = document.getElementById('commandInput') as HTMLTextAreaElement;
+                          input.value += 'turn up\n';
+                          input.focus();
+                        }}
+                        className="command-quick-button"
+                        style={{ backgroundColor: '#3498db', color: 'white', border: 'none', padding: '3px 8px', borderRadius: '3px', fontSize: '0.8rem', cursor: 'pointer' }}
+                      >
+                        turn up
+                      </button>
+                      <button 
+                        onClick={() => {
+                          const input = document.getElementById('commandInput') as HTMLTextAreaElement;
+                          input.value += 'turn down\n';
+                          input.focus();
+                        }}
+                        className="command-quick-button"
+                        style={{ backgroundColor: '#3498db', color: 'white', border: 'none', padding: '3px 8px', borderRadius: '3px', fontSize: '0.8rem', cursor: 'pointer' }}
+                      >
+                        turn down
                       </button>
                       <button 
                         onClick={() => {
