@@ -328,6 +328,111 @@ const levels: Level[] = [
     },
     xpReward: 50,
     coinsReward: 40
+  },
+  {
+    id: 11,
+    title: 'Add a Navigation Bar',
+    description: 'Create a simple top navigation menu',
+    challenge: 'Add a <nav> with links laid out in a row using flexbox',
+    htmlTemplate: `<!DOCTYPE html>
+<html>
+<head>
+  <title>My Website with Navigation</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: lightblue;
+    }
+    /* Add your navigation styles here */
+  </style>
+</head>
+<body>
+  <!-- Add your nav bar here -->
+  
+</body>
+</html>`,
+    cssTemplate: `/* Hint: try display: flex; justify-content: space-around; */`,
+    requirements: {
+      html: ['nav'],
+      css: ['display: flex', 'justify-content']
+    },
+    xpReward: 60,
+    coinsReward: 45
+  },
+  {
+    id: 12,
+    title: 'Two-Column Layout',
+    description: 'Create a content and sidebar layout',
+    challenge: 'Use flexbox to create a main content area and a sidebar side by side',
+    htmlTemplate: `<!DOCTYPE html>
+<html>
+<head>
+  <title>Two Column Layout</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f0f4ff;
+    }
+    /* Add your layout styles here */
+  </style>
+</head>
+<body>
+  <h1>My Awesome Page</h1>
+  <!-- Wrap your columns in a container -->
+  <!-- Example:
+  <div class="layout">
+    <div class="main">Main content here</div>
+    <div class="sidebar">Sidebar here</div>
+  </div>
+  -->
+  
+</body>
+</html>`,
+    cssTemplate: `/* Hint: .layout { display: flex; } */`,
+    requirements: {
+      html: ['div'],
+      css: ['display: flex', 'sidebar']
+    },
+    xpReward: 70,
+    coinsReward: 55
+  },
+  {
+    id: 13,
+    title: 'Hero Section',
+    description: 'Design a big hero banner for your site',
+    challenge: 'Create a hero section with a background image, big heading, paragraph, and a call-to-action button',
+    htmlTemplate: `<!DOCTYPE html>
+<html>
+<head>
+  <title>Hero Section</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    /* Add your hero section styles here */
+  </style>
+</head>
+<body>
+  <!-- Example structure:
+  <section class="hero">
+    <h1>Welcome to My Site</h1>
+    <p>This is my awesome hero section!</p>
+    <button>Get Started</button>
+  </section>
+  -->
+  
+</body>
+</html>`,
+    cssTemplate: `/* Hint: try background-image, padding, text-align: center; */`,
+    requirements: {
+      html: ['h1', 'p', 'button'],
+      css: ['background-image', 'padding']
+    },
+    xpReward: 80,
+    coinsReward: 70
   }
 ];
 
