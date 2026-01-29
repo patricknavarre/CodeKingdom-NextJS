@@ -460,8 +460,14 @@ export default function SideScrollerPage() {
         if (!hasWonRef.current && x > 94) {
           setHasWon(true);
           hasWonRef.current = true;
+
+          const totalCollected = collectedTotal;
+          const allCoinsCollected = totalCollected === totalCoins;
+
           setStatusMessage(
-            `You reached the flag and collected ${collectedCount + 0} coins! 🎉`
+            allCoinsCollected
+              ? `You reached the flag and collected all ${totalCollected} coins! 🎉`
+              : `You reached the flag and collected ${totalCollected} coin(s)!`
           );
           setStatusType('success');
 
@@ -471,6 +477,21 @@ export default function SideScrollerPage() {
             addCoins(40);
             addExperience(80);
             addPoints(120);
+          }
+
+          // Advance to next level after a short pause, if any levels remain
+          const nextLevel = levelRef.current + 1;
+          if (nextLevel <= LEVELS.length) {
+            setTimeout(() => {
+              setCurrentLevel(nextLevel);
+              resetGameForLevel(nextLevel);
+              hasWonRef.current = false;
+              setHasWon(false);
+            }, 1800);
+          } else {
+            setTimeout(() => {
+              setStatusMessage('You beat all the Side Scroller levels! 🎉');
+            }, 1800);
           }
         }
 
