@@ -41,18 +41,19 @@ type ScriptAction =
   | { type: 'jump' }
   | { type: 'wait'; seconds: number };
 
+// Level layout tuned to be forgiving: coins sit in clear spaces with plenty of room
+// to jump before/after obstacles.
 const initialCoins: Coin[] = [
-  { x: 22, y: 16, collected: false },
-  { x: 38, y: 20, collected: false },
-  { x: 55, y: 18, collected: false },
+  { x: 18, y: 14, collected: false },
+  { x: 32, y: 18, collected: false },
+  { x: 50, y: 20, collected: false },
   { x: 72, y: 22, collected: false },
-  { x: 88, y: 24, collected: false }
+  { x: 90, y: 24, collected: false }
 ];
 
 const obstacles: Obstacle[] = [
-  { x: 30, width: 6, height: 10 },
-  { x: 48, width: 7, height: 10 },
-  { x: 66, width: 6, height: 11 }
+  { x: 40, width: 4, height: 10 },
+  { x: 65, width: 4, height: 10 }
 ];
 
 export default function SideScrollerPage() {
@@ -78,9 +79,9 @@ export default function SideScrollerPage() {
       '',
       'run(4)',
       'jump()',
-      'run(3)',
+      'run(4)',
       'jump()',
-      'run(6)'
+      'run(10)'
     ].join('\n')
   );
 
