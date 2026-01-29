@@ -236,7 +236,10 @@ function AdventurePage() {
           let lastBlock = firstBlock;
           let current: Block | undefined = firstBlock;
           while (current) {
-            const next = connectedBlocks.find(b => b.connectedTo === current!.id);
+            // Find the block that current connects TO (next in chain)
+            const next: Block | undefined = current.connectedTo
+              ? connectedBlocks.find(b => b.id === current!.connectedTo)
+              : undefined;
             if (next) {
               lastBlock = next;
               current = next;
@@ -258,27 +261,59 @@ function AdventurePage() {
         y: newY
       };
       
-      if (snapToBlock) {
-        newBlock.connectedTo = snapToBlock.id;
-        playSnapSound();
-      }
-      
       setConnectedBlocks(prev => {
-        // If snapping, insert after the target block and update connections
         if (snapToBlock) {
-          const index = prev.findIndex(b => b.id === snapToBlock!.id);
-          const newBlocks = [...prev];
-          newBlocks.splice(index + 1, 0, newBlock);
-          // Update connections: the target block now connects to the new block
-          return newBlocks.map(b => {
+          // When snapping: target block connects TO new block (target → new)
+          // Find what the target was connected to, and connect new block to that
+          const targetWasConnectedTo = snapToBlock.connectedTo;
+          newBlock.connectedTo = targetWasConnectedTo;
+          
+          // Update target to connect to new block
+          const updated = prev.map(b => {
             if (b.id === snapToBlock!.id) {
               return { ...b, connectedTo: newBlock.id };
             }
             return b;
           });
+          
+          // Insert new block after target
+          const index = updated.findIndex(b => b.id === snapToBlock!.id);
+          const newBlocks = [...updated];
+          newBlocks.splice(index + 1, 0, newBlock);
+          
+          playSnapSound();
+          return newBlocks;
+        } else {
+          // When not snapping: connect to the last block in the chain
+          if (prev.length > 0) {
+            // Find the last block in the chain
+            const firstBlock = prev.find(b => 
+              !prev.some(other => other.connectedTo === b.id)
+            ) || prev[0];
+            
+            let lastBlock = firstBlock;
+            let current: Block | undefined = firstBlock;
+            while (current) {
+              const next = prev.find(b => b.id === current!.connectedTo);
+              if (next) {
+                lastBlock = next;
+                current = next;
+              } else {
+                break;
+              }
+            }
+            
+            // Connect the last block to the new block
+            return prev.map(b => {
+              if (b.id === lastBlock.id) {
+                return { ...b, connectedTo: newBlock.id };
+              }
+              return b;
+            }).concat(newBlock);
+          }
+          // First block, no connection needed
+          return [...prev, newBlock];
         }
-        // If not snapping, add to end
-        return [...prev, newBlock];
       });
       
       setDraggedBlock(null);
@@ -311,7 +346,7 @@ function AdventurePage() {
     const blocksToCommands = (): string[] => {
       if (connectedBlocks.length === 0) return [];
       
-      // Find the first block (one with no incoming connection)
+      // Find the first block (one with no incoming connection - no other block points to it)
       const firstBlock = connectedBlocks.find(b => 
         !connectedBlocks.some(other => other.connectedTo === b.id)
       ) || connectedBlocks[0];
@@ -337,8 +372,11 @@ function AdventurePage() {
         }
         commands.push(cmd);
         
-        // Find next connected block
-        const nextBlock = connectedBlocks.find(b => b.connectedTo === current!.id);
+        // Find next block: the one whose id matches current.connectedTo
+        // (current connects TO next, so next's id = current.connectedTo)
+        const nextBlock: Block | undefined = current.connectedTo 
+          ? connectedBlocks.find(b => b.id === current!.connectedTo)
+          : undefined;
         current = nextBlock;
       }
       
