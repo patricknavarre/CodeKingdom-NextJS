@@ -146,6 +146,18 @@ export default function SideScrollerPage() {
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName?.toLowerCase();
+      const isTypingInField =
+        tag === 'input' ||
+        tag === 'textarea' ||
+        (target && (target as HTMLElement).isContentEditable);
+
+      // Never hijack keys while the user is typing in an input/textarea/editor
+      if (isTypingInField) {
+        return;
+      }
+
       // In code mode we only listen for restart (R); movement comes from the script
       if (modeRef.current === 'code') {
         if (e.key.toLowerCase() === 'r') {
@@ -178,6 +190,17 @@ export default function SideScrollerPage() {
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName?.toLowerCase();
+      const isTypingInField =
+        tag === 'input' ||
+        tag === 'textarea' ||
+        (target && (target as HTMLElement).isContentEditable);
+
+      if (isTypingInField) {
+        return;
+      }
+
       if (modeRef.current === 'code') {
         return;
       }
