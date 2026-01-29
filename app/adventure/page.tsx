@@ -639,8 +639,6 @@ function AdventurePage() {
       setDirection(dir);
       addToLog(`Turned to face ${newDirection}.`);
     };
-<｜tool▁call▁begin｜>
-read_lints
     
     const collectDiamond = (index: number) => {
       if (collectedDiamonds[index]) {
