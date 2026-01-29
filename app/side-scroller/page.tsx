@@ -40,20 +40,77 @@ type ScriptAction =
   | { type: 'run'; steps: number }
   | { type: 'jump' }
   | { type: 'wait'; seconds: number };
+// Platforms you can land on
+interface Platform {
+  x: number; // left position, 0–100
+  width: number; // width in percentage units
+  top: number; // height of the top surface above ground (same units as character y)
+  thickness: number; // block thickness
+}
 
-// Level layout tuned to be forgiving: coins sit in clear spaces with plenty of room
-// to jump before/after obstacles.
-const initialCoins: Coin[] = [
-  { x: 18, y: 14, collected: false },
-  { x: 32, y: 18, collected: false },
-  { x: 50, y: 20, collected: false },
-  { x: 72, y: 22, collected: false },
-  { x: 90, y: 24, collected: false }
-];
+interface LevelConfig {
+  id: number;
+  name: string;
+  coins: { x: number; y: number }[];
+  obstacles: Obstacle[];
+  platforms?: Platform[];
+}
 
-const obstacles: Obstacle[] = [
-  { x: 40, width: 4, height: 10 },
-  { x: 65, width: 4, height: 10 }
+// Level layouts: start easy, then add platforms / trickier jumps.
+const LEVELS: LevelConfig[] = [
+  {
+    id: 1,
+    name: 'Warm‑Up Run',
+    coins: [
+      { x: 18, y: 14 },
+      { x: 32, y: 18 },
+      { x: 50, y: 20 },
+      { x: 72, y: 22 },
+      { x: 90, y: 24 }
+    ],
+    obstacles: [
+      { x: 40, width: 4, height: 10 },
+      { x: 65, width: 4, height: 10 }
+    ]
+  },
+  {
+    id: 2,
+    name: 'First Platforms',
+    coins: [
+      { x: 20, y: 14 },
+      { x: 38, y: 20 }, // above first platform
+      { x: 52, y: 22 },
+      { x: 72, y: 18 },
+      { x: 90, y: 24 }
+    ],
+    obstacles: [
+      { x: 30, width: 4, height: 10 }
+    ],
+    platforms: [
+      { x: 34, width: 12, top: 18, thickness: 6 },
+      { x: 60, width: 10, top: 14, thickness: 6 }
+    ]
+  },
+  {
+    id: 3,
+    name: 'Sky Steps',
+    coins: [
+      { x: 18, y: 14 },
+      { x: 34, y: 20 }, // first step
+      { x: 50, y: 26 }, // higher step
+      { x: 68, y: 20 },
+      { x: 88, y: 24 }
+    ],
+    obstacles: [
+      { x: 26, width: 3.5, height: 10 },
+      { x: 44, width: 3.5, height: 10 }
+    ],
+    platforms: [
+      { x: 30, width: 12, top: 18, thickness: 6 },
+      { x: 46, width: 12, top: 24, thickness: 6 },
+      { x: 68, width: 10, top: 18, thickness: 6 }
+    ]
+  }
 ];
 
 export default function SideScrollerPage() {
@@ -62,8 +119,11 @@ export default function SideScrollerPage() {
   // Character position (x is 0–100, y is height above ground)
   const [renderX, setRenderX] = useState(10);
   const [renderY, setRenderY] = useState(0);
+  const [currentLevel, setCurrentLevel] = useState(1);
   const [mode, setMode] = useState<GameMode>('code'); // default to learning mode
-  const [coins, setCoins] = useState<Coin[]>(initialCoins);
+  const [coins, setCoins] = useState<Coin[]>(
+    LEVELS[0].coins.map(c => ({ ...c, collected: false }))
+  );
   const [collectedCount, setCollectedCount] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
   const [hasWon, setHasWon] = useState(false);
@@ -95,6 +155,7 @@ export default function SideScrollerPage() {
   const hasWonRef = useRef(false);
   const rewardGivenRef = useRef(false);
   const modeRef = useRef<GameMode>('code');
+  const levelRef = useRef(1);
 
   // Script control refs
   const scriptActionsRef = useRef<ScriptAction[]>([]);
@@ -121,14 +182,21 @@ export default function SideScrollerPage() {
     isRunningScriptRef.current = isRunningScript;
   }, [isRunningScript]);
 
-  const resetGame = () => {
+  useEffect(() => {
+    levelRef.current = currentLevel;
+  }, [currentLevel]);
+
+  const resetGameForLevel = (level: number) => {
+    const index = Math.max(0, Math.min(LEVELS.length - 1, level - 1));
+    const cfg = LEVELS[index];
+
     xRef.current = 10;
     yRef.current = 0;
     velocityYRef.current = 0;
     onGroundRef.current = true;
     setRenderX(10);
     setRenderY(0);
-    setCoins(initialCoins.map(c => ({ ...c, collected: false })));
+    setCoins(cfg.coins.map(c => ({ ...c, collected: false })));
     setCollectedCount(0);
     setIsGameOver(false);
     setHasWon(false);
@@ -141,6 +209,10 @@ export default function SideScrollerPage() {
     targetRunXRef.current = null;
     setStatusMessage(null);
     setStatusType(null);
+  };
+
+  const resetGame = () => {
+    resetGameForLevel(levelRef.current);
   };
 
   // Keyboard controls
@@ -227,6 +299,11 @@ export default function SideScrollerPage() {
     let animationId: number;
 
     const step = (time: number) => {
+      const levelIndex = Math.max(0, Math.min(LEVELS.length - 1, levelRef.current - 1));
+      const levelConfig = LEVELS[levelIndex];
+      const platforms = levelConfig.platforms || [];
+      const levelObstacles = levelConfig.obstacles;
+
       const deltaSeconds = Math.min((time - lastTime) / 1000, 0.04); // clamp for safety
       lastTime = time;
 
@@ -234,6 +311,7 @@ export default function SideScrollerPage() {
         let x = xRef.current;
         let y = yRef.current;
         let vy = velocityYRef.current;
+        const prevY = y;
 
         const currentMode = modeRef.current;
 
@@ -302,13 +380,38 @@ export default function SideScrollerPage() {
         // Vertical physics
         vy += GRAVITY * deltaSeconds;
         y += vy * deltaSeconds;
+        let onSurface = false;
 
-        if (y <= GROUND_Y) {
-          y = GROUND_Y;
-          vy = 0;
-          onGroundRef.current = true;
-        } else {
-          onGroundRef.current = false;
+        // Landing on platforms (only when moving downward)
+        if (vy < 0 && platforms.length > 0) {
+          const charLeft = x - CHARACTER_WIDTH / 2;
+          const charRight = x + CHARACTER_WIDTH / 2;
+
+          for (const platform of platforms) {
+            const platLeft = platform.x;
+            const platRight = platform.x + platform.width;
+            const top = platform.top;
+            const horizontalOverlap = charRight > platLeft && charLeft < platRight;
+
+            if (horizontalOverlap && prevY >= top && y <= top) {
+              y = top;
+              vy = 0;
+              onSurface = true;
+              onGroundRef.current = true;
+              break;
+            }
+          }
+        }
+
+        // Ground
+        if (!onSurface) {
+          if (y <= GROUND_Y) {
+            y = GROUND_Y;
+            vy = 0;
+            onGroundRef.current = true;
+          } else {
+            onGroundRef.current = false;
+          }
         }
 
         // Collision with obstacles (simple AABB check near ground)
@@ -316,7 +419,7 @@ export default function SideScrollerPage() {
         const charRight = x + CHARACTER_WIDTH / 2;
         const charHeight = 16 + y; // approx height used for collision
 
-        for (const obstacle of obstacles) {
+        for (const obstacle of levelObstacles) {
           const obsLeft = obstacle.x;
           const obsRight = obstacle.x + obstacle.width;
           const obsHeight = obstacle.height;
@@ -508,6 +611,7 @@ export default function SideScrollerPage() {
                 <span>🪙 {character.coins} Coins</span>
                 <span>⭐ {character.experience} XP</span>
                 <span>🏆 {character.points || 0} Points</span>
+                <span>🎯 Level {currentLevel} / {LEVELS.length}</span>
               </div>
             </div>
           </header>
@@ -521,7 +625,27 @@ export default function SideScrollerPage() {
                     ? '- write commands to control your run.'
                     : '- use keys or buttons to control your character.'}
                 </div>
-                <div style={{ display: 'flex', gap: '4px' }}>
+                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                  <div style={{ display: 'flex', gap: '4px', marginRight: '4px' }}>
+                    {LEVELS.map(level => (
+                      <button
+                        key={level.id}
+                        type="button"
+                        className="side-scroller-btn secondary"
+                        style={
+                          currentLevel === level.id
+                            ? { opacity: 1 }
+                            : { opacity: 0.6 }
+                        }
+                        onClick={() => {
+                          setCurrentLevel(level.id);
+                          resetGameForLevel(level.id);
+                        }}
+                      >
+                        Lv {level.id}
+                      </button>
+                    ))}
+                  </div>
                   <button
                     type="button"
                     className="side-scroller-btn"
@@ -648,6 +772,28 @@ export default function SideScrollerPage() {
               )}
 
               <div className="side-scroller-world">
+                {(() => {
+                  const index = Math.max(0, Math.min(LEVELS.length - 1, currentLevel - 1));
+                  const cfg = LEVELS[index];
+                  const platforms = cfg.platforms || [];
+                  return (
+                    <>
+                      {/* Platforms */}
+                      {platforms.map((platform, index) => (
+                        <div
+                          key={index}
+                          className="side-scroller-platform"
+                          style={{
+                            left: `${platform.x}%`,
+                            bottom: `${60 + platform.top - platform.thickness}px`,
+                            height: `${platform.thickness}px`,
+                            width: `${platform.width}%`
+                          }}
+                        />
+                      )}
+                    </>
+                  );
+                })()}
                 {/* Character */}
                 <div
                   className="side-scroller-character"
