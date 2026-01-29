@@ -110,6 +110,49 @@ const LEVELS: LevelConfig[] = [
       { x: 46, width: 12, top: 24, thickness: 6 },
       { x: 68, width: 10, top: 18, thickness: 6 }
     ]
+  },
+  {
+    id: 4,
+    name: 'Gap Dash',
+    coins: [
+      { x: 16, y: 14 },
+      { x: 32, y: 18 },
+      { x: 48, y: 22 },
+      { x: 64, y: 18 },
+      { x: 82, y: 22 }
+    ],
+    obstacles: [
+      { x: 24, width: 4, height: 12 },
+      { x: 56, width: 4, height: 12 }
+    ],
+    platforms: [
+      { x: 20, width: 8, top: 16, thickness: 6 },
+      { x: 36, width: 10, top: 20, thickness: 6 },
+      { x: 52, width: 8, top: 22, thickness: 6 },
+      { x: 70, width: 10, top: 18, thickness: 6 }
+    ]
+  },
+  {
+    id: 5,
+    name: 'Castle Climb',
+    coins: [
+      { x: 14, y: 16 },
+      { x: 30, y: 22 },
+      { x: 46, y: 28 },
+      { x: 62, y: 22 },
+      { x: 80, y: 26 }
+    ],
+    obstacles: [
+      { x: 22, width: 3.5, height: 12 },
+      { x: 38, width: 3.5, height: 16 },
+      { x: 60, width: 4, height: 14 }
+    ],
+    platforms: [
+      { x: 18, width: 10, top: 18, thickness: 6 },
+      { x: 34, width: 10, top: 24, thickness: 6 },
+      { x: 50, width: 10, top: 28, thickness: 6 },
+      { x: 68, width: 10, top: 22, thickness: 6 }
+    ]
   }
 ];
 
@@ -124,6 +167,7 @@ export default function SideScrollerPage() {
   const [coins, setCoins] = useState<Coin[]>(
     LEVELS[0].coins.map(c => ({ ...c, collected: false }))
   );
+  const [backgroundOffset, setBackgroundOffset] = useState(0);
   const [collectedCount, setCollectedCount] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
   const [hasWon, setHasWon] = useState(false);
@@ -156,6 +200,7 @@ export default function SideScrollerPage() {
   const rewardGivenRef = useRef(false);
   const modeRef = useRef<GameMode>('code');
   const levelRef = useRef(1);
+  const backgroundOffsetRef = useRef(0);
 
   // Script control refs
   const scriptActionsRef = useRef<ScriptAction[]>([]);
@@ -500,6 +545,10 @@ export default function SideScrollerPage() {
         velocityYRef.current = vy;
         setRenderX(x);
         setRenderY(y);
+        // Simple parallax background offset based on horizontal progress
+        const newOffset = x * 1.2;
+        backgroundOffsetRef.current = newOffset;
+        setBackgroundOffset(newOffset);
       }
 
       animationId = requestAnimationFrame(step);
@@ -796,6 +845,11 @@ export default function SideScrollerPage() {
               )}
 
               <div className="side-scroller-world">
+                {/* Scrolling background layer */}
+                <div
+                  className="side-scroller-parallax"
+                  style={{ transform: `translateX(${-backgroundOffset}px)` }}
+                />
                 {/* Platforms */}
                 {(currentLevelConfig.platforms || []).map((platform, index) => (
                   <div

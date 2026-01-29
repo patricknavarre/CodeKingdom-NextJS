@@ -123,6 +123,20 @@
   margin-top: 6px;
 }
 
+.side-scroller-parallax {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 300%;
+  height: 100%;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.8) 0, rgba(255, 255, 255, 0) 40%),
+    radial-gradient(circle at 40% 15%, rgba(255, 255, 255, 0.8) 0, rgba(255, 255, 255, 0) 40%),
+    radial-gradient(circle at 75% 18%, rgba(255, 255, 255, 0.8) 0, rgba(255, 255, 255, 0) 40%);
+  opacity: 0.4;
+  pointer-events: none;
+}
+
 .side-scroller-ground {
   position: absolute;
   left: 0;
