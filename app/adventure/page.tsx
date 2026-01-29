@@ -151,7 +151,21 @@ function AdventurePage() {
       }
     };
     
-    // Block drag handlers
+    // Helper to get client coordinates from event (works for both mouse and touch)
+    const getClientCoordinates = (e: React.DragEvent | React.TouchEvent | React.MouseEvent) => {
+      if ('touches' in e && e.touches.length > 0) {
+        return { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY };
+      }
+      if ('changedTouches' in e && e.changedTouches.length > 0) {
+        return { clientX: e.changedTouches[0].clientX, clientY: e.changedTouches[0].clientY };
+      }
+      if ('clientX' in e && 'clientY' in e) {
+        return { clientX: e.clientX, clientY: e.clientY };
+      }
+      return { clientX: 0, clientY: 0 };
+    };
+    
+    // Block drag handlers (mouse)
     const handleBlockDragStart = (e: React.DragEvent, type: string, value?: string | number) => {
       setDraggedBlock({ type, value });
       e.dataTransfer.effectAllowed = 'move';
@@ -163,9 +177,10 @@ function AdventurePage() {
     const handleBlockDrag = (e: React.DragEvent) => {
       if (!draggedBlock || !workspaceRef.current) return;
       const rect = workspaceRef.current.getBoundingClientRect();
+      const coords = getClientCoordinates(e);
       setDragPosition({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
+        x: coords.clientX - rect.left,
+        y: coords.clientY - rect.top
       });
       
       // Check for snap targets (horizontal - left to right)
@@ -177,8 +192,8 @@ function AdventurePage() {
         const blockX = block.x;
         const blockY = block.y;
         // Check both horizontal distance (for snapping) and vertical alignment
-        const horizontalDistance = Math.abs(e.clientX - rect.left - (blockX + 120)); // 120 = block width + gap
-        const verticalDistance = Math.abs(e.clientY - rect.top - blockY);
+        const horizontalDistance = Math.abs(coords.clientX - rect.left - (blockX + 120)); // 120 = block width + gap
+        const verticalDistance = Math.abs(coords.clientY - rect.top - blockY);
         // Snap if horizontally close to the right edge of a block AND vertically aligned
         if (horizontalDistance < SNAP_DISTANCE && verticalDistance < 30 && horizontalDistance < minDistance) {
           minDistance = horizontalDistance;
@@ -189,13 +204,60 @@ function AdventurePage() {
       setSnapTarget(closestBlock?.id || null);
     };
     
-    const handleBlockDrop = (e: React.DragEvent) => {
-      e.preventDefault();
+    // Touch event handlers for mobile
+    const handleBlockTouchStart = (e: React.TouchEvent, type: string, value?: string | number) => {
+      e.preventDefault(); // Prevent scrolling
+      setDraggedBlock({ type, value });
+      const coords = getClientCoordinates(e);
+      if (workspaceRef.current) {
+        const rect = workspaceRef.current.getBoundingClientRect();
+        setDragPosition({
+          x: coords.clientX - rect.left,
+          y: coords.clientY - rect.top
+        });
+      }
+    };
+    
+    const handleBlockTouchMove = (e: React.TouchEvent) => {
       if (!draggedBlock || !workspaceRef.current) return;
-      
+      e.preventDefault(); // Prevent scrolling
       const rect = workspaceRef.current.getBoundingClientRect();
-      const dropX = e.clientX - rect.left;
-      const dropY = e.clientY - rect.top;
+      const coords = getClientCoordinates(e);
+      setDragPosition({
+        x: coords.clientX - rect.left,
+        y: coords.clientY - rect.top
+      });
+      
+      // Check for snap targets (horizontal - left to right)
+      const SNAP_DISTANCE = 60;
+      let closestBlock: Block | null = null;
+      let minDistance = Infinity;
+      
+      for (const block of connectedBlocks) {
+        const blockX = block.x;
+        const blockY = block.y;
+        const horizontalDistance = Math.abs(coords.clientX - rect.left - (blockX + 120));
+        const verticalDistance = Math.abs(coords.clientY - rect.top - blockY);
+        if (horizontalDistance < SNAP_DISTANCE && verticalDistance < 30 && horizontalDistance < minDistance) {
+          minDistance = horizontalDistance;
+          closestBlock = block;
+        }
+      }
+      
+      setSnapTarget(closestBlock?.id || null);
+    };
+    
+    const handleBlockTouchEnd = (e: React.TouchEvent) => {
+      if (!draggedBlock || !workspaceRef.current) return;
+      e.preventDefault();
+      const rect = workspaceRef.current.getBoundingClientRect();
+      const coords = getClientCoordinates(e);
+      handleBlockDropAtPosition(coords.clientX - rect.left, coords.clientY - rect.top);
+    };
+    
+    // Shared drop logic for both mouse and touch
+    const handleBlockDropAtPosition = (dropX: number, dropY: number) => {
+      if (!draggedBlock || !workspaceRef.current) return;
       
       const SNAP_DISTANCE = 60;
       const BLOCK_WIDTH = 120; // Approximate block width + gap
@@ -318,6 +380,15 @@ function AdventurePage() {
       
       setDraggedBlock(null);
       setSnapTarget(null);
+    };
+    
+    const handleBlockDrop = (e: React.DragEvent) => {
+      e.preventDefault();
+      if (!draggedBlock || !workspaceRef.current) return;
+      
+      const rect = workspaceRef.current.getBoundingClientRect();
+      const coords = getClientCoordinates(e);
+      handleBlockDropAtPosition(coords.clientX - rect.left, coords.clientY - rect.top);
     };
     
     const handleBlockDelete = (blockId: string) => {
@@ -1157,6 +1228,9 @@ function AdventurePage() {
                     <div
                       draggable
                       onDragStart={(e) => handleBlockDragStart(e, 'move', 1)}
+                      onTouchStart={(e) => handleBlockTouchStart(e, 'move', 1)}
+                      onTouchMove={handleBlockTouchMove}
+                      onTouchEnd={handleBlockTouchEnd}
                       className="block-palette-item"
                       style={{
                         backgroundColor: '#3498db',
@@ -1167,7 +1241,8 @@ function AdventurePage() {
                         fontWeight: 'bold',
                         fontSize: '0.9rem',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                        userSelect: 'none'
+                        userSelect: 'none',
+                        touchAction: 'none'
                       }}
                     >
                       move 1
@@ -1175,6 +1250,9 @@ function AdventurePage() {
                     <div
                       draggable
                       onDragStart={(e) => handleBlockDragStart(e, 'move', 2)}
+                      onTouchStart={(e) => handleBlockTouchStart(e, 'move', 2)}
+                      onTouchMove={handleBlockTouchMove}
+                      onTouchEnd={handleBlockTouchEnd}
                       className="block-palette-item"
                       style={{
                         backgroundColor: '#3498db',
@@ -1185,7 +1263,8 @@ function AdventurePage() {
                         fontWeight: 'bold',
                         fontSize: '0.9rem',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                        userSelect: 'none'
+                        userSelect: 'none',
+                        touchAction: 'none'
                       }}
                     >
                       move 2
@@ -1194,6 +1273,9 @@ function AdventurePage() {
                     <div
                       draggable
                       onDragStart={(e) => handleBlockDragStart(e, 'turn', 'right')}
+                      onTouchStart={(e) => handleBlockTouchStart(e, 'turn', 'right')}
+                      onTouchMove={handleBlockTouchMove}
+                      onTouchEnd={handleBlockTouchEnd}
                       className="block-palette-item"
                       style={{
                         backgroundColor: '#9b59b6',
@@ -1204,7 +1286,8 @@ function AdventurePage() {
                         fontWeight: 'bold',
                         fontSize: '0.9rem',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                        userSelect: 'none'
+                        userSelect: 'none',
+                        touchAction: 'none'
                       }}
                     >
                       turn right
@@ -1212,6 +1295,9 @@ function AdventurePage() {
                     <div
                       draggable
                       onDragStart={(e) => handleBlockDragStart(e, 'turn', 'left')}
+                      onTouchStart={(e) => handleBlockTouchStart(e, 'turn', 'left')}
+                      onTouchMove={handleBlockTouchMove}
+                      onTouchEnd={handleBlockTouchEnd}
                       className="block-palette-item"
                       style={{
                         backgroundColor: '#9b59b6',
@@ -1222,7 +1308,8 @@ function AdventurePage() {
                         fontWeight: 'bold',
                         fontSize: '0.9rem',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                        userSelect: 'none'
+                        userSelect: 'none',
+                        touchAction: 'none'
                       }}
                     >
                       turn left
@@ -1230,6 +1317,9 @@ function AdventurePage() {
                     <div
                       draggable
                       onDragStart={(e) => handleBlockDragStart(e, 'turn', 'up')}
+                      onTouchStart={(e) => handleBlockTouchStart(e, 'turn', 'up')}
+                      onTouchMove={handleBlockTouchMove}
+                      onTouchEnd={handleBlockTouchEnd}
                       className="block-palette-item"
                       style={{
                         backgroundColor: '#9b59b6',
@@ -1240,7 +1330,8 @@ function AdventurePage() {
                         fontWeight: 'bold',
                         fontSize: '0.9rem',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                        userSelect: 'none'
+                        userSelect: 'none',
+                        touchAction: 'none'
                       }}
                     >
                       turn up
@@ -1248,6 +1339,9 @@ function AdventurePage() {
                     <div
                       draggable
                       onDragStart={(e) => handleBlockDragStart(e, 'turn', 'down')}
+                      onTouchStart={(e) => handleBlockTouchStart(e, 'turn', 'down')}
+                      onTouchMove={handleBlockTouchMove}
+                      onTouchEnd={handleBlockTouchEnd}
                       className="block-palette-item"
                       style={{
                         backgroundColor: '#9b59b6',
@@ -1258,7 +1352,8 @@ function AdventurePage() {
                         fontWeight: 'bold',
                         fontSize: '0.9rem',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                        userSelect: 'none'
+                        userSelect: 'none',
+                        touchAction: 'none'
                       }}
                     >
                       turn down
@@ -1267,6 +1362,9 @@ function AdventurePage() {
                     <div
                       draggable
                       onDragStart={(e) => handleBlockDragStart(e, 'collect')}
+                      onTouchStart={(e) => handleBlockTouchStart(e, 'collect')}
+                      onTouchMove={handleBlockTouchMove}
+                      onTouchEnd={handleBlockTouchEnd}
                       className="block-palette-item"
                       style={{
                         backgroundColor: '#f39c12',
@@ -1277,7 +1375,8 @@ function AdventurePage() {
                         fontWeight: 'bold',
                         fontSize: '0.9rem',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                        userSelect: 'none'
+                        userSelect: 'none',
+                        touchAction: 'none'
                       }}
                     >
                       collect
@@ -1292,6 +1391,16 @@ function AdventurePage() {
                       handleBlockDrag(e);
                     }}
                     onDrop={handleBlockDrop}
+                    onTouchMove={(e) => {
+                      if (draggedBlock) {
+                        handleBlockTouchMove(e);
+                      }
+                    }}
+                    onTouchEnd={(e) => {
+                      if (draggedBlock) {
+                        handleBlockTouchEnd(e);
+                      }
+                    }}
                     style={{
                       minHeight: '150px',
                       backgroundColor: '#fff',
@@ -1299,7 +1408,8 @@ function AdventurePage() {
                       borderRadius: '8px',
                       padding: '15px',
                       marginBottom: '12px',
-                      position: 'relative'
+                      position: 'relative',
+                      touchAction: 'none'
                     }}
                   >
                     {connectedBlocks.length === 0 ? (
