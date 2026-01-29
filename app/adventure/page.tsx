@@ -1175,17 +1175,33 @@ function AdventurePage() {
                   flex: 1,
                   display: 'flex',
                   justifyContent: 'center',
-                  alignItems: 'center',
+                  alignItems: 'flex-start',
                   backgroundColor: '#ebf5fb',
                   borderRadius: '8px',
                   padding: '10px',
                   boxShadow: 'inset 0 0 10px rgba(52, 152, 219, 0.2)',
                   overflow: 'auto',
                   minHeight: '300px',
-                  position: 'relative',
-                  marginTop: 'auto'
+                  position: 'relative'
                 }}>
-                  <div className="game-grid" ref={gridRef} style={{ position: 'relative' }}>
+                  <div 
+                    className="game-grid" 
+                    ref={gridRef} 
+                    style={{ 
+                      position: 'relative', 
+                      margin: '0 auto',
+                      display: 'grid',
+                      gridTemplateColumns: `repeat(${grid[0]?.length || 10}, 28px)`,
+                      gridTemplateRows: `repeat(${grid.length}, 28px)`,
+                      gap: '1px',
+                      backgroundColor: '#3498db',
+                      borderRadius: '6px',
+                      padding: '3px',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                      width: 'fit-content',
+                      border: '2px solid #3498db'
+                    }}
+                  >
                     {grid.map((row, rowIndex) => (
                       <div key={rowIndex} className="grid-row">
                         {row.map((cell, cellIndex) => (

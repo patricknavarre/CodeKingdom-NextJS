@@ -334,9 +334,7 @@
 }
 
 .game-world, .game-grid {
-  display: grid;
-  grid-template-columns: repeat(10, 28px); /* 10 columns of 28px each - scaled down */
-  grid-template-rows: repeat(10, 28px); /* 10 rows of 28px each - scaled down */
+  /* Grid sizing is now handled inline based on actual grid dimensions */
   gap: 1px;
   background-color: #3498db;
   border-radius: 6px;
