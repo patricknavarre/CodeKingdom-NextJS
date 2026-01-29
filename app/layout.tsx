@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { CharacterProvider } from '@/contexts/CharacterContext';
 import './globals.css';
@@ -6,6 +6,14 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'CodeKingdom',
   description: 'Learn to code through interactive games',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({
