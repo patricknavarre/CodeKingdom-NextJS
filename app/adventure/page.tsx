@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useCharacter, type Accessory, type AccessoryType } from '@/contexts/CharacterContext';
 import Navigation from '@/components/Navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { getLevelConfig, getMaxLevel, type LevelConfig } from './utils/levelConfigs';
 import '@/styles/AdventureGamePage.css';
 
 // Image paths for Next.js public folder
@@ -94,14 +95,20 @@ function AdventurePage() {
       girlCharacterPath: girlCharacter
     });
     
-    // Game state
-    const [position, setPosition] = useState({ x: 1, y: 1 });
+    // Get initial position and direction from level config
+    const getInitialConfig = () => {
+      return getLevelConfig(level) || getLevelConfig(1)!;
+    };
+
+    // Game state - initialized from level config
+    const initialConfig = getInitialConfig();
+    const [position, setPosition] = useState(initialConfig.startPosition);
     // Use a ref to track position synchronously (for immediate use in move function)
-    const positionRef = useRef({ x: 1, y: 1 });
+    const positionRef = useRef(initialConfig.startPosition);
     
-    const [direction, setDirection] = useState('right');
+    const [direction, setDirection] = useState(initialConfig.startDirection);
     // Use a ref to track direction synchronously (for immediate use in move function)
-    const directionRef = useRef('right');
+    const directionRef = useRef(initialConfig.startDirection);
     
     const [diamonds, setDiamonds] = useState(0);
     const [log, setLog] = useState(['Welcome to the adventure!']);
@@ -480,6 +487,28 @@ function AdventurePage() {
       }
     }, [level]);
 
+    // Reset game state when level changes
+    useEffect(() => {
+      const levelConfig = getLevelConfig(level);
+      if (levelConfig) {
+        // Reset position and direction
+        positionRef.current = levelConfig.startPosition;
+        setPosition(levelConfig.startPosition);
+        directionRef.current = levelConfig.startDirection;
+        setDirection(levelConfig.startDirection);
+        
+        // Reset diamonds
+        setDiamonds(0);
+        setCollectedDiamonds(new Array(levelConfig.diamondPositions.length).fill(false));
+        
+        // Clear blocks
+        setConnectedBlocks([]);
+        
+        // Clear log
+        setLog(['Welcome to the adventure!']);
+      }
+    }, [level]);
+
     // Determine reward based on level
     // Note: Level 1 no longer grants the Pink Hoodie (available in the shop instead).
     const getRewardForLevel = (currentLevel: number) => {
@@ -522,30 +551,20 @@ function AdventurePage() {
       }
     }, [speechBubble.visible, position.x, position.y]);
     
-    // Game grid (10x10)
+    // Get current level configuration
+    const currentLevelConfig = getLevelConfig(level) || getLevelConfig(1)!;
+    
+    // Game grid from level config
     // 0 = empty, 1 = wall, 2 = diamond, 3 = goal
-    const grid = [
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 0, 0, 0, 0, 0, 1, 2, 0, 1],
-      [1, 0, 1, 1, 1, 0, 1, 1, 0, 1],
-      [1, 0, 1, 2, 0, 0, 0, 0, 0, 1],
-      [1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
-      [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [1, 1, 1, 1, 1, 0, 1, 1, 0, 1],
-      [1, 2, 0, 0, 0, 0, 1, 3, 0, 1],
-      [1, 0, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    ];
+    const grid = currentLevelConfig.grid;
     
     // Diamond positions for collection logic
-    const diamondPositions = [
-      { x: 7, y: 1 },
-      { x: 3, y: 3 },
-      { x: 1, y: 7 }
-    ];
+    const diamondPositions = currentLevelConfig.diamondPositions;
     
-    // Track collected diamonds
-    const [collectedDiamonds, setCollectedDiamonds] = useState([false, false, false]);
+    // Track collected diamonds (dynamic based on level)
+    const [collectedDiamonds, setCollectedDiamonds] = useState<boolean[]>(
+      new Array(diamondPositions.length).fill(false)
+    );
     
     // Keep refs in sync with state
     useEffect(() => {
@@ -571,8 +590,10 @@ function AdventurePage() {
         if (currentDirection === 'left') newX -= steps;
         if (currentDirection === 'right') newX += steps;
         
-        // Check boundaries and walls
-        if (newX < 0 || newX >= 10 || newY < 0 || newY >= 10 || grid[newY][newX] === 1) {
+        // Check boundaries and walls (use dynamic grid size)
+        const gridHeight = grid.length;
+        const gridWidth = grid[0]?.length || 0;
+        if (newX < 0 || newX >= gridWidth || newY < 0 || newY >= gridHeight || grid[newY][newX] === 1) {
           addToLog("Can't move there! There's a wall or boundary.");
           resolve();
           return;
@@ -593,10 +614,11 @@ function AdventurePage() {
           
           // Check for goal flag (🏁)
           if (grid[newY][newX] === 3) {
-            if (diamonds === 3) {
+            const totalDiamonds = diamondPositions.length;
+            if (diamonds === totalDiamonds) {
               completeLevel();
             } else {
-              addToLog('You found the finish flag, but you need all 3 diamonds before you can finish the level.');
+              addToLog(`You found the finish flag, but you need all ${totalDiamonds} diamonds before you can finish the level.`);
             }
           }
           
@@ -606,11 +628,19 @@ function AdventurePage() {
     };
     
     const turn = (newDirection: string) => {
+      // Validate direction
+      if (!['up', 'down', 'left', 'right'].includes(newDirection)) {
+        addToLog(`Invalid direction: ${newDirection}`);
+        return;
+      }
       // Update both state and ref immediately
-      directionRef.current = newDirection;
-      setDirection(newDirection);
+      const dir = newDirection as 'up' | 'down' | 'left' | 'right';
+      directionRef.current = dir;
+      setDirection(dir);
       addToLog(`Turned to face ${newDirection}.`);
     };
+<｜tool▁call▁begin｜>
+read_lints
     
     const collectDiamond = (index: number) => {
       if (collectedDiamonds[index]) {
@@ -658,15 +688,17 @@ function AdventurePage() {
       }, 2000);
       
       // If all diamonds are collected, prompt player to reach the flag instead of auto-completing
-      if (newDiamondCount === 3) {
-        addToLog('Great job! You collected all 3 diamonds. Now move to the finish flag (🏁) to complete the level.');
+      const totalDiamonds = diamondPositions.length;
+      if (newDiamondCount === totalDiamonds) {
+        addToLog(`Great job! You collected all ${totalDiamonds} diamonds. Now move to the finish flag (🏁) to complete the level.`);
       }
     };
     
     const completeLevel = () => {
       // Safety check: only allow completion when all diamonds are collected
-      if (diamonds < 3) {
-        addToLog('You need all 3 diamonds before you can finish the level.');
+      const totalDiamonds = diamondPositions.length;
+      if (diamonds < totalDiamonds) {
+        addToLog(`You need all ${totalDiamonds} diamonds before you can finish the level.`);
         return;
       }
       const currentReward = getRewardForLevel(level);
@@ -745,14 +777,29 @@ function AdventurePage() {
       
       // Reset for next level
       setTimeout(() => {
-        setLevel(level + 1);
-        setDiamonds(0);
-        setCollectedDiamonds([false, false, false]);
-        const resetPos = { x: 1, y: 1 };
-        positionRef.current = resetPos;
-        setPosition(resetPos);
-        directionRef.current = 'right';
-        setDirection('right');
+        const nextLevel = level + 1;
+        const maxLevel = getMaxLevel();
+        
+        // Only advance if there's a next level
+        if (nextLevel <= maxLevel) {
+          setLevel(nextLevel);
+          const nextLevelConfig = getLevelConfig(nextLevel);
+          if (nextLevelConfig) {
+            // Reset position and direction for new level
+            const resetPos = nextLevelConfig.startPosition;
+            positionRef.current = resetPos;
+            setPosition(resetPos);
+            directionRef.current = nextLevelConfig.startDirection;
+            setDirection(nextLevelConfig.startDirection);
+            
+            // Reset diamonds for new level
+            setDiamonds(0);
+            setCollectedDiamonds(new Array(nextLevelConfig.diamondPositions.length).fill(false));
+          }
+        } else {
+          // All levels completed!
+          addToLog('🎉 Congratulations! You completed all levels!');
+        }
         setShowReward(false);
       }, alreadyHasItem ? 1500 : 3000); // Shorter delay if they already have the item
     };
@@ -947,8 +994,18 @@ function AdventurePage() {
           <Navigation />
           <div className="adventure-game" style={{ height: 'calc(100vh - 100px)', display: 'flex', flexDirection: 'column', overflow: 'auto', paddingBottom: '20px' }}>
             <div style={{ marginBottom: '8px', flexShrink: 0 }}>
-              <h1 style={{ margin: 0, fontSize: '1.6rem' }}>Code Grid Adventure</h1>
-              <p style={{ margin: '4px 0 0 0', fontSize: '0.9rem', color: '#666' }}>Use code to navigate the grid, avoid walls, and collect all the diamonds!</p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
+                <div>
+                  <h1 style={{ margin: 0, fontSize: '1.6rem' }}>Code Grid Adventure</h1>
+                  <p style={{ margin: '4px 0 0 0', fontSize: '1rem', color: '#667eea', fontWeight: 'bold' }}>
+                    Level {level}: {currentLevelConfig.title}
+                  </p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ margin: 0, fontSize: '0.9rem', color: '#666' }}>Level {level} of {getMaxLevel()}</p>
+                </div>
+              </div>
+              <p style={{ margin: '4px 0 0 0', fontSize: '0.9rem', color: '#666' }}>{currentLevelConfig.description}</p>
             </div>
             
             {/* Diamond Celebration Modal */}
@@ -1010,7 +1067,7 @@ function AdventurePage() {
                 }}>
                   <h2 style={{ color: '#e74c3c', marginTop: '0', fontSize: '2.5rem' }}>🎉 Level Complete! 🎉</h2>
                   <p style={{ fontSize: '1.2rem', color: '#666', marginBottom: '20px' }}>
-                    You've collected all 3 diamonds and completed the level!
+                    You've collected all {diamondPositions.length} diamonds and completed {currentLevelConfig.title}!
                   </p>
                   <div className="reward-item-display" style={{ marginTop: '20px' }}>
                     <h3 style={{ color: '#9b59b6', fontSize: '1.5rem' }}>Reward Unlocked:</h3>
@@ -1110,7 +1167,7 @@ function AdventurePage() {
                       <li>Use <code>turn right</code>, <code>turn left</code>, <code>turn up</code>, or <code>turn down</code> to change direction</li>
                       <li>Use <code>collect</code> when on a diamond to collect it</li>
                       <li>Use <code>say Hello!</code> to make your character say something in a speech bubble!</li>
-                      <li>Collect all 3 diamonds to complete the level!</li>
+                      <li>Collect all {diamondPositions.length} diamonds to complete the level!</li>
                     </ol>
                   )}
                 </div>
