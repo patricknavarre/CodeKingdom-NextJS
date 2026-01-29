@@ -168,16 +168,20 @@ function AdventurePage() {
         y: e.clientY - rect.top
       });
       
-      // Check for snap targets
-      const SNAP_DISTANCE = 50;
+      // Check for snap targets (horizontal - left to right)
+      const SNAP_DISTANCE = 60;
       let closestBlock: Block | null = null;
       let minDistance = Infinity;
       
       for (const block of connectedBlocks) {
+        const blockX = block.x;
         const blockY = block.y;
-        const distance = Math.abs(e.clientY - rect.top - blockY);
-        if (distance < SNAP_DISTANCE && distance < minDistance) {
-          minDistance = distance;
+        // Check both horizontal distance (for snapping) and vertical alignment
+        const horizontalDistance = Math.abs(e.clientX - rect.left - (blockX + 120)); // 120 = block width + gap
+        const verticalDistance = Math.abs(e.clientY - rect.top - blockY);
+        // Snap if horizontally close to the right edge of a block AND vertically aligned
+        if (horizontalDistance < SNAP_DISTANCE && verticalDistance < 30 && horizontalDistance < minDistance) {
+          minDistance = horizontalDistance;
           closestBlock = block;
         }
       }
@@ -193,15 +197,56 @@ function AdventurePage() {
       const dropX = e.clientX - rect.left;
       const dropY = e.clientY - rect.top;
       
-      const SNAP_DISTANCE = 50;
+      const SNAP_DISTANCE = 60;
+      const BLOCK_WIDTH = 120; // Approximate block width + gap
       let snapToBlock: Block | null = null;
       let minDistance = Infinity;
       
       for (const block of connectedBlocks) {
-        const distance = Math.abs(dropY - block.y);
-        if (distance < SNAP_DISTANCE && distance < minDistance) {
-          minDistance = distance;
+        const horizontalDistance = Math.abs(dropX - (block.x + BLOCK_WIDTH));
+        const verticalDistance = Math.abs(dropY - block.y);
+        // Snap if horizontally close to right edge AND vertically aligned
+        if (horizontalDistance < SNAP_DISTANCE && verticalDistance < 30 && horizontalDistance < minDistance) {
+          minDistance = horizontalDistance;
           snapToBlock = block;
+        }
+      }
+      
+      // Calculate position: if snapping, place to the right; otherwise append to end of chain
+      let newX: number;
+      let newY: number;
+      const BASE_Y = 20; // All blocks align on same horizontal line
+      
+      if (snapToBlock) {
+        // Snap to the right of the target block
+        newX = snapToBlock.x + BLOCK_WIDTH;
+        newY = snapToBlock.y; // Same vertical position
+      } else {
+        // If no blocks exist, start at left edge
+        if (connectedBlocks.length === 0) {
+          newX = 20;
+          newY = BASE_Y;
+        } else {
+          // Find the last block in the chain (rightmost connected block)
+          // Start from first block and follow connections
+          const firstBlock = connectedBlocks.find(b => 
+            !connectedBlocks.some(other => other.connectedTo === b.id)
+          ) || connectedBlocks[0];
+          
+          let lastBlock = firstBlock;
+          let current: Block | undefined = firstBlock;
+          while (current) {
+            const next = connectedBlocks.find(b => b.connectedTo === current!.id);
+            if (next) {
+              lastBlock = next;
+              current = next;
+            } else {
+              break;
+            }
+          }
+          
+          newX = lastBlock.x + BLOCK_WIDTH;
+          newY = BASE_Y; // Align all blocks on same line
         }
       }
       
@@ -209,8 +254,8 @@ function AdventurePage() {
         id: `block-${Date.now()}-${Math.random()}`,
         type: draggedBlock.type as 'move' | 'turn' | 'collect' | 'say',
         value: draggedBlock.value,
-        x: snapToBlock ? snapToBlock.x : dropX,
-        y: snapToBlock ? snapToBlock.y + 50 : dropY
+        x: newX,
+        y: newY
       };
       
       if (snapToBlock) {
@@ -219,12 +264,12 @@ function AdventurePage() {
       }
       
       setConnectedBlocks(prev => {
-        // If snapping, insert after the target block
+        // If snapping, insert after the target block and update connections
         if (snapToBlock) {
           const index = prev.findIndex(b => b.id === snapToBlock!.id);
           const newBlocks = [...prev];
           newBlocks.splice(index + 1, 0, newBlock);
-          // Update connections
+          // Update connections: the target block now connects to the new block
           return newBlocks.map(b => {
             if (b.id === snapToBlock!.id) {
               return { ...b, connectedTo: newBlock.id };
@@ -232,6 +277,7 @@ function AdventurePage() {
             return b;
           });
         }
+        // If not snapping, add to end
         return [...prev, newBlock];
       });
       
@@ -270,10 +316,15 @@ function AdventurePage() {
         !connectedBlocks.some(other => other.connectedTo === b.id)
       ) || connectedBlocks[0];
       
+      if (!firstBlock) return [];
+      
       const commands: string[] = [];
       let current: Block | undefined = firstBlock;
+      const visited = new Set<string>(); // Prevent infinite loops
       
-      while (current) {
+      while (current && !visited.has(current.id)) {
+        visited.add(current.id);
+        
         let cmd = '';
         if (current.type === 'move') {
           cmd = `move ${current.value || 1}`;
@@ -287,7 +338,8 @@ function AdventurePage() {
         commands.push(cmd);
         
         // Find next connected block
-        current = connectedBlocks.find(b => b.connectedTo === current!.id);
+        const nextBlock = connectedBlocks.find(b => b.connectedTo === current!.id);
+        current = nextBlock;
       }
       
       return commands;
@@ -1222,64 +1274,89 @@ function AdventurePage() {
                         Drag blocks here to build your program! 🧩
                       </div>
                     ) : (
-                      connectedBlocks.map((block, index) => {
-                        const getBlockColor = () => {
-                          if (block.type === 'move') return '#3498db';
-                          if (block.type === 'turn') return '#9b59b6';
-                          if (block.type === 'collect') return '#f39c12';
-                          return '#2ecc71';
-                        };
-                        
-                        const getBlockText = () => {
-                          if (block.type === 'move') return `move ${block.value || 1}`;
-                          if (block.type === 'turn') return `turn ${block.value || 'right'}`;
-                          if (block.type === 'collect') return 'collect';
-                          return `say ${block.value || 'Hello!'}`;
-                        };
-                        
-                        return (
-                          <div
-                            key={block.id}
-                            style={{
-                              position: 'absolute',
-                              left: `${block.x}px`,
-                              top: `${block.y}px`,
-                              backgroundColor: getBlockColor(),
-                              color: 'white',
-                              padding: '10px 14px',
-                              borderRadius: '8px',
-                              fontWeight: 'bold',
-                              fontSize: '0.9rem',
-                              cursor: 'move',
-                              boxShadow: snapTarget === block.id 
-                                ? '0 0 15px rgba(52, 152, 219, 0.8)' 
-                                : '0 3px 6px rgba(0,0,0,0.3)',
-                              transform: snapTarget === block.id ? 'scale(1.05)' : 'scale(1)',
-                              transition: 'all 0.2s ease',
-                              zIndex: snapTarget === block.id ? 10 : 1,
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '8px'
-                            }}
-                          >
-                            <span>{getBlockText()}</span>
-                            <button
-                              onClick={() => handleBlockDelete(block.id)}
-                              style={{
-                                background: 'rgba(255,255,255,0.3)',
-                                border: 'none',
-                                color: 'white',
-                                borderRadius: '4px',
-                                padding: '2px 6px',
-                                cursor: 'pointer',
-                                fontSize: '0.8rem'
-                              }}
-                            >
-                              ×
-                            </button>
-                          </div>
-                        );
-                      })
+                      <>
+                        {connectedBlocks.map((block) => {
+                          const getBlockColor = () => {
+                            if (block.type === 'move') return '#3498db';
+                            if (block.type === 'turn') return '#9b59b6';
+                            if (block.type === 'collect') return '#f39c12';
+                            return '#2ecc71';
+                          };
+                          
+                          const getBlockText = () => {
+                            if (block.type === 'move') return `move ${block.value || 1}`;
+                            if (block.type === 'turn') return `turn ${block.value || 'right'}`;
+                            if (block.type === 'collect') return 'collect';
+                            return `say ${block.value || 'Hello!'}`;
+                          };
+                          
+                          // Find the block this one connects to (for drawing connector)
+                          const connectsTo = connectedBlocks.find(b => b.id === block.connectedTo);
+                          
+                          return (
+                            <React.Fragment key={block.id}>
+                              {/* Connector line to next block */}
+                              {connectsTo && (
+                                <div
+                                  style={{
+                                    position: 'absolute',
+                                    left: `${block.x + 100}px`, // Right edge of current block
+                                    top: `${block.y + 20}px`, // Middle of block
+                                    width: `${connectsTo.x - block.x - 100}px`,
+                                    height: '3px',
+                                    backgroundColor: '#3498db',
+                                    zIndex: 0,
+                                    opacity: 0.6
+                                  }}
+                                />
+                              )}
+                              {/* Block */}
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  left: `${block.x}px`,
+                                  top: `${block.y}px`,
+                                  backgroundColor: getBlockColor(),
+                                  color: 'white',
+                                  padding: '10px 14px',
+                                  borderRadius: '8px',
+                                  fontWeight: 'bold',
+                                  fontSize: '0.9rem',
+                                  cursor: 'move',
+                                  boxShadow: snapTarget === block.id 
+                                    ? '0 0 15px rgba(52, 152, 219, 0.8)' 
+                                    : '0 3px 6px rgba(0,0,0,0.3)',
+                                  transform: snapTarget === block.id ? 'scale(1.05)' : 'scale(1)',
+                                  transition: 'all 0.2s ease',
+                                  zIndex: snapTarget === block.id ? 10 : 2,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '8px',
+                                  minWidth: '100px',
+                                  whiteSpace: 'nowrap'
+                                }}
+                              >
+                                <span>{getBlockText()}</span>
+                                <button
+                                  onClick={() => handleBlockDelete(block.id)}
+                                  style={{
+                                    background: 'rgba(255,255,255,0.3)',
+                                    border: 'none',
+                                    color: 'white',
+                                    borderRadius: '4px',
+                                    padding: '2px 6px',
+                                    cursor: 'pointer',
+                                    fontSize: '0.8rem',
+                                    marginLeft: 'auto'
+                                  }}
+                                >
+                                  ×
+                                </button>
+                              </div>
+                            </React.Fragment>
+                          );
+                        })}
+                      </>
                     )}
                   </div>
                   
