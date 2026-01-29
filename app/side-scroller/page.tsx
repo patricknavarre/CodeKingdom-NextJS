@@ -563,6 +563,9 @@ export default function SideScrollerPage() {
 
   const characterImage = getCharacterImage();
 
+  const levelIndexForRender = Math.max(0, Math.min(LEVELS.length - 1, currentLevel - 1));
+  const currentLevelConfig = LEVELS[levelIndexForRender];
+
   // Helpers for mobile controls
   const pressLeft = () => {
     if (modeRef.current === 'code') return;
@@ -772,28 +775,19 @@ export default function SideScrollerPage() {
               )}
 
               <div className="side-scroller-world">
-                {(() => {
-                  const index = Math.max(0, Math.min(LEVELS.length - 1, currentLevel - 1));
-                  const cfg = LEVELS[index];
-                  const platforms = cfg.platforms || [];
-                  return (
-                    <>
-                      {/* Platforms */}
-                      {platforms.map((platform, index) => (
-                        <div
-                          key={index}
-                          className="side-scroller-platform"
-                          style={{
-                            left: `${platform.x}%`,
-                            bottom: `${60 + platform.top - platform.thickness}px`,
-                            height: `${platform.thickness}px`,
-                            width: `${platform.width}%`
-                          }}
-                        />
-                      )}
-                    </>
-                  );
-                })()}
+                {/* Platforms */}
+                {(currentLevelConfig.platforms || []).map((platform, index) => (
+                  <div
+                    key={index}
+                    className="side-scroller-platform"
+                    style={{
+                      left: `${platform.x}%`,
+                      bottom: `${60 + platform.top - platform.thickness}px`,
+                      height: `${platform.thickness}px`,
+                      width: `${platform.width}%`
+                    }}
+                  />
+                ))}
                 {/* Character */}
                 <div
                   className="side-scroller-character"
@@ -825,7 +819,7 @@ export default function SideScrollerPage() {
                 )}
 
                 {/* Obstacles */}
-                {obstacles.map((obstacle, index) => (
+                {currentLevelConfig.obstacles.map((obstacle, index) => (
                   <div
                     key={index}
                     className="side-scroller-obstacle"
