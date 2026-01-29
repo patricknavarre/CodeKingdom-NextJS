@@ -111,6 +111,188 @@ function AdventurePage() {
     const [commandSequence, setCommandSequence] = useState<string[]>([]);
     const [diamondsCollectedThisSequence, setDiamondsCollectedThisSequence] = useState(0);
     
+    // Block system state
+    interface Block {
+      id: string;
+      type: 'move' | 'turn' | 'collect' | 'say';
+      value?: string | number; // for move steps, turn direction, or say message
+      x: number;
+      y: number;
+      connectedTo?: string; // id of block this is connected to
+    }
+    
+    const [connectedBlocks, setConnectedBlocks] = useState<Block[]>([]);
+    const [draggedBlock, setDraggedBlock] = useState<{ type: string; value?: string | number } | null>(null);
+    const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
+    const [snapTarget, setSnapTarget] = useState<string | null>(null);
+    const workspaceRef = useRef<HTMLDivElement>(null);
+    
+    // Sound effect for block snapping
+    const playSnapSound = () => {
+      try {
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.value = 800;
+        oscillator.type = 'sine';
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.1);
+      } catch (e) {
+        // Fallback if audio context fails
+        console.log('Audio not available');
+      }
+    };
+    
+    // Block drag handlers
+    const handleBlockDragStart = (e: React.DragEvent, type: string, value?: string | number) => {
+      setDraggedBlock({ type, value });
+      e.dataTransfer.effectAllowed = 'move';
+      if (e.dataTransfer) {
+        e.dataTransfer.setData('text/plain', ''); // Required for Firefox
+      }
+    };
+    
+    const handleBlockDrag = (e: React.DragEvent) => {
+      if (!draggedBlock || !workspaceRef.current) return;
+      const rect = workspaceRef.current.getBoundingClientRect();
+      setDragPosition({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      });
+      
+      // Check for snap targets
+      const SNAP_DISTANCE = 50;
+      let closestBlock: Block | null = null;
+      let minDistance = Infinity;
+      
+      for (const block of connectedBlocks) {
+        const blockY = block.y;
+        const distance = Math.abs(e.clientY - rect.top - blockY);
+        if (distance < SNAP_DISTANCE && distance < minDistance) {
+          minDistance = distance;
+          closestBlock = block;
+        }
+      }
+      
+      setSnapTarget(closestBlock?.id || null);
+    };
+    
+    const handleBlockDrop = (e: React.DragEvent) => {
+      e.preventDefault();
+      if (!draggedBlock || !workspaceRef.current) return;
+      
+      const rect = workspaceRef.current.getBoundingClientRect();
+      const dropX = e.clientX - rect.left;
+      const dropY = e.clientY - rect.top;
+      
+      const SNAP_DISTANCE = 50;
+      let snapToBlock: Block | null = null;
+      let minDistance = Infinity;
+      
+      for (const block of connectedBlocks) {
+        const distance = Math.abs(dropY - block.y);
+        if (distance < SNAP_DISTANCE && distance < minDistance) {
+          minDistance = distance;
+          snapToBlock = block;
+        }
+      }
+      
+      const newBlock: Block = {
+        id: `block-${Date.now()}-${Math.random()}`,
+        type: draggedBlock.type as 'move' | 'turn' | 'collect' | 'say',
+        value: draggedBlock.value,
+        x: snapToBlock ? snapToBlock.x : dropX,
+        y: snapToBlock ? snapToBlock.y + 50 : dropY
+      };
+      
+      if (snapToBlock) {
+        newBlock.connectedTo = snapToBlock.id;
+        playSnapSound();
+      }
+      
+      setConnectedBlocks(prev => {
+        // If snapping, insert after the target block
+        if (snapToBlock) {
+          const index = prev.findIndex(b => b.id === snapToBlock!.id);
+          const newBlocks = [...prev];
+          newBlocks.splice(index + 1, 0, newBlock);
+          // Update connections
+          return newBlocks.map(b => {
+            if (b.id === snapToBlock!.id) {
+              return { ...b, connectedTo: newBlock.id };
+            }
+            return b;
+          });
+        }
+        return [...prev, newBlock];
+      });
+      
+      setDraggedBlock(null);
+      setSnapTarget(null);
+    };
+    
+    const handleBlockDelete = (blockId: string) => {
+      setConnectedBlocks(prev => {
+        const block = prev.find(b => b.id === blockId);
+        if (!block) return prev;
+        
+        const connectedToId = block.connectedTo;
+        
+        // Remove this block and update connections
+        const filtered = prev.filter(b => b.id !== blockId);
+        return filtered.map(b => {
+          if (b.connectedTo === blockId) {
+            return { ...b, connectedTo: connectedToId };
+          }
+          return b;
+        });
+      });
+    };
+    
+    const clearAllBlocks = () => {
+      setConnectedBlocks([]);
+    };
+    
+    // Convert connected blocks to command sequence
+    const blocksToCommands = (): string[] => {
+      if (connectedBlocks.length === 0) return [];
+      
+      // Find the first block (one with no incoming connection)
+      const firstBlock = connectedBlocks.find(b => 
+        !connectedBlocks.some(other => other.connectedTo === b.id)
+      ) || connectedBlocks[0];
+      
+      const commands: string[] = [];
+      let current: Block | undefined = firstBlock;
+      
+      while (current) {
+        let cmd = '';
+        if (current.type === 'move') {
+          cmd = `move ${current.value || 1}`;
+        } else if (current.type === 'turn') {
+          cmd = `turn ${current.value || 'right'}`;
+        } else if (current.type === 'collect') {
+          cmd = 'collect';
+        } else if (current.type === 'say') {
+          cmd = `say ${current.value || 'Hello!'}`;
+        }
+        commands.push(cmd);
+        
+        // Find next connected block
+        current = connectedBlocks.find(b => b.connectedTo === current!.id);
+      }
+      
+      return commands;
+    };
+    
     // Load saved level from localStorage so players resume where they left off
     useEffect(() => {
       if (typeof window === 'undefined') return;
@@ -541,22 +723,31 @@ function AdventurePage() {
     };
     
     const executeCommand = async () => {
-      const commandInput = document.getElementById('commandInput') as HTMLTextAreaElement;
-      const input = commandInput.value.trim();
+      // First try to use connected blocks
+      const blockCommands = blocksToCommands();
+      let commands: string[] = [];
       
-      if (!input) {
-        addToLog('Please enter a command.');
-        return;
+      if (blockCommands.length > 0) {
+        commands = blockCommands;
+      } else {
+        // Fallback to text input
+        const commandInput = document.getElementById('commandInput') as HTMLTextAreaElement;
+        const input = commandInput?.value.trim() || '';
+        
+        if (!input) {
+          addToLog('Please connect some blocks or enter a command.');
+          return;
+        }
+        
+        // Clear the input
+        if (commandInput) commandInput.value = '';
+        
+        // Split commands by comma or newline
+        commands = input
+          .split(/[,\n]/)
+          .map(cmd => cmd.trim())
+          .filter(cmd => cmd.length > 0);
       }
-      
-      // Clear the input
-      commandInput.value = '';
-      
-      // Split commands by comma or newline
-      const commands = input
-        .split(/[,\n]/)
-        .map(cmd => cmd.trim())
-        .filter(cmd => cmd.length > 0);
       
       if (commands.length === 0) {
         addToLog('Please enter a valid command.');
@@ -856,14 +1047,262 @@ function AdventurePage() {
                   flexShrink: 0,
                   overflow: 'visible'
                 }}>
-                  <h3>Commands</h3>
-                  <div className="command-key" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
-                    <div className="key-item" style={{ backgroundColor: '#f8f9fa', padding: '4px 8px', borderRadius: '3px', fontSize: '0.85rem' }}>move &lt;steps&gt;</div>
-                    <div className="key-item" style={{ backgroundColor: '#f8f9fa', padding: '4px 8px', borderRadius: '3px', fontSize: '0.85rem' }}>turn &lt;direction&gt;</div>
-                    <div className="key-item" style={{ backgroundColor: '#f8f9fa', padding: '4px 8px', borderRadius: '3px', fontSize: '0.85rem' }}>collect</div>
-                    <div className="key-item" style={{ backgroundColor: '#f8f9fa', padding: '4px 8px', borderRadius: '3px', fontSize: '0.85rem' }}>say &lt;message&gt;</div>
+                  <h3>Drag & Connect Blocks</h3>
+                  <div style={{ marginBottom: '12px', fontSize: '0.85rem', color: '#666' }}>
+                    Drag blocks from the palette below into the workspace. They'll snap together with a satisfying click! 🧲
                   </div>
-                    <div className="command-input">
+                  
+                  {/* Block Palette */}
+                  <div style={{ 
+                    display: 'flex', 
+                    flexWrap: 'wrap', 
+                    gap: '8px', 
+                    marginBottom: '12px',
+                    padding: '10px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '6px',
+                    border: '2px dashed #bdc3c7'
+                  }}>
+                    {/* Move blocks */}
+                    <div
+                      draggable
+                      onDragStart={(e) => handleBlockDragStart(e, 'move', 1)}
+                      className="block-palette-item"
+                      style={{
+                        backgroundColor: '#3498db',
+                        color: 'white',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        cursor: 'grab',
+                        fontWeight: 'bold',
+                        fontSize: '0.9rem',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        userSelect: 'none'
+                      }}
+                    >
+                      move 1
+                    </div>
+                    <div
+                      draggable
+                      onDragStart={(e) => handleBlockDragStart(e, 'move', 2)}
+                      className="block-palette-item"
+                      style={{
+                        backgroundColor: '#3498db',
+                        color: 'white',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        cursor: 'grab',
+                        fontWeight: 'bold',
+                        fontSize: '0.9rem',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        userSelect: 'none'
+                      }}
+                    >
+                      move 2
+                    </div>
+                    {/* Turn blocks */}
+                    <div
+                      draggable
+                      onDragStart={(e) => handleBlockDragStart(e, 'turn', 'right')}
+                      className="block-palette-item"
+                      style={{
+                        backgroundColor: '#9b59b6',
+                        color: 'white',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        cursor: 'grab',
+                        fontWeight: 'bold',
+                        fontSize: '0.9rem',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        userSelect: 'none'
+                      }}
+                    >
+                      turn right
+                    </div>
+                    <div
+                      draggable
+                      onDragStart={(e) => handleBlockDragStart(e, 'turn', 'left')}
+                      className="block-palette-item"
+                      style={{
+                        backgroundColor: '#9b59b6',
+                        color: 'white',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        cursor: 'grab',
+                        fontWeight: 'bold',
+                        fontSize: '0.9rem',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        userSelect: 'none'
+                      }}
+                    >
+                      turn left
+                    </div>
+                    <div
+                      draggable
+                      onDragStart={(e) => handleBlockDragStart(e, 'turn', 'up')}
+                      className="block-palette-item"
+                      style={{
+                        backgroundColor: '#9b59b6',
+                        color: 'white',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        cursor: 'grab',
+                        fontWeight: 'bold',
+                        fontSize: '0.9rem',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        userSelect: 'none'
+                      }}
+                    >
+                      turn up
+                    </div>
+                    <div
+                      draggable
+                      onDragStart={(e) => handleBlockDragStart(e, 'turn', 'down')}
+                      className="block-palette-item"
+                      style={{
+                        backgroundColor: '#9b59b6',
+                        color: 'white',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        cursor: 'grab',
+                        fontWeight: 'bold',
+                        fontSize: '0.9rem',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        userSelect: 'none'
+                      }}
+                    >
+                      turn down
+                    </div>
+                    {/* Collect block */}
+                    <div
+                      draggable
+                      onDragStart={(e) => handleBlockDragStart(e, 'collect')}
+                      className="block-palette-item"
+                      style={{
+                        backgroundColor: '#f39c12',
+                        color: 'white',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        cursor: 'grab',
+                        fontWeight: 'bold',
+                        fontSize: '0.9rem',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        userSelect: 'none'
+                      }}
+                    >
+                      collect
+                    </div>
+                  </div>
+                  
+                  {/* Workspace for connected blocks */}
+                  <div
+                    ref={workspaceRef}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      handleBlockDrag(e);
+                    }}
+                    onDrop={handleBlockDrop}
+                    style={{
+                      minHeight: '150px',
+                      backgroundColor: '#fff',
+                      border: '2px dashed #3498db',
+                      borderRadius: '8px',
+                      padding: '15px',
+                      marginBottom: '12px',
+                      position: 'relative'
+                    }}
+                  >
+                    {connectedBlocks.length === 0 ? (
+                      <div style={{ 
+                        textAlign: 'center', 
+                        color: '#999', 
+                        padding: '40px',
+                        fontSize: '0.9rem'
+                      }}>
+                        Drag blocks here to build your program! 🧩
+                      </div>
+                    ) : (
+                      connectedBlocks.map((block, index) => {
+                        const getBlockColor = () => {
+                          if (block.type === 'move') return '#3498db';
+                          if (block.type === 'turn') return '#9b59b6';
+                          if (block.type === 'collect') return '#f39c12';
+                          return '#2ecc71';
+                        };
+                        
+                        const getBlockText = () => {
+                          if (block.type === 'move') return `move ${block.value || 1}`;
+                          if (block.type === 'turn') return `turn ${block.value || 'right'}`;
+                          if (block.type === 'collect') return 'collect';
+                          return `say ${block.value || 'Hello!'}`;
+                        };
+                        
+                        return (
+                          <div
+                            key={block.id}
+                            style={{
+                              position: 'absolute',
+                              left: `${block.x}px`,
+                              top: `${block.y}px`,
+                              backgroundColor: getBlockColor(),
+                              color: 'white',
+                              padding: '10px 14px',
+                              borderRadius: '8px',
+                              fontWeight: 'bold',
+                              fontSize: '0.9rem',
+                              cursor: 'move',
+                              boxShadow: snapTarget === block.id 
+                                ? '0 0 15px rgba(52, 152, 219, 0.8)' 
+                                : '0 3px 6px rgba(0,0,0,0.3)',
+                              transform: snapTarget === block.id ? 'scale(1.05)' : 'scale(1)',
+                              transition: 'all 0.2s ease',
+                              zIndex: snapTarget === block.id ? 10 : 1,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px'
+                            }}
+                          >
+                            <span>{getBlockText()}</span>
+                            <button
+                              onClick={() => handleBlockDelete(block.id)}
+                              style={{
+                                background: 'rgba(255,255,255,0.3)',
+                                border: 'none',
+                                color: 'white',
+                                borderRadius: '4px',
+                                padding: '2px 6px',
+                                cursor: 'pointer',
+                                fontSize: '0.8rem'
+                              }}
+                            >
+                              ×
+                            </button>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                  
+                  {connectedBlocks.length > 0 && (
+                    <button
+                      onClick={clearAllBlocks}
+                      style={{
+                        backgroundColor: '#e74c3c',
+                        color: 'white',
+                        border: 'none',
+                        padding: '6px 12px',
+                        borderRadius: '5px',
+                        fontSize: '0.85rem',
+                        cursor: 'pointer',
+                        marginBottom: '8px'
+                      }}
+                    >
+                      Clear All Blocks
+                    </button>
+                  )}
+                  
+                  {/* Fallback text input */}
+                  <div className="command-input">
                     <div className="command-buttons" style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginBottom: '8px' }}>
                       <button 
                         onClick={() => {
