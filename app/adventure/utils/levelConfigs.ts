@@ -22,15 +22,15 @@ export const LEVELS: LevelConfig[] = [
     hint: 'Use "move" to walk forward and "turn" to change direction. Collect the diamond, then reach the flag!',
     grid: [
       [1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 0, 0, 0, 0, 0, 2, 1],
-      [1, 0, 1, 1, 1, 0, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0],
+      [1, 0, 1, 1, 1, 2, 0, 1],
       [1, 0, 0, 0, 0, 0, 0, 1],
       [1, 0, 1, 1, 1, 1, 0, 1],
       [1, 0, 0, 0, 0, 0, 3, 1],
       [1, 1, 1, 1, 1, 1, 1, 1]
     ],
-    diamondPositions: [{ x: 6, y: 1 }],
-    startPosition: { x: 1, y: 1 },
+    diamondPositions: [{ x: 5, y: 2 }],
+    startPosition: { x: 7, y: 1 },
     startDirection: 'right'
   },
 
