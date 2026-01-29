@@ -95,9 +95,13 @@ function AdventurePage() {
       girlCharacterPath: girlCharacter
     });
     
-    // Get initial position and direction from level config
+    const [diamonds, setDiamonds] = useState(0);
+    const [log, setLog] = useState(['Welcome to the adventure!']);
+    const [level, setLevel] = useState(1);
+    
+    // Get initial position and direction from level config (use level 1 as default)
     const getInitialConfig = () => {
-      return getLevelConfig(level) || getLevelConfig(1)!;
+      return getLevelConfig(1)!;
     };
 
     // Game state - initialized from level config
@@ -109,10 +113,6 @@ function AdventurePage() {
     const [direction, setDirection] = useState(initialConfig.startDirection);
     // Use a ref to track direction synchronously (for immediate use in move function)
     const directionRef = useRef(initialConfig.startDirection);
-    
-    const [diamonds, setDiamonds] = useState(0);
-    const [log, setLog] = useState(['Welcome to the adventure!']);
-    const [level, setLevel] = useState(1);
     const [showReward, setShowReward] = useState(false);
     const [showDiamondCelebration, setShowDiamondCelebration] = useState(false);
     const [commandSequence, setCommandSequence] = useState<string[]>([]);
