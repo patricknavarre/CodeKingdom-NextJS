@@ -268,3 +268,10 @@
     font-size: 0.85rem;
   }
 }
+
+/* Hide navigation in landscape mode on mobile for more game space */
+@media (max-width: 900px) and (orientation: landscape) {
+  .navigation-header {
+    display: none;
+  }
+}
