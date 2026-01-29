@@ -119,6 +119,13 @@ export default function Navigation() {
         >
           🌐 HTML & CSS Basics
         </Link>
+        <Link 
+          href="/3d-basics" 
+          onClick={closeMenu} 
+          className="nav-link threed nav-sub-link"
+        >
+          🧱 3D Basics
+        </Link>
         
         <Link 
           href="/shop" 
