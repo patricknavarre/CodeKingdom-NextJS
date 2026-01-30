@@ -1091,7 +1091,7 @@ function AdventurePage() {
       margin: 0,
       padding: 0,
       background: character.background.value,
-      backgroundAttachment: 'fixed' as const,
+      backgroundAttachment: 'fixed',
       minHeight: '100vh'
     } : {
       width: '100%',
