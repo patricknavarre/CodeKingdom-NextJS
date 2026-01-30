@@ -1093,9 +1093,9 @@ function AdventurePage() {
 
     return (
       <ProtectedRoute>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px', ...backgroundStyle }}>
+        <div style={{ width: '100%', height: '100vh', margin: 0, padding: 0, ...backgroundStyle }}>
           <Navigation />
-          <div className="adventure-game" style={{ height: 'calc(100vh - 100px)', display: 'flex', flexDirection: 'column', overflow: 'auto', paddingBottom: '20px' }}>
+          <div className="adventure-game" style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             <div style={{ marginBottom: '8px', flexShrink: 0 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
                 <div>
@@ -1228,20 +1228,20 @@ function AdventurePage() {
             )}
             
             
-            <div className="game-container" style={{ flex: 1, display: 'flex', flexDirection: 'row', gap: '10px', overflow: 'auto', minHeight: 0 }}>
+            <div className="game-container" style={{ flex: 1, display: 'flex', flexDirection: 'row', gap: '20px', overflow: 'hidden', minHeight: 0 }}>
               {/* Left Column - Instructions and Game Grid */}
-              <div style={{ flex: '0 0 50%', display: 'flex', flexDirection: 'column', gap: '10px', overflow: 'auto', minHeight: 0 }}>
+              <div style={{ flex: '0 0 50%', display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'hidden', minHeight: 0 }}>
                 {/* Instructions Panel - Collapsible */}
                 <div className="instructions-panel" style={{ 
-                  padding: '10px 12px',
+                  padding: '15px 20px',
                   overflowY: 'auto',
                   flexShrink: 0,
-                  maxHeight: showHowToPlay ? '200px' : '40px',
+                  maxHeight: showHowToPlay ? '300px' : '60px',
                   transition: 'max-height 0.3s ease',
                   backgroundColor: 'white',
-                  borderRadius: '6px',
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                  borderLeft: '3px solid #27ae60'
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+                  borderLeft: '4px solid #27ae60'
                 }}>
                   <div 
                     style={{ 

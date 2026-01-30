@@ -1,8 +1,11 @@
 .block-builder-page {
-  min-height: calc(100vh - 60px);
+  height: 100vh;
   background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
   color: white;
   padding: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .block-builder-header {
@@ -33,7 +36,9 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  height: calc(100vh - 180px);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .block-builder-editor-panel {
@@ -76,12 +81,12 @@
 
 .block-code-editor {
   width: 100%;
-  height: 300px;
-  padding: 15px;
+  height: 400px;
+  padding: 20px;
   border: 2px solid #ddd;
   border-radius: 8px;
   font-family: 'Courier New', monospace;
-  font-size: 14px;
+  font-size: 16px;
   resize: vertical;
   background: #f8f9fa;
   color: #333;
@@ -325,7 +330,7 @@
   border-radius: 8px;
   overflow: hidden;
   background: #87ceeb;
-  min-height: 500px;
+  min-height: 600px;
   position: relative;
 }
 
@@ -431,14 +436,3 @@
   background: #27ae60;
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
-  .block-builder-content {
-    grid-template-columns: 1fr;
-    height: auto;
-  }
-
-  .block-builder-world-panel {
-    min-height: 500px;
-  }
-}

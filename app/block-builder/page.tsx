@@ -1264,7 +1264,7 @@ except Exception as e:
 
   return (
     <ProtectedRoute>
-      <div style={{ maxWidth: '100%', margin: '0 auto' }}>
+      <div style={{ width: '100%', height: '100vh', margin: 0, padding: 0 }}>
         <Navigation />
         <div className="block-builder-page">
           <div className="block-builder-header">

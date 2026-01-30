@@ -449,9 +449,9 @@ export default function StoryGamePage() {
 
   return (
     <ProtectedRoute>
-      <div style={{ maxWidth: '100%', margin: '0 auto', ...backgroundStyle }}>
+      <div style={{ width: '100%', height: '100vh', margin: 0, padding: 0, ...backgroundStyle }}>
         <Navigation />
-        <div className="story-game-container" style={{ height: 'calc(100vh - 100px)', background: 'transparent' }}>
+        <div className="story-game-container" style={{ height: '100vh', background: 'transparent' }}>
           {/* Header */}
           <div className="story-game-header">
             <h1>Python Story Adventure</h1>
