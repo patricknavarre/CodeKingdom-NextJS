@@ -1085,13 +1085,13 @@ function AdventurePage() {
       }, 500);
     };
     
-    const backgroundStyle: React.CSSProperties = character.background ? {
+    const backgroundStyle = character.background ? {
       background: character.background.value,
-      backgroundAttachment: 'fixed',
+      backgroundAttachment: 'fixed' as const,
       minHeight: '100vh'
     } : {};
 
-    const containerStyle: React.CSSProperties = {
+    const containerStyle = {
       width: '100%',
       height: '100vh',
       margin: 0,
