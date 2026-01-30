@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useCharacter } from '@/contexts/CharacterContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { storyGameAPI } from '@/lib/api';
+import { SCENES } from '@/lib/storyGameConstants';
 import Navigation from '@/components/Navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import '@/styles/StoryGamePage.css';
