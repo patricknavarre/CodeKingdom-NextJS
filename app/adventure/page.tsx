@@ -1282,11 +1282,11 @@ function AdventurePage() {
                   justifyContent: 'center',
                   alignItems: 'flex-start',
                   backgroundColor: '#ebf5fb',
-                  borderRadius: '8px',
-                  padding: '10px',
+                  borderRadius: '10px',
+                  padding: '20px',
                   boxShadow: 'inset 0 0 10px rgba(52, 152, 219, 0.2)',
                   overflow: 'auto',
-                  minHeight: '300px',
+                  minHeight: 0,
                   position: 'relative'
                 }}>
                   <div 
@@ -1296,8 +1296,8 @@ function AdventurePage() {
                       position: 'relative', 
                       margin: '0 auto',
                       display: 'grid',
-                      gridTemplateColumns: `repeat(${grid[0]?.length || 10}, 28px)`,
-                      gridTemplateRows: `repeat(${grid.length}, 28px)`,
+                      gridTemplateColumns: `repeat(${grid[0]?.length || 10}, 40px)`,
+                      gridTemplateRows: `repeat(${grid.length}, 40px)`,
                       gap: '1px',
                       backgroundColor: '#3498db',
                       borderRadius: '6px',
@@ -1372,7 +1372,7 @@ function AdventurePage() {
               </div>
               
               {/* Right Column - Commands, Character, Status, Log */}
-              <div style={{ flex: '0 0 50%', display: 'flex', flexDirection: 'column', gap: '10px', overflow: 'auto', minHeight: 0 }}>
+              <div style={{ flex: '0 0 50%', display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'auto', minHeight: 0 }}>
                 {/* Commands Panel */}
                 <div className="command-panel" style={{
                   backgroundColor: 'white',
