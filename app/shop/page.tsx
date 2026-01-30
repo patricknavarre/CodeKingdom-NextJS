@@ -264,16 +264,16 @@ const shopItems: ShopItem[] = [
     backgroundValue: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)'
   },
   {
-    id: 'bg-rainbow',
-    name: 'Rainbow Magic',
+    id: 'bg-gold',
+    name: 'Golden Shine',
     type: 'background',
-    image: '🌈',
-    description: 'A vibrant rainbow gradient background!',
+    image: '✨',
+    description: 'A luxurious gold and shiny gradient background!',
     price: 500,
     rarity: 'legendary',
     category: 'backgrounds',
     backgroundType: 'gradient',
-    backgroundValue: 'linear-gradient(135deg, #ff0000 0%, #ff7f00 16.66%, #ffff00 33.33%, #00ff00 50%, #0000ff 66.66%, #4b0082 83.33%, #9400d3 100%)'
+    backgroundValue: 'linear-gradient(135deg, #FFD700 0%, #FFA500 25%, #FFD700 50%, #FFA500 75%, #FFD700 100%)'
   }
 ];
 
