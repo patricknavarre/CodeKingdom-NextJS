@@ -102,6 +102,12 @@ export async function POST(req: NextRequest) {
             coinsEarned = 50;
             experienceEarned = 50;
           } else if (storyGame.currentScene === 'mountain') {
+            storyGame.currentScene = 'desert';
+            updatedLocation = 'oasis';
+            message = 'Mountain completed! You arrive at the ancient desert.';
+            coinsEarned = 50;
+            experienceEarned = 50;
+          } else if (storyGame.currentScene === 'desert') {
             message = 'Congratulations! You completed all scenes! You are a true coding adventurer!';
             coinsEarned = 100;
             experienceEarned = 100;

@@ -2,7 +2,7 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IStoryGame extends Document {
   user: mongoose.Types.ObjectId;
-  currentScene: 'forest' | 'castle' | 'town';
+  currentScene: 'forest' | 'castle' | 'town' | 'ocean' | 'mountain' | 'desert';
   currentLocation: string;
   inventory: Array<{
     name: string;
@@ -10,7 +10,7 @@ export interface IStoryGame extends Document {
     collectedAt: Date;
   }>;
   completedScenes: Array<{
-    scene: 'forest' | 'castle' | 'town';
+    scene: 'forest' | 'castle' | 'town' | 'ocean' | 'mountain' | 'desert';
     completedAt: Date;
   }>;
   storyProgress: number; // 0-100 percentage
@@ -36,7 +36,7 @@ const storyGameSchema = new Schema<IStoryGame>(
     },
     currentScene: {
       type: String,
-      enum: ['forest', 'castle', 'town'],
+      enum: ['forest', 'castle', 'town', 'ocean', 'mountain', 'desert'],
       default: 'forest',
     },
     currentLocation: {
@@ -57,7 +57,7 @@ const storyGameSchema = new Schema<IStoryGame>(
     completedScenes: [{
       scene: {
         type: String,
-        enum: ['forest', 'castle', 'town'],
+        enum: ['forest', 'castle', 'town', 'ocean', 'mountain', 'desert'],
       },
       completedAt: {
         type: Date,

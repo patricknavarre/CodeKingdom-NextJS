@@ -60,6 +60,11 @@ const SCENES = {
     background: 'linear-gradient(135deg, #8b7355 0%, #5a4a3a 50%, #3d2f1f 100%)',
     locations: ['mountain_base', 'cliff_path', 'summit', 'cave'],
   },
+  desert: {
+    name: 'Ancient Desert',
+    background: 'linear-gradient(135deg, #d4a574 0%, #c19a6b 50%, #8b6914 100%)',
+    locations: ['oasis', 'sand_dunes', 'ancient_ruins', 'temple'],
+  },
 };
 
 export default function StoryGamePage() {
@@ -115,6 +120,14 @@ export default function StoryGamePage() {
 #     move_to("cliff_path")
 # else:
 #     collect_item("rope")
+`;
+      case 'desert':
+        return `# Manage your resources with if/else!
+# Example:
+# if "water" in inventory:
+#     move_to("ancient_ruins")
+# else:
+#     collect_item("water")
 `;
       default:
         return `# Write Python code to make decisions!
@@ -567,6 +580,14 @@ export default function StoryGamePage() {
                           <p><strong>Step 3:</strong> Get the torch before the cave: <code>if "torch" in inventory: move_to("cave")</code></p>
                         </>
                       )}
+                      {storyProgress?.currentScene === 'desert' && (
+                        <>
+                          <p>Survival in the desert! Collect water and manage your resources. Use <strong>if/else for resource management</strong>!</p>
+                          <p><strong>Step 1:</strong> Get water first: <code>move_to("sand_dunes")</code> then <code>collect_item("water")</code></p>
+                          <p><strong>Step 2:</strong> Check resources before exploring: <code>if "water" in inventory: move_to("ancient_ruins")</code></p>
+                          <p><strong>Step 3:</strong> Collect artifact before temple: <code>if "artifact" in inventory: move_to("temple")</code></p>
+                        </>
+                      )}
                     </div>
                     {availableItems.length > 0 && (
                       <div className="available-items-hint">
@@ -717,6 +738,9 @@ export default function StoryGamePage() {
                         {item === 'rope' && '🪢'}
                         {item === 'torch' && '🔥'}
                         {item === 'crystal' && '💠'}
+                        {item === 'water' && '💧'}
+                        {item === 'artifact' && '🏺'}
+                        {item === 'scroll' && '📜'}
                         <span>{item}</span>
                       </div>
                     ))
@@ -918,6 +942,33 @@ export default function StoryGamePage() {
                       {availableItems.includes('crystal') && !storyProgress?.inventory.includes('crystal') && (
                         <div className={`scene-element collectible-item item-crystal ${collectedItem === 'crystal' ? 'collected' : ''}`}>
                           💠
+                          <div className="item-glow"></div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                  {storyProgress?.currentScene === 'desert' && (
+                    <>
+                      <div className="scene-element sand-dune sand-dune-1">🏜️</div>
+                      <div className="scene-element sand-dune sand-dune-2">🌵</div>
+                      <div className="scene-element oasis">🌴</div>
+                      <div className="scene-element temple">🏛️</div>
+                      {/* Collectible Items */}
+                      {availableItems.includes('water') && !storyProgress?.inventory.includes('water') && (
+                        <div className={`scene-element collectible-item item-water ${collectedItem === 'water' ? 'collected' : ''}`}>
+                          💧
+                          <div className="item-glow"></div>
+                        </div>
+                      )}
+                      {availableItems.includes('artifact') && !storyProgress?.inventory.includes('artifact') && (
+                        <div className={`scene-element collectible-item item-artifact ${collectedItem === 'artifact' ? 'collected' : ''}`}>
+                          🏺
+                          <div className="item-glow"></div>
+                        </div>
+                      )}
+                      {availableItems.includes('scroll') && !storyProgress?.inventory.includes('scroll') && (
+                        <div className={`scene-element collectible-item item-scroll ${collectedItem === 'scroll' ? 'collected' : ''}`}>
+                          📜
                           <div className="item-glow"></div>
                         </div>
                       )}

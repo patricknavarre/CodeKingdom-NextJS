@@ -140,4 +140,32 @@ export const SCENES = {
       },
     },
   },
+  desert: {
+    name: 'Ancient Desert',
+    locations: ['oasis', 'sand_dunes', 'ancient_ruins', 'temple'],
+    items: ['water', 'artifact', 'scroll'],
+    locationItems: {
+      'oasis': [],
+      'sand_dunes': ['water'],
+      'ancient_ruins': ['artifact'],
+      'temple': ['scroll'],
+    },
+    hints: {
+      1: { 
+        cost: 10, 
+        text: 'Survival in the desert requires water! Use if statements to check your resources.',
+        example: 'if "water" in inventory:'
+      },
+      2: { 
+        cost: 20, 
+        text: 'Collect water first, then use if/else to manage your resources before exploring dangerous areas.',
+        example: 'if "water" in inventory:\n    move_to("ancient_ruins")\nelse:\n    move_to("sand_dunes")\n    collect_item("water")'
+      },
+      3: { 
+        cost: 30, 
+        text: 'Resource management is key! Use nested if/else to check for water before exploring, and artifacts before entering the temple.',
+        example: 'if "water" in inventory:\n    if "artifact" in inventory:\n        move_to("temple")\n        collect_item("scroll")\n    else:\n        move_to("ancient_ruins")\n        collect_item("artifact")\nelse:\n    move_to("sand_dunes")\n    collect_item("water")'
+      },
+    },
+  },
 };
