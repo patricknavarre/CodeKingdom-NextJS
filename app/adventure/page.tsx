@@ -1085,15 +1085,23 @@ function AdventurePage() {
       }, 500);
     };
     
-    const backgroundStyle = character.background ? {
+    const backgroundStyle: React.CSSProperties = character.background ? {
       background: character.background.value,
       backgroundAttachment: 'fixed',
       minHeight: '100vh'
     } : {};
 
+    const containerStyle: React.CSSProperties = {
+      width: '100%',
+      height: '100vh',
+      margin: 0,
+      padding: 0,
+      ...backgroundStyle
+    };
+
     return (
       <ProtectedRoute>
-        <div style={{ width: '100%', height: '100vh', margin: 0, padding: 0, ...backgroundStyle }}>
+        <div style={containerStyle}>
           <Navigation />
           <div className="adventure-game" style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             <div style={{ marginBottom: '8px', flexShrink: 0 }}>
