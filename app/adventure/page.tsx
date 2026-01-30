@@ -134,16 +134,39 @@ function AdventurePage() {
     const [snapTarget, setSnapTarget] = useState<string | null>(null);
     const workspaceRef = useRef<HTMLDivElement>(null);
     
-    // Sound effect for block snapping
-    const playSnapSound = () => {
+    // Persistent audio context for snap sounds
+    const audioContextRef = useRef<AudioContext | null>(null);
+    const audioInitializedRef = useRef(false);
+    
+    // Initialize audio context on first user interaction
+    const initAudio = () => {
+      if (audioInitializedRef.current && audioContextRef.current) return audioContextRef.current;
+      
       try {
-        // Create audio context (may need user interaction first)
         const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
         const audioContext = new AudioContextClass();
+        audioContextRef.current = audioContext;
+        audioInitializedRef.current = true;
+        return audioContext;
+      } catch (e) {
+        console.log('Audio context creation failed:', e);
+        return null;
+      }
+    };
+    
+    // Sound effect for block snapping
+    const playSnapSound = async () => {
+      try {
+        // Initialize audio on first use
+        let audioContext = audioContextRef.current;
+        if (!audioContext) {
+          audioContext = initAudio();
+          if (!audioContext) return;
+        }
         
-        // Resume audio context in case it's suspended (requires user interaction)
+        // Resume audio context if suspended (browser may suspend it)
         if (audioContext.state === 'suspended') {
-          audioContext.resume();
+          await audioContext.resume();
         }
         
         const oscillator = audioContext.createOscillator();
@@ -165,6 +188,27 @@ function AdventurePage() {
         console.log('Audio not available:', e);
       }
     };
+    
+    // Initialize audio on first user interaction (click, touch, or drag)
+    useEffect(() => {
+      const initOnInteraction = () => {
+        initAudio();
+      };
+      
+      // Try to initialize on mount (may not work due to browser restrictions)
+      initAudio();
+      
+      // Also initialize on any user interaction
+      window.addEventListener('click', initOnInteraction, { once: true });
+      window.addEventListener('touchstart', initOnInteraction, { once: true });
+      window.addEventListener('mousedown', initOnInteraction, { once: true });
+      
+      return () => {
+        window.removeEventListener('click', initOnInteraction);
+        window.removeEventListener('touchstart', initOnInteraction);
+        window.removeEventListener('mousedown', initOnInteraction);
+      };
+    }, []);
     
     // Helper to get client coordinates from event (works for both mouse and touch)
     const getClientCoordinates = (e: React.DragEvent | React.TouchEvent | React.MouseEvent) => {
