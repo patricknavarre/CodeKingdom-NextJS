@@ -270,14 +270,45 @@ export default function CharacterPage() {
                                   )
                                 }));
                               } else {
-                                if (item.backgroundData) {
-                                  setBackground(item.backgroundData);
+                                // If backgroundData exists, use it; otherwise create it from the item
+                                let backgroundData = item.backgroundData;
+                                
+                                // If no backgroundData but it's a background item, create it
+                                if (!backgroundData && (item.id?.startsWith('bg-') || item.type === 'background')) {
+                                  // Try to extract background info from the item
+                                  // For backgrounds purchased from shop, we need to reconstruct the backgroundData
+                                  backgroundData = {
+                                    id: item.id,
+                                    name: item.name,
+                                    type: 'gradient' as const, // Default to gradient, could be improved
+                                    value: item.description?.includes('gold') 
+                                      ? 'linear-gradient(135deg, #FFD700 0%, #FFA500 25%, #FFD700 50%, #FFA500 75%, #FFD700 100%)'
+                                      : item.description?.includes('galaxy') || item.description?.includes('stars')
+                                      ? 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)'
+                                      : item.description?.includes('ocean')
+                                      ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                                      : item.description?.includes('sunset')
+                                      ? 'linear-gradient(135deg, #FF6B6B 0%, #FFE66D 50%, #FF6B9D 100%)'
+                                      : item.description?.includes('forest')
+                                      ? 'linear-gradient(135deg, #2d5016 0%, #1a3009 100%)'
+                                      : item.description?.includes('sky')
+                                      ? '#87CEEB'
+                                      : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', // Default
+                                    description: item.description || '',
+                                    rarity: item.rarity || 'common'
+                                  };
+                                }
+                                
+                                if (backgroundData) {
+                                  setBackground(backgroundData);
                                   setCharacter(prev => ({
                                     ...prev,
                                     accessories: prev.accessories.map(acc => 
-                                      acc.id === item.id ? { ...acc, isEquipped: true } : 
-                                      acc.backgroundData ? { ...acc, isEquipped: false } : acc
-                                    )
+                                      acc.id === item.id ? { ...acc, isEquipped: true, backgroundData } : 
+                                      acc.backgroundData || (acc.id?.startsWith('bg-') || acc.type === 'background') 
+                                        ? { ...acc, isEquipped: false } 
+                                        : acc
+                                    ))
                                   }));
                                 }
                               }
