@@ -137,7 +137,15 @@ function AdventurePage() {
     // Sound effect for block snapping
     const playSnapSound = () => {
       try {
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        // Create audio context (may need user interaction first)
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        const audioContext = new AudioContextClass();
+        
+        // Resume audio context in case it's suspended (requires user interaction)
+        if (audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+        
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
         
@@ -154,7 +162,7 @@ function AdventurePage() {
         oscillator.stop(audioContext.currentTime + 0.1);
       } catch (e) {
         // Fallback if audio context fails
-        console.log('Audio not available');
+        console.log('Audio not available:', e);
       }
     };
     
@@ -1512,6 +1520,10 @@ function AdventurePage() {
                           // Find the block this one connects to (for drawing connector)
                           const connectsTo = connectedBlocks.find(b => b.id === block.connectedTo);
                           
+                          // Calculate block width (minWidth 100px + padding 14px*2 = ~128px, but use actual rendered width)
+                          const BLOCK_WIDTH = 120; // Approximate width including padding
+                          const BLOCK_HEIGHT = 40; // Approximate height
+                          
                           return (
                             <React.Fragment key={block.id}>
                               {/* Connector line to next block */}
@@ -1519,13 +1531,15 @@ function AdventurePage() {
                                 <div
                                   style={{
                                     position: 'absolute',
-                                    left: `${block.x + 100}px`, // Right edge of current block
-                                    top: `${block.y + 20}px`, // Middle of block
-                                    width: `${connectsTo.x - block.x - 100}px`,
+                                    left: `${block.x + BLOCK_WIDTH}px`, // Right edge of current block
+                                    top: `${block.y + BLOCK_HEIGHT / 2}px`, // Middle of block vertically
+                                    width: `${Math.max(0, connectsTo.x - block.x - BLOCK_WIDTH)}px`, // Gap between blocks
                                     height: '3px',
                                     backgroundColor: '#3498db',
-                                    zIndex: 0,
-                                    opacity: 0.6
+                                    zIndex: 1,
+                                    opacity: 0.7,
+                                    borderRadius: '2px',
+                                    boxShadow: '0 1px 2px rgba(52, 152, 219, 0.3)'
                                   }}
                                 />
                               )}
