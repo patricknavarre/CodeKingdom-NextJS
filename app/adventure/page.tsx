@@ -1560,13 +1560,13 @@ function AdventurePage() {
                                       style={{
                                         position: 'absolute',
                                         left: `${block.x + BLOCK_WIDTH}px`,
-                                        top: `${block.y + BLOCK_HEIGHT / 2 - 2}px`, // Center vertically, offset for 4px height
+                                        top: `${block.y + BLOCK_HEIGHT / 2 - 3}px`, // Center vertically
                                         width: `${Math.max(0, connectsTo.x - block.x - BLOCK_WIDTH)}px`,
-                                        height: '5px',
+                                        height: '6px',
                                         backgroundColor: '#2980b9',
-                                        zIndex: 3, // Above workspace background, below blocks
+                                        zIndex: 4, // Above workspace background, below blocks
                                         borderRadius: '3px',
-                                        boxShadow: '0 0 4px rgba(52, 152, 219, 0.8)',
+                                        boxShadow: '0 0 6px rgba(41, 128, 185, 1), 0 2px 4px rgba(0, 0, 0, 0.2)',
                                         border: '1px solid #1f5f8b'
                                       }}
                                     />
@@ -1577,14 +1577,14 @@ function AdventurePage() {
                                       <div
                                         style={{
                                           position: 'absolute',
-                                          left: `${block.x + BLOCK_WIDTH / 2 - 2}px`, // Center horizontally, offset for 4px width
+                                          left: `${block.x + BLOCK_WIDTH / 2 - 3}px`, // Center horizontally
                                           top: `${block.y + BLOCK_HEIGHT}px`,
-                                          width: '5px',
+                                          width: '6px',
                                           height: `${Math.max(0, connectsTo.y - block.y - BLOCK_HEIGHT)}px`,
                                           backgroundColor: '#2980b9',
-                                          zIndex: 3,
+                                          zIndex: 4,
                                           borderRadius: '3px',
-                                          boxShadow: '0 0 4px rgba(52, 152, 219, 0.8)',
+                                          boxShadow: '0 0 6px rgba(41, 128, 185, 1), 0 2px 4px rgba(0, 0, 0, 0.2)',
                                           border: '1px solid #1f5f8b'
                                         }}
                                       />
@@ -1593,13 +1593,13 @@ function AdventurePage() {
                                         style={{
                                           position: 'absolute',
                                           left: `${block.x + BLOCK_WIDTH / 2}px`,
-                                          top: `${connectsTo.y + BLOCK_HEIGHT / 2 - 2}px`, // Center vertically
+                                          top: `${connectsTo.y + BLOCK_HEIGHT / 2 - 3}px`, // Center vertically
                                           width: `${Math.max(0, connectsTo.x - block.x - BLOCK_WIDTH / 2)}px`,
-                                          height: '5px',
+                                          height: '6px',
                                           backgroundColor: '#2980b9',
-                                          zIndex: 3,
+                                          zIndex: 4,
                                           borderRadius: '3px',
-                                          boxShadow: '0 0 4px rgba(52, 152, 219, 0.8)',
+                                          boxShadow: '0 0 6px rgba(41, 128, 185, 1), 0 2px 4px rgba(0, 0, 0, 0.2)',
                                           border: '1px solid #1f5f8b'
                                         }}
                                       />
