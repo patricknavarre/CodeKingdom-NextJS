@@ -1668,17 +1668,17 @@ function AdventurePage() {
                 {/* Commands Panel - Right Side */}
                 <div style={{ flex: '0 0 50%' }}>
                   {/* Commands Panel */}
-                <div className="command-panel" style={{
-                  backgroundColor: 'white',
-                  borderRadius: '6px',
-                  padding: '12px',
-                  paddingBottom: '20px',
-                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                  borderLeft: '3px solid #3498db',
-                  flex: 1,
-                  overflow: 'auto',
-                  minHeight: 0
-                }}>
+                  <div className="command-panel" style={{
+                    backgroundColor: 'white',
+                    borderRadius: '6px',
+                    padding: '12px',
+                    paddingBottom: '20px',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                    borderLeft: '3px solid #3498db',
+                    flex: 1,
+                    overflow: 'auto',
+                    minHeight: 0
+                  }}>
                   <h3>Drag & Connect Blocks</h3>
                   <div style={{ marginBottom: '12px', fontSize: '0.85rem', color: '#666' }}>
                     Drag blocks from the palette below into the workspace. Connect them in a line to build your program!
