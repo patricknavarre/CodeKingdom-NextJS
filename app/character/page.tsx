@@ -120,7 +120,7 @@ export default function CharacterPage() {
       setCharacterSaved(false);
     }, 3000);
   };
-  
+
   return (
     <ProtectedRoute>
       <div style={{ maxWidth: '100%', margin: '0 auto' }}>
