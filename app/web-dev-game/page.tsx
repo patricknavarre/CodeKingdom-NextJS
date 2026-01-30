@@ -756,7 +756,7 @@ export default function WebDevGamePage() {
 
   return (
     <ProtectedRoute>
-      <div style={{ maxWidth: '100%', margin: '0 auto', minHeight: '100vh', ...backgroundStyle }}>
+      <div style={{ maxWidth: '100%', margin: '0 auto', ...backgroundStyle }}>
         <Navigation />
         <div className="web-dev-game" style={{ minHeight: 'calc(100vh - 60px)', height: 'auto', overflow: 'auto', background: 'transparent' }}>
           <div className="game-header">

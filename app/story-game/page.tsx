@@ -451,7 +451,7 @@ export default function StoryGamePage() {
 
   return (
     <ProtectedRoute>
-      <div style={{ maxWidth: '100%', margin: '0 auto', minHeight: '100vh', ...backgroundStyle }}>
+      <div style={{ maxWidth: '100%', margin: '0 auto', ...backgroundStyle }}>
         <Navigation />
         <div className="story-game-container" style={{ height: 'calc(100vh - 100px)', background: 'transparent' }}>
           {/* Header */}
