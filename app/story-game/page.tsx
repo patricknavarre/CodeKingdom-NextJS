@@ -596,6 +596,62 @@ export default function StoryGamePage() {
                         </>
                       )}
                     </div>
+                    {storyProgress?.currentScene && (
+                      <div className="location-guide" style={{
+                        background: 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)',
+                        padding: '15px',
+                        borderRadius: '10px',
+                        marginTop: '15px',
+                        border: '2px solid #90caf9'
+                      }}>
+                        <strong>🗺️ Where Can I Go?</strong>
+                        <p style={{ marginTop: '8px', marginBottom: '10px', fontSize: '0.9rem' }}>
+                          This scene has several locations to explore. Try using <code>move_to("location_name")</code> to visit them:
+                        </p>
+                        <div style={{ 
+                          display: 'grid', 
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                          gap: '8px',
+                          marginTop: '10px'
+                        }}>
+                          {(() => {
+                            const scene = SCENES[storyProgress.currentScene as keyof typeof SCENES];
+                            if (!scene) return null;
+                            return scene.locations.map((loc) => {
+                              const isCurrent = loc === storyProgress?.currentLocation;
+                              const locationName = loc.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                              return (
+                                <div 
+                                  key={loc}
+                                  style={{
+                                    background: isCurrent ? '#4caf50' : 'rgba(255, 255, 255, 0.7)',
+                                    color: isCurrent ? 'white' : '#333',
+                                    padding: '8px 12px',
+                                    borderRadius: '6px',
+                                    fontSize: '0.85rem',
+                                    fontWeight: isCurrent ? 'bold' : 'normal',
+                                    border: `2px solid ${isCurrent ? '#fff' : '#90caf9'}`,
+                                    textAlign: 'center'
+                                  }}
+                                >
+                                  {isCurrent ? '📍 ' : '🔹 '}
+                                  {locationName}
+                                  {isCurrent && ' (You are here)'}
+                                </div>
+                              );
+                            });
+                          })()}
+                        </div>
+                        <p style={{ 
+                          marginTop: '12px', 
+                          fontSize: '0.85rem', 
+                          fontStyle: 'italic',
+                          color: '#555'
+                        }}>
+                          💡 Tip: Each location might have different items or secrets to discover!
+                        </p>
+                      </div>
+                    )}
                     {availableChoices.length > 0 && (
                       <div className="decision-point-hint" style={{ 
                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
