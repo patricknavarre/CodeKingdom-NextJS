@@ -112,6 +112,13 @@ export default function Home() {
                         <div className="basics-item-desc">Master web development</div>
                       </div>
                     </Link>
+                    <Link href="/3d-basics" className="basics-dropdown-item" onClick={() => setBasicsDropdownOpen(false)}>
+                      <span className="basics-item-icon">🧱</span>
+                      <div className="basics-item-content">
+                        <div className="basics-item-title">3D Basics</div>
+                        <div className="basics-item-desc">Learn 3D coordinates and building</div>
+                      </div>
+                    </Link>
                   </div>
                 )}
               </div>
