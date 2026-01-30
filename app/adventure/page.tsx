@@ -668,27 +668,46 @@ function AdventurePage() {
         const currentPosition = positionRef.current;
         const currentDirection = directionRef.current;
         
-        let newX = currentPosition.x;
-        let newY = currentPosition.y;
-        
-        if (currentDirection === 'up') newY -= steps;
-        if (currentDirection === 'down') newY += steps;
-        if (currentDirection === 'left') newX -= steps;
-        if (currentDirection === 'right') newX += steps;
-        
-        // Check boundaries and walls (use dynamic grid size)
         const gridHeight = grid.length;
         const gridWidth = grid[0]?.length || 0;
-        if (newX < 0 || newX >= gridWidth || newY < 0 || newY >= gridHeight || grid[newY][newX] === 1) {
-          addToLog("Can't move there! There's a wall or boundary.");
-          resolve();
-          return;
+        
+        let newX = currentPosition.x;
+        let newY = currentPosition.y;
+        let actualStepsMoved = 0;
+        
+        // Move one step at a time, checking for walls/boundaries at each step
+        for (let i = 0; i < steps; i++) {
+          // Calculate next step position
+          let nextX = newX;
+          let nextY = newY;
+          
+          if (currentDirection === 'up') nextY -= 1;
+          if (currentDirection === 'down') nextY += 1;
+          if (currentDirection === 'left') nextX -= 1;
+          if (currentDirection === 'right') nextX += 1;
+          
+          // Check if this step is valid (within bounds and not a wall)
+          if (nextX < 0 || nextX >= gridWidth || nextY < 0 || nextY >= gridHeight || grid[nextY][nextX] === 1) {
+            // Hit a wall or boundary - stop here
+            if (actualStepsMoved === 0) {
+              addToLog("Can't move there! There's a wall or boundary.");
+            } else {
+              addToLog(`Moved ${actualStepsMoved} step(s) ${currentDirection}, but hit a wall!`);
+            }
+            resolve();
+            return;
+          }
+          
+          // This step is valid, update position
+          newX = nextX;
+          newY = nextY;
+          actualStepsMoved++;
         }
         
         // Update both state and ref immediately
         positionRef.current = { x: newX, y: newY };
         setPosition({ x: newX, y: newY });
-        addToLog(`Moved ${steps} step(s) ${currentDirection}.`);
+        addToLog(`Moved ${actualStepsMoved} step(s) ${currentDirection}.`);
         
         // Small delay to allow state update
         setTimeout(() => {
