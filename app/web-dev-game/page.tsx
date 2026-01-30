@@ -746,14 +746,19 @@ export default function WebDevGamePage() {
   const backgroundStyle = character.background ? {
     background: character.background.value,
     backgroundAttachment: 'fixed',
-    minHeight: '100vh'
-  } : {};
+    minHeight: '100vh',
+    width: '100%'
+  } : {
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    minHeight: '100vh',
+    width: '100%'
+  };
 
   return (
     <ProtectedRoute>
-      <div style={{ maxWidth: '100%', margin: '0 auto', ...backgroundStyle }}>
+      <div style={{ maxWidth: '100%', margin: '0 auto', minHeight: '100vh', ...backgroundStyle }}>
         <Navigation />
-        <div className="web-dev-game" style={{ minHeight: 'calc(100vh - 60px)', height: 'auto', overflow: 'auto' }}>
+        <div className="web-dev-game" style={{ minHeight: 'calc(100vh - 60px)', height: 'auto', overflow: 'auto', background: 'transparent' }}>
           <div className="game-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flex: 1 }}>
               <h1>🌐 Web Developer Game</h1>

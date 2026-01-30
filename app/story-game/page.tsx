@@ -52,8 +52,13 @@ export default function StoryGamePage() {
   const backgroundStyle = character.background ? {
     background: character.background.value,
     backgroundAttachment: 'fixed',
-    minHeight: '100vh'
-  } : {};
+    minHeight: '100vh',
+    width: '100%'
+  } : {
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    minHeight: '100vh',
+    width: '100%'
+  };
   const { authState } = useAuth();
   
   // Get scene-specific default code
@@ -446,9 +451,9 @@ export default function StoryGamePage() {
 
   return (
     <ProtectedRoute>
-      <div style={{ maxWidth: '100%', margin: '0 auto', ...backgroundStyle }}>
+      <div style={{ maxWidth: '100%', margin: '0 auto', minHeight: '100vh', ...backgroundStyle }}>
         <Navigation />
-        <div className="story-game-container" style={{ height: 'calc(100vh - 100px)' }}>
+        <div className="story-game-container" style={{ height: 'calc(100vh - 100px)', background: 'transparent' }}>
           {/* Header */}
           <div className="story-game-header">
             <h1>Python Story Adventure</h1>
