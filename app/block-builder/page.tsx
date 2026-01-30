@@ -204,7 +204,49 @@ export default function BlockBuilderPage() {
 
         // Scene setup
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x87ceeb); // Sky blue
+        // Set background from character's selected background, or default to sky blue
+        if (character.background?.value) {
+          const bgValue = character.background.value;
+          if (bgValue.startsWith('#')) {
+            // Hex color
+            scene.background = new THREE.Color(bgValue);
+          } else if (bgValue.startsWith('rgb') || bgValue.startsWith('rgba')) {
+            // RGB/RGBA color - parse it
+            const match = bgValue.match(/(\d+),\s*(\d+),\s*(\d+)/);
+            if (match) {
+              scene.background = new THREE.Color(
+                parseInt(match[1]) / 255,
+                parseInt(match[2]) / 255,
+                parseInt(match[3]) / 255
+              );
+            } else {
+              scene.background = new THREE.Color(0x87ceeb); // Fallback to sky blue
+            }
+          } else if (bgValue.includes('gradient')) {
+            // For gradients, extract the first color or use a solid color approximation
+            // Three.js doesn't support CSS gradients directly, so we'll use the first color
+            const colorMatch = bgValue.match(/#([0-9a-fA-F]{6})/);
+            if (colorMatch) {
+              scene.background = new THREE.Color('#' + colorMatch[1]);
+            } else {
+              // Try to extract RGB from gradient
+              const rgbMatch = bgValue.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+              if (rgbMatch) {
+                scene.background = new THREE.Color(
+                  parseInt(rgbMatch[1]) / 255,
+                  parseInt(rgbMatch[2]) / 255,
+                  parseInt(rgbMatch[3]) / 255
+                );
+              } else {
+                scene.background = new THREE.Color(0x87ceeb); // Fallback
+              }
+            }
+          } else {
+            scene.background = new THREE.Color(0x87ceeb); // Fallback to sky blue
+          }
+        } else {
+          scene.background = new THREE.Color(0x87ceeb); // Default sky blue
+        }
         sceneRef3D.current = scene;
 
         // Get container dimensions
