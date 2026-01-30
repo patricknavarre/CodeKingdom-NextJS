@@ -6,6 +6,16 @@ import Navigation from '@/components/Navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import '@/styles/CharacterPage.css';
 
+// Background definitions to reconstruct backgroundData if missing
+const BACKGROUND_DEFINITIONS: Record<string, { type: 'color' | 'gradient' | 'image'; value: string }> = {
+  'bg-sky-blue': { type: 'color', value: '#87CEEB' },
+  'bg-sunset': { type: 'gradient', value: 'linear-gradient(135deg, #FF6B6B 0%, #FFE66D 50%, #FF6B9D 100%)' },
+  'bg-ocean': { type: 'gradient', value: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+  'bg-forest': { type: 'gradient', value: 'linear-gradient(135deg, #2d5016 0%, #1a3009 100%)' },
+  'bg-galaxy': { type: 'gradient', value: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)' },
+  'bg-gold': { type: 'gradient', value: 'linear-gradient(135deg, #FFD700 0%, #FFA500 25%, #FFD700 50%, #FFA500 75%, #FFD700 100%)' },
+};
+
 // Image paths for Next.js public folder
 const girlCharacter = '/images/characters/Girl_Character_BrownHair.png';
 const boyCharacter = '/images/characters/Boy_Character_BrownHair.png';
@@ -275,28 +285,29 @@ export default function CharacterPage() {
                                 
                                 // If no backgroundData but it's a background item, create it
                                 if (!backgroundData && (item.id?.startsWith('bg-') || item.type === 'background')) {
-                                  // Try to extract background info from the item
-                                  // For backgrounds purchased from shop, we need to reconstruct the backgroundData
-                                  backgroundData = {
-                                    id: item.id,
-                                    name: item.name,
-                                    type: 'gradient' as const, // Default to gradient, could be improved
-                                    value: item.description?.includes('gold') 
-                                      ? 'linear-gradient(135deg, #FFD700 0%, #FFA500 25%, #FFD700 50%, #FFA500 75%, #FFD700 100%)'
-                                      : item.description?.includes('galaxy') || item.description?.includes('stars')
-                                      ? 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)'
-                                      : item.description?.includes('ocean')
-                                      ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                                      : item.description?.includes('sunset')
-                                      ? 'linear-gradient(135deg, #FF6B6B 0%, #FFE66D 50%, #FF6B9D 100%)'
-                                      : item.description?.includes('forest')
-                                      ? 'linear-gradient(135deg, #2d5016 0%, #1a3009 100%)'
-                                      : item.description?.includes('sky')
-                                      ? '#87CEEB'
-                                      : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', // Default
-                                    description: item.description || '',
-                                    rarity: item.rarity || 'common'
-                                  };
+                                  // Look up the background definition by ID
+                                  const bgDef = item.id ? BACKGROUND_DEFINITIONS[item.id] : null;
+                                  
+                                  if (bgDef) {
+                                    backgroundData = {
+                                      id: item.id,
+                                      name: item.name,
+                                      type: bgDef.type,
+                                      value: bgDef.value,
+                                      description: item.description || '',
+                                      rarity: item.rarity || 'common'
+                                    };
+                                  } else {
+                                    // Fallback: create a default gradient background
+                                    backgroundData = {
+                                      id: item.id,
+                                      name: item.name,
+                                      type: 'gradient' as const,
+                                      value: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                      description: item.description || '',
+                                      rarity: item.rarity || 'common'
+                                    };
+                                  }
                                 }
                                 
                                 if (backgroundData) {
