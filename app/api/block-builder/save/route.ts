@@ -3,6 +3,8 @@ import connectDB from '@/lib/mongodb';
 import BlockBuild from '@/models/blockBuildModel';
 import jwt from 'jsonwebtoken';
 
+export const dynamic = 'force-dynamic';
+
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_jwt_secret';
 
 export async function POST(request: NextRequest) {
