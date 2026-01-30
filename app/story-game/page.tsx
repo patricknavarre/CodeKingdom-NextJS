@@ -50,6 +50,16 @@ const SCENES = {
     background: 'linear-gradient(135deg, #8b6f47 0%, #5a4a3a 100%)',
     locations: ['town_gate', 'town_square', 'town_market', 'town_exit'],
   },
+  ocean: {
+    name: 'Mystical Ocean',
+    background: 'linear-gradient(135deg, #1e3a5f 0%, #0a1f3d 50%, #006994 100%)',
+    locations: ['beach_shore', 'tide_pool', 'cave_entrance', 'treasure_cove'],
+  },
+  mountain: {
+    name: 'Mountain Peak',
+    background: 'linear-gradient(135deg, #8b7355 0%, #5a4a3a 50%, #3d2f1f 100%)',
+    locations: ['mountain_base', 'cliff_path', 'summit', 'cave'],
+  },
 };
 
 export default function StoryGamePage() {
@@ -62,13 +72,62 @@ export default function StoryGamePage() {
     minHeight: '100vh'
   } : {};
   const { authState } = useAuth();
-  const [code, setCode] = useState(`# Write Python code to make decisions!
+  
+  // Get scene-specific default code
+  const getDefaultCode = (scene: string) => {
+    switch (scene) {
+      case 'forest':
+        return `# Write Python code to make decisions!
 # Example:
 # if "key" in inventory:
 #     open_door()
 # else:
 #     print("You need a key!")
-`);
+`;
+      case 'castle':
+        return `# Use if/else to check your inventory!
+# Example:
+# if "sword" in inventory:
+#     move_to("castle_hall")
+# else:
+#     collect_item("sword")
+`;
+      case 'town':
+        return `# Check your location with if statements!
+# Example:
+# if current_location == "town_market":
+#     collect_item("bread")
+# else:
+#     move_to("town_market")
+`;
+      case 'ocean':
+        return `# Use if/else to check items before accessing treasure!
+# Example:
+# if "treasure_map" in inventory:
+#     move_to("treasure_cove")
+# else:
+#     collect_item("treasure_map")
+`;
+      case 'mountain':
+        return `# Safety first! Check equipment with if/else!
+# Example:
+# if "rope" in inventory:
+#     move_to("cliff_path")
+# else:
+#     collect_item("rope")
+`;
+      default:
+        return `# Write Python code to make decisions!
+# Example:
+# if "key" in inventory:
+#     open_door()
+# else:
+#     print("You need a key!")
+`;
+    }
+  };
+  
+  const [code, setCode] = useState(getDefaultCode('forest'));
   const [storyProgress, setStoryProgress] = useState<StoryProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [executing, setExecuting] = useState(false);
@@ -152,6 +211,10 @@ export default function StoryGamePage() {
       const items = response.data.availableItems || [];
       console.log('Available items loaded:', items);
       setAvailableItems(items);
+      // Set default code based on current scene
+      if (response.data.currentScene) {
+        setCode(getDefaultCode(response.data.currentScene));
+      }
       setLoading(false);
     } catch (error: any) {
       console.error('Error loading story progress:', error);
@@ -215,6 +278,11 @@ export default function StoryGamePage() {
         inventory: response.data.newInventory,
         storyProgress: response.data.storyProgress || prev?.storyProgress || 0,
       }));
+      
+      // Update default code when scene changes
+      if (newScene !== prevScene) {
+        setCode(getDefaultCode(newScene));
+      }
 
       // Update available items from response
       const newAvailableItems = response.data.availableItems || [];
@@ -459,10 +527,46 @@ export default function StoryGamePage() {
                     </ol>
                     <div className="quest-hint">
                       <strong>🎯 Your Quest:</strong>
-                      <p>There is a hidden key somewhere in the forest. You need to <strong>move through different locations</strong> until you discover it.</p>
-                      <p><strong>Step 1:</strong> Use <code>move_to("location_name")</code> to travel around the map.</p>
-                      <p><strong>Step 2:</strong> When you see a glowing key, run <code>collect_item("key")</code> to pick it up.</p>
-                      <p><strong>Step 3:</strong> Then use <code>if "key" in inventory: open_door()</code> to open the door!</p>
+                      {storyProgress?.currentScene === 'forest' && (
+                        <>
+                          <p>There is a hidden key somewhere in the forest. You need to <strong>move through different locations</strong> until you discover it.</p>
+                          <p><strong>Step 1:</strong> Use <code>move_to("location_name")</code> to travel around the map.</p>
+                          <p><strong>Step 2:</strong> When you see a glowing key, run <code>collect_item("key")</code> to pick it up.</p>
+                          <p><strong>Step 3:</strong> Then use <code>if "key" in inventory: open_door()</code> to open the door!</p>
+                        </>
+                      )}
+                      {storyProgress?.currentScene === 'castle' && (
+                        <>
+                          <p>Collect the sword and shield to progress through the castle. Use <strong>if/else statements</strong> to check your inventory!</p>
+                          <p><strong>Step 1:</strong> Move to different locations to find items: <code>move_to("castle_courtyard")</code></p>
+                          <p><strong>Step 2:</strong> Collect items when you find them: <code>collect_item("sword")</code></p>
+                          <p><strong>Step 3:</strong> Use if statements to check before moving: <code>if "sword" in inventory: move_to("castle_hall")</code></p>
+                        </>
+                      )}
+                      {storyProgress?.currentScene === 'town' && (
+                        <>
+                          <p>Explore the town market to find useful items. Use <strong>if statements to check your location</strong>!</p>
+                          <p><strong>Step 1:</strong> Move to the market: <code>move_to("town_market")</code></p>
+                          <p><strong>Step 2:</strong> Check your location with if: <code>if current_location == "town_market": collect_item("bread")</code></p>
+                          <p><strong>Step 3:</strong> Use if/else to handle different locations!</p>
+                        </>
+                      )}
+                      {storyProgress?.currentScene === 'ocean' && (
+                        <>
+                          <p>Find the treasure map to access the treasure cove! Use <strong>if/else to check items before accessing treasure</strong>.</p>
+                          <p><strong>Step 1:</strong> Explore the ocean locations: <code>move_to("tide_pool")</code> or <code>move_to("cave_entrance")</code></p>
+                          <p><strong>Step 2:</strong> Collect the treasure map: <code>collect_item("treasure_map")</code></p>
+                          <p><strong>Step 3:</strong> Use if to check before entering: <code>if "treasure_map" in inventory: move_to("treasure_cove")</code></p>
+                        </>
+                      )}
+                      {storyProgress?.currentScene === 'mountain' && (
+                        <>
+                          <p>Safety first! Collect the rope and torch before climbing. Use <strong>if/else to check your equipment</strong>!</p>
+                          <p><strong>Step 1:</strong> Collect the rope first: <code>move_to("cliff_path")</code> then <code>collect_item("rope")</code></p>
+                          <p><strong>Step 2:</strong> Check before climbing: <code>if "rope" in inventory: move_to("summit")</code></p>
+                          <p><strong>Step 3:</strong> Get the torch before the cave: <code>if "torch" in inventory: move_to("cave")</code></p>
+                        </>
+                      )}
                     </div>
                     {availableItems.length > 0 && (
                       <div className="available-items-hint">
@@ -607,6 +711,12 @@ export default function StoryGamePage() {
                         {item === 'coin' && '🪙'}
                         {item === 'bread' && '🍞'}
                         {item === 'potion' && '🧪'}
+                        {item === 'shell' && '🐚'}
+                        {item === 'pearl' && '💎'}
+                        {item === 'treasure_map' && '🗺️'}
+                        {item === 'rope' && '🪢'}
+                        {item === 'torch' && '🔥'}
+                        {item === 'crystal' && '💠'}
                         <span>{item}</span>
                       </div>
                     ))
@@ -755,6 +865,59 @@ export default function StoryGamePage() {
                       {availableItems.includes('potion') && !storyProgress?.inventory.includes('potion') && (
                         <div className={`scene-element collectible-item item-potion ${collectedItem === 'potion' ? 'collected' : ''}`}>
                           🧪
+                          <div className="item-glow"></div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                  {storyProgress?.currentScene === 'ocean' && (
+                    <>
+                      <div className="scene-element wave wave-1">🌊</div>
+                      <div className="scene-element wave wave-2">🌊</div>
+                      <div className="scene-element beach">🏖️</div>
+                      <div className="scene-element cave">🕳️</div>
+                      {/* Collectible Items */}
+                      {availableItems.includes('shell') && !storyProgress?.inventory.includes('shell') && (
+                        <div className={`scene-element collectible-item item-shell ${collectedItem === 'shell' ? 'collected' : ''}`}>
+                          🐚
+                          <div className="item-glow"></div>
+                        </div>
+                      )}
+                      {availableItems.includes('pearl') && !storyProgress?.inventory.includes('pearl') && (
+                        <div className={`scene-element collectible-item item-pearl ${collectedItem === 'pearl' ? 'collected' : ''}`}>
+                          💎
+                          <div className="item-glow"></div>
+                        </div>
+                      )}
+                      {availableItems.includes('treasure_map') && !storyProgress?.inventory.includes('treasure_map') && (
+                        <div className={`scene-element collectible-item item-treasure-map ${collectedItem === 'treasure_map' ? 'collected' : ''}`}>
+                          🗺️
+                          <div className="item-glow"></div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                  {storyProgress?.currentScene === 'mountain' && (
+                    <>
+                      <div className="scene-element mountain-peak">⛰️</div>
+                      <div className="scene-element cliff">🧗</div>
+                      <div className="scene-element cave">🕳️</div>
+                      {/* Collectible Items */}
+                      {availableItems.includes('rope') && !storyProgress?.inventory.includes('rope') && (
+                        <div className={`scene-element collectible-item item-rope ${collectedItem === 'rope' ? 'collected' : ''}`}>
+                          🪢
+                          <div className="item-glow"></div>
+                        </div>
+                      )}
+                      {availableItems.includes('torch') && !storyProgress?.inventory.includes('torch') && (
+                        <div className={`scene-element collectible-item item-torch ${collectedItem === 'torch' ? 'collected' : ''}`}>
+                          🔥
+                          <div className="item-glow"></div>
+                        </div>
+                      )}
+                      {availableItems.includes('crystal') && !storyProgress?.inventory.includes('crystal') && (
+                        <div className={`scene-element collectible-item item-crystal ${collectedItem === 'crystal' ? 'collected' : ''}`}>
+                          💠
                           <div className="item-glow"></div>
                         </div>
                       )}

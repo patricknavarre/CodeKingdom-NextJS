@@ -1,18 +1,122 @@
 /**
+ * Get indentation level of a line (number of leading spaces)
+ */
+const getIndent = (line: string): number => {
+  let indent = 0;
+  for (let i = 0; i < line.length; i++) {
+    if (line[i] === ' ') indent++;
+    else if (line[i] === '\t') indent += 4; // Treat tab as 4 spaces
+    else break;
+  }
+  return indent;
+};
+
+/**
+ * Evaluate a Python-like condition
+ */
+const evaluateCondition = (condition: string, context: Record<string, any>): boolean => {
+  const trimmed = condition.trim();
+  
+  // Handle: "item" in inventory
+  const inMatch = trimmed.match(/["']([\w_]+)["']\s+in\s+inventory/);
+  if (inMatch) {
+    const item = inMatch[1];
+    const inventory = context.inventory || [];
+    return inventory.includes(item);
+  }
+  
+  // Handle: current_location == "location_name"
+  const locationMatch = trimmed.match(/current_location\s*==\s*["']([\w_]+)["']/);
+  if (locationMatch) {
+    const location = locationMatch[1];
+    return context.currentLocation === location;
+  }
+  
+  // Handle: len(inventory) > 0
+  const lenGtMatch = trimmed.match(/len\(inventory\)\s*>\s*(\d+)/);
+  if (lenGtMatch) {
+    const threshold = parseInt(lenGtMatch[1]);
+    const inventory = context.inventory || [];
+    return inventory.length > threshold;
+  }
+  
+  // Handle: len(inventory) == 0
+  const lenEqMatch = trimmed.match(/len\(inventory\)\s*==\s*(\d+)/);
+  if (lenEqMatch) {
+    const value = parseInt(lenEqMatch[1]);
+    const inventory = context.inventory || [];
+    return inventory.length === value;
+  }
+  
+  // Handle: len(inventory) >= X
+  const lenGeMatch = trimmed.match(/len\(inventory\)\s*>=\s*(\d+)/);
+  if (lenGeMatch) {
+    const threshold = parseInt(lenGeMatch[1]);
+    const inventory = context.inventory || [];
+    return inventory.length >= threshold;
+  }
+  
+  // Default: return false for unknown conditions
+  return false;
+};
+
+/**
+ * Parse and execute a code block (lines with same or greater indentation)
+ */
+const executeCodeBlock = (
+  lines: string[],
+  startIndex: number,
+  baseIndent: number,
+  context: Record<string, any>
+): { result: any; nextIndex: number } => {
+  const moveRegex = /move_to\(\s*["']([\w_]+)["']\s*\)/;
+  const collectRegex = /collect_item\(\s*["']([\w_]+)["']\s*\)/;
+  const openDoorRegex = /open_door\(\s*\)/;
+  const messageRegex = /show_message\(\s*["']([^"']+)["']\s*\)/;
+  
+  let result: any = { action: 'continue', success: true };
+  let i = startIndex;
+  
+  while (i < lines.length) {
+    const line = lines[i];
+    const indent = getIndent(line);
+    const trimmed = line.trim();
+    
+    // If we've gone back to base indent or less, we're done with this block
+    if (trimmed && indent <= baseIndent && !trimmed.startsWith('else:')) {
+      break;
+    }
+    
+    // Skip empty lines
+    if (!trimmed) {
+      i++;
+      continue;
+    }
+    
+    // Check for function calls
+    let match;
+    if ((match = trimmed.match(moveRegex))) {
+      result = { action: 'move', location: match[1], success: true };
+    } else if ((match = trimmed.match(collectRegex))) {
+      result = { action: 'collect', item: match[1], success: true };
+    } else if (openDoorRegex.test(trimmed)) {
+      result = { action: 'open_door', success: true, message: 'The door opens!' };
+    } else if ((match = trimmed.match(messageRegex))) {
+      result = { action: 'message', text: match[1], success: true };
+    }
+    
+    i++;
+  }
+  
+  return { result, nextIndex: i };
+};
+
+/**
  * Execute a very small "Python-like" command language used by the Story Game.
  *
- * Instead of running a real Python interpreter (which isn't available in
- * serverless environments like Vercel), we parse the student's code as a
- * string and look for calls to our game functions:
- *   - move_to("location_name")
- *   - collect_item("item_name")
- *   - open_door()
- *   - show_message("some text")
- *
- * We simulate the behaviour of the original Python wrapper by returning
- * the *last* function call found in the code as the result.
+ * Supports if/else statements with proper indentation parsing.
  * @param {string} code - Python code to execute
- * @param {Object} context - Context variables (inventory, etc.)
+ * @param {Object} context - Context variables (inventory, currentLocation, etc.)
  * @returns {Promise<Object>} - Execution result
  */
 export const executePython = (code: string, context: Record<string, any> = {}): Promise<any> => {
@@ -29,20 +133,83 @@ export const executePython = (code: string, context: Record<string, any> = {}): 
       const openDoorRegex = /open_door\(\s*\)/;
       const messageRegex = /show_message\(\s*["']([^"']+)["']\s*\)/;
 
-      for (const rawLine of lines) {
-        const line = rawLine.trim();
-        if (!line) continue;
-
+      let i = 0;
+      while (i < lines.length) {
+        const line = lines[i];
+        const trimmed = line.trim();
+        
+        // Skip empty lines
+        if (!trimmed) {
+          i++;
+          continue;
+        }
+        
+        // Check for if statement
+        const ifMatch = trimmed.match(/if\s+(.+):/);
+        if (ifMatch) {
+          const condition = ifMatch[1];
+          const conditionResult = evaluateCondition(condition, context);
+          const baseIndent = getIndent(line);
+          
+          if (conditionResult) {
+            // Execute if block
+            const blockResult = executeCodeBlock(lines, i + 1, baseIndent, context);
+            result = blockResult.result;
+            i = blockResult.nextIndex;
+            
+            // Check for else on same indent level
+            if (i < lines.length) {
+              const nextLine = lines[i];
+              const nextTrimmed = nextLine.trim();
+              const nextIndent = getIndent(nextLine);
+              
+              if (nextTrimmed.startsWith('else:') && nextIndent === baseIndent) {
+                // Skip else block since if was true
+                const elseBlockResult = executeCodeBlock(lines, i + 1, baseIndent, context);
+                i = elseBlockResult.nextIndex;
+              }
+            }
+          } else {
+            // Skip if block, look for else
+            const ifBlockResult = executeCodeBlock(lines, i + 1, baseIndent, context);
+            i = ifBlockResult.nextIndex;
+            
+            // Check for else
+            if (i < lines.length) {
+              const nextLine = lines[i];
+              const nextTrimmed = nextLine.trim();
+              const nextIndent = getIndent(nextLine);
+              
+              if (nextTrimmed.startsWith('else:') && nextIndent === baseIndent) {
+                // Execute else block
+                const elseBlockResult = executeCodeBlock(lines, i + 1, baseIndent, context);
+                result = elseBlockResult.result;
+                i = elseBlockResult.nextIndex;
+              }
+            }
+          }
+          continue;
+        }
+        
+        // Check for else without if (shouldn't happen, but handle gracefully)
+        if (trimmed.startsWith('else:')) {
+          i++;
+          continue;
+        }
+        
+        // Regular line - execute function calls (backward compatibility)
         let match;
-        if ((match = line.match(moveRegex))) {
+        if ((match = trimmed.match(moveRegex))) {
           result = { action: 'move', location: match[1], success: true };
-        } else if ((match = line.match(collectRegex))) {
+        } else if ((match = trimmed.match(collectRegex))) {
           result = { action: 'collect', item: match[1], success: true };
-        } else if (openDoorRegex.test(line)) {
+        } else if (openDoorRegex.test(trimmed)) {
           result = { action: 'open_door', success: true, message: 'The door opens!' };
-        } else if ((match = line.match(messageRegex))) {
+        } else if ((match = trimmed.match(messageRegex))) {
           result = { action: 'message', text: match[1], success: true };
         }
+        
+        i++;
       }
 
       resolve(result);

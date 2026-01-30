@@ -89,6 +89,22 @@ export async function POST(req: NextRequest) {
             message = 'Castle completed! You enter the town.';
             coinsEarned = 50;
             experienceEarned = 50;
+          } else if (storyGame.currentScene === 'town') {
+            storyGame.currentScene = 'ocean';
+            updatedLocation = 'beach_shore';
+            message = 'Town completed! You arrive at the mystical ocean.';
+            coinsEarned = 50;
+            experienceEarned = 50;
+          } else if (storyGame.currentScene === 'ocean') {
+            storyGame.currentScene = 'mountain';
+            updatedLocation = 'mountain_base';
+            message = 'Ocean completed! You reach the mountain peak.';
+            coinsEarned = 50;
+            experienceEarned = 50;
+          } else if (storyGame.currentScene === 'mountain') {
+            message = 'Congratulations! You completed all scenes! You are a true coding adventurer!';
+            coinsEarned = 100;
+            experienceEarned = 100;
           } else {
             message = 'Congratulations! You completed all scenes!';
             coinsEarned = 100;
