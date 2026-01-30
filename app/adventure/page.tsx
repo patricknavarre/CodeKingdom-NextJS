@@ -1085,18 +1085,20 @@ function AdventurePage() {
       }, 500);
     };
     
-    const backgroundStyle = character.background ? {
-      background: character.background.value,
-      backgroundAttachment: 'fixed' as const,
-      minHeight: '100vh'
-    } : {};
-
-    const containerStyle = {
+    const containerStyle = character.background ? {
       width: '100%',
       height: '100vh',
       margin: 0,
       padding: 0,
-      ...backgroundStyle
+      background: character.background.value,
+      backgroundAttachment: 'fixed' as const,
+      minHeight: '100vh'
+    } : {
+      width: '100%',
+      height: '100vh',
+      margin: 0,
+      padding: 0,
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
     };
 
     return (
