@@ -1371,8 +1371,297 @@ function AdventurePage() {
                 </div>
               </div>
               
-              {/* Right Column - Commands, Character, Status, Log */}
+              {/* Right Column - Character, Status, Log, then Commands */}
               <div style={{ flex: '0 0 50%', display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'auto', minHeight: 0 }}>
+                {/* Character, Status, and Log at the top */}
+                <div style={{ display: 'flex', gap: '10px', flexShrink: 0 }}>
+                  {/* Character and Pet display */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: '0 0 auto' }}>
+                    {/* Character display */}
+                    <div className="character-display-panel" style={{
+                      backgroundColor: 'white',
+                      borderRadius: '8px',
+                      padding: '6px',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                      border: '1px solid #9b59b6',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '4px',
+                      width: '80px'
+                    }}>
+                      <div style={{
+                        position: 'relative',
+                        width: '50px',
+                        height: '50px',
+                        backgroundColor: '#f0f8ff',
+                        borderRadius: '4px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        border: '1px solid #ddd',
+                        overflow: 'hidden',
+                        flexShrink: 0
+                      }}>
+                        <img 
+                          src={getCharacterImage()} 
+                          alt={character.name || 'Character'} 
+                          style={{
+                            maxWidth: '90%',
+                            maxHeight: '90%',
+                            objectFit: 'contain',
+                            display: 'block'
+                          }}
+                          onError={(e) => {
+                            console.error('Image failed to load:', e);
+                            (e.target as HTMLImageElement).src = character.id === 'boy1' ? boyCharacter : girlCharacter;
+                          }}
+                        />
+                      </div>
+                      <div style={{
+                        fontWeight: 'bold',
+                        color: '#333',
+                        fontSize: '0.75rem',
+                        textAlign: 'center'
+                      }}>{character.name || 'Character'}</div>
+                    </div>
+                    
+                    {/* Pet display - always visible */}
+                    <div className="pet-display-panel" style={{
+                      backgroundColor: 'white',
+                      borderRadius: '8px',
+                      padding: '6px',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                      border: '1px solid #f39c12',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '4px',
+                      width: '80px'
+                    }}>
+                      <div style={{
+                        position: 'relative',
+                        width: '50px',
+                        height: '50px',
+                        backgroundColor: '#fff8e1',
+                        borderRadius: '4px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        border: '1px solid #f39c12',
+                        overflow: 'hidden',
+                        flexShrink: 0
+                      }}>
+                        {(() => {
+                          const equippedPet = character.accessories?.find(acc => acc.type === 'pet' && acc.isEquipped);
+                          if (equippedPet) {
+                            if (equippedPet.image && (equippedPet.image.includes('.png') || equippedPet.image.includes('.jpg') || equippedPet.image.startsWith('/') || equippedPet.image.startsWith('http'))) {
+                              return (
+                                <img 
+                                  src={equippedPet.image} 
+                                  alt={equippedPet.name} 
+                                  style={{
+                                    maxWidth: '90%',
+                                    maxHeight: '90%',
+                                    objectFit: 'contain',
+                                    display: 'block'
+                                  }}
+                                  onError={(e) => {
+                                    console.error('Pet image failed to load:', e);
+                                    (e.target as HTMLImageElement).style.display = 'none';
+                                  }}
+                                />
+                              );
+                            } else {
+                              return <span style={{ fontSize: '30px' }}>{equippedPet.image || '🐾'}</span>;
+                            }
+                          } else {
+                            return <span style={{ fontSize: '24px', opacity: 0.5 }}>🐾</span>;
+                          }
+                        })()}
+                      </div>
+                      <div style={{
+                        fontWeight: 'bold',
+                        color: '#333',
+                        fontSize: '0.7rem',
+                        textAlign: 'center'
+                      }}>
+                        {(() => {
+                          const equippedPet = character.accessories?.find(acc => acc.type === 'pet' && acc.isEquipped);
+                          return equippedPet ? equippedPet.name : 'Pet';
+                        })()}
+                      </div>
+                    </div>
+                    
+                    {/* Accessories display */}
+                    {equippedAccessories.map((accessory, idx) => (
+                      <div key={accessory.id || idx} className="accessory-display-panel" style={{
+                        backgroundColor: 'white',
+                        borderRadius: '8px',
+                        padding: '6px',
+                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                        border: '1px solid #9b59b6',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '4px',
+                        width: '80px'
+                      }}>
+                        <div style={{
+                          position: 'relative',
+                          width: '50px',
+                          height: '50px',
+                          backgroundColor: '#f0f8ff',
+                          borderRadius: '4px',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          border: '1px solid #9b59b6',
+                          overflow: 'hidden',
+                          flexShrink: 0
+                        }}>
+                          {accessory.image && (accessory.image.includes('.png') || accessory.image.includes('.jpg') || accessory.image.startsWith('/') || accessory.image.startsWith('http')) ? (
+                            <img 
+                              src={accessory.image} 
+                              alt={accessory.name} 
+                              style={{
+                                maxWidth: '90%',
+                                maxHeight: '90%',
+                                objectFit: 'contain',
+                                display: 'block'
+                              }}
+                              onError={(e) => {
+                                console.error('Accessory image failed to load:', e);
+                                (e.target as HTMLImageElement).style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <span style={{ fontSize: '30px' }}>{accessory.image || '✨'}</span>
+                          )}
+                        </div>
+                        <div style={{
+                          fontWeight: 'bold',
+                          color: '#333',
+                          fontSize: '0.7rem',
+                          textAlign: 'center'
+                        }}>
+                          {accessory.name}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Status Panel */}
+                  <div className="status-panel" style={{
+                    backgroundColor: 'white',
+                    borderRadius: '8px',
+                    padding: '8px 10px 12px 10px',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                    border: '1px solid #3498db',
+                    overflow: 'visible',
+                    flex: 1
+                  }}>
+                    <h3 style={{ 
+                      fontSize: '0.9rem', 
+                      marginTop: '0', 
+                      marginBottom: '6px', 
+                      color: '#2874a6', 
+                      borderBottom: '2px solid #aed6f1',
+                      paddingBottom: '3px'
+                    }}>Status</h3>
+                    <div className="status-item" style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      marginBottom: '4px',
+                      fontSize: '0.85rem',
+                      fontWeight: 'bold'
+                    }}>
+                      <span style={{ color: '#333' }}>Level:</span>
+                      <span style={{ color: '#2980b9' }}>{level}</span>
+                    </div>
+                    <div className="status-item" style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      marginBottom: '4px',
+                      fontSize: '0.85rem',
+                      fontWeight: 'bold'
+                    }}>
+                      <span style={{ color: '#333' }}>Position:</span>
+                      <span style={{ color: '#2980b9' }}>({position.x}, {position.y})</span>
+                    </div>
+                    <div className="status-item" style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      marginBottom: '4px',
+                      fontSize: '0.85rem',
+                      fontWeight: 'bold'
+                    }}>
+                      <span style={{ color: '#333' }}>Direction:</span>
+                      <span style={{ color: '#2980b9' }}>{direction}</span>
+                    </div>
+                    <div className="status-item" style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between',
+                      marginBottom: '4px',
+                      fontSize: '0.85rem',
+                      fontWeight: 'bold'
+                    }}>
+                      <span style={{ color: '#333' }}>Diamonds:</span>
+                      <span style={{ 
+                        color: diamonds > 0 ? '#e67e22' : '#2980b9',
+                        fontWeight: diamonds > 0 ? 'bold' : 'bold'
+                      }}>{diamonds}/3</span>
+                    </div>
+                    <div className="status-item" style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between',
+                      marginBottom: '4px',
+                      fontSize: '0.85rem',
+                      fontWeight: 'bold'
+                    }}>
+                      <span style={{ color: '#333' }}>Coins:</span>
+                      <span style={{ color: '#f39c12', fontWeight: 'bold' }}>🪙 {character.coins || 0}</span>
+                    </div>
+                    <div className="status-item" style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between',
+                      marginBottom: '0',
+                      fontSize: '0.85rem',
+                      fontWeight: 'bold'
+                    }}>
+                      <span style={{ color: '#333' }}>Points:</span>
+                      <span style={{ color: '#9b59b6', fontWeight: 'bold' }}>🏆 {character.points || 0}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Log Panel */}
+                  <div className="log-panel" style={{
+                    backgroundColor: 'white',
+                    borderRadius: '8px',
+                    padding: '8px 10px',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                    flex: 1
+                  }}>
+                    <h3 style={{ margin: '0 0 6px 0', fontSize: '0.9rem' }}>Log</h3>
+                    <div className="log-content" style={{
+                      height: '100px',
+                      overflowY: 'auto',
+                      padding: '4px',
+                      backgroundColor: '#f8f9fa',
+                      borderRadius: '4px',
+                      fontSize: '0.8rem'
+                    }}>
+                      {log.map((entry, index) => (
+                        <div key={index} className="log-entry" style={{
+                          marginBottom: '2px',
+                          padding: '2px',
+                          borderLeft: '2px solid #3498db'
+                        }}>{entry}</div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
                 {/* Commands Panel */}
                 <div className="command-panel" style={{
                   backgroundColor: 'white',
@@ -1381,8 +1670,9 @@ function AdventurePage() {
                   paddingBottom: '20px',
                   boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
                   borderLeft: '3px solid #3498db',
-                  flexShrink: 0,
-                  overflow: 'visible'
+                  flex: 1,
+                  overflow: 'auto',
+                  minHeight: 0
                 }}>
                   <h3>Drag & Connect Blocks</h3>
                   <div style={{ marginBottom: '12px', fontSize: '0.85rem', color: '#666' }}>
@@ -1878,298 +2168,6 @@ function AdventurePage() {
                     />
                     <div className="command-tip" style={{ fontSize: '0.8rem', color: '#666', marginTop: '6px' }}>
                       Tip: You can **click the command buttons above** or **type your own commands** (separate multiple commands with commas, e.g. "turn right, move 2").
-                    </div>
-                  </div>
-                  
-                  {/* Status and Log side by side */}
-                  <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
-                    {/* Character and Pet display */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: '0 0 auto' }}>
-                      {/* Character display */}
-                      <div className="character-display-panel" style={{
-                        backgroundColor: 'white',
-                        borderRadius: '8px',
-                        padding: '6px',
-                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                        border: '1px solid #9b59b6',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '4px',
-                        width: '80px'
-                      }}>
-                        <div style={{
-                          position: 'relative',
-                          width: '50px',
-                          height: '50px',
-                          backgroundColor: '#f0f8ff',
-                          borderRadius: '4px',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          border: '1px solid #ddd',
-                          overflow: 'hidden',
-                          flexShrink: 0
-                        }}>
-                          <img 
-                            src={getCharacterImage()} 
-                            alt={character.name || 'Character'} 
-                            style={{
-                              maxWidth: '90%',
-                              maxHeight: '90%',
-                              objectFit: 'contain',
-                              display: 'block'
-                            }}
-                            onError={(e) => {
-                              console.error('Image failed to load:', e);
-                              // Fallback to base character image
-                              (e.target as HTMLImageElement).src = character.id === 'boy1' ? boyCharacter : girlCharacter;
-                            }}
-                          />
-                        </div>
-                        <div style={{
-                          fontWeight: 'bold',
-                          color: '#333',
-                          fontSize: '0.75rem',
-                          textAlign: 'center'
-                        }}>{character.name || 'Character'}</div>
-                      </div>
-                      
-                      {/* Pet display - always visible */}
-                      <div className="pet-display-panel" style={{
-                        backgroundColor: 'white',
-                        borderRadius: '8px',
-                        padding: '6px',
-                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                        border: '1px solid #f39c12',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '4px',
-                        width: '80px'
-                      }}>
-                        <div style={{
-                          position: 'relative',
-                          width: '50px',
-                          height: '50px',
-                          backgroundColor: '#fff8e1',
-                          borderRadius: '4px',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          border: '1px solid #f39c12',
-                          overflow: 'hidden',
-                          flexShrink: 0
-                        }}>
-                          {(() => {
-                            const equippedPet = character.accessories?.find(acc => acc.type === 'pet' && acc.isEquipped);
-                            if (equippedPet) {
-                              // Show equipped pet image
-                              if (equippedPet.image && (equippedPet.image.includes('.png') || equippedPet.image.includes('.jpg') || equippedPet.image.startsWith('/') || equippedPet.image.startsWith('http'))) {
-                                return (
-                                  <img 
-                                    src={equippedPet.image} 
-                                    alt={equippedPet.name} 
-                                    style={{
-                                      maxWidth: '90%',
-                                      maxHeight: '90%',
-                                      objectFit: 'contain',
-                                      display: 'block'
-                                    }}
-                                    onError={(e) => {
-                                      console.error('Pet image failed to load:', e);
-                                      (e.target as HTMLImageElement).style.display = 'none';
-                                    }}
-                                  />
-                                );
-                              } else {
-                                return <span style={{ fontSize: '30px' }}>{equippedPet.image || '🐾'}</span>;
-                              }
-                            } else {
-                              // Show placeholder when no pet is equipped
-                              return <span style={{ fontSize: '24px', opacity: 0.5 }}>🐾</span>;
-                            }
-                          })()}
-                        </div>
-                        <div style={{
-                          fontWeight: 'bold',
-                          color: '#333',
-                          fontSize: '0.7rem',
-                          textAlign: 'center'
-                        }}>
-                          {(() => {
-                            const equippedPet = character.accessories?.find(acc => acc.type === 'pet' && acc.isEquipped);
-                            return equippedPet ? equippedPet.name : 'Pet';
-                          })()}
-                        </div>
-                      </div>
-                      
-                      {/* Accessories display */}
-                      {equippedAccessories.map((accessory, idx) => (
-                        <div key={accessory.id || idx} className="accessory-display-panel" style={{
-                          backgroundColor: 'white',
-                          borderRadius: '8px',
-                          padding: '6px',
-                          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                          border: '1px solid #9b59b6',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          gap: '4px',
-                          width: '80px'
-                        }}>
-                          <div style={{
-                            position: 'relative',
-                            width: '50px',
-                            height: '50px',
-                            backgroundColor: '#f0f8ff',
-                            borderRadius: '4px',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            border: '1px solid #9b59b6',
-                            overflow: 'hidden',
-                            flexShrink: 0
-                          }}>
-                            {accessory.image && (accessory.image.includes('.png') || accessory.image.includes('.jpg') || accessory.image.startsWith('/') || accessory.image.startsWith('http')) ? (
-                              <img 
-                                src={accessory.image} 
-                                alt={accessory.name} 
-                                style={{
-                                  maxWidth: '90%',
-                                  maxHeight: '90%',
-                                  objectFit: 'contain',
-                                  display: 'block'
-                                }}
-                                onError={(e) => {
-                                  console.error('Accessory image failed to load:', e);
-                                  (e.target as HTMLImageElement).style.display = 'none';
-                                }}
-                              />
-                            ) : (
-                              <span style={{ fontSize: '30px' }}>{accessory.image || '✨'}</span>
-                            )}
-                          </div>
-                          <div style={{
-                            fontWeight: 'bold',
-                            color: '#333',
-                            fontSize: '0.7rem',
-                            textAlign: 'center'
-                          }}>
-                            {accessory.name}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    {/* Status Panel */}
-                    <div className="status-panel" style={{
-                      backgroundColor: 'white',
-                      borderRadius: '8px',
-                      padding: '8px 10px 12px 10px',
-                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                      border: '1px solid #3498db',
-                      overflow: 'visible',
-                      flex: 1
-                    }}>
-                      <h3 style={{ 
-                        fontSize: '0.9rem', 
-                        marginTop: '0', 
-                        marginBottom: '6px', 
-                        color: '#2874a6', 
-                        borderBottom: '2px solid #aed6f1',
-                        paddingBottom: '3px'
-                      }}>Status</h3>
-                      <div className="status-item" style={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
-                        marginBottom: '4px',
-                        fontSize: '0.85rem',
-                        fontWeight: 'bold'
-                      }}>
-                        <span style={{ color: '#333' }}>Level:</span>
-                        <span style={{ color: '#2980b9' }}>{level}</span>
-                      </div>
-                      <div className="status-item" style={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
-                        marginBottom: '4px',
-                        fontSize: '0.85rem',
-                        fontWeight: 'bold'
-                      }}>
-                        <span style={{ color: '#333' }}>Position:</span>
-                        <span style={{ color: '#2980b9' }}>({position.x}, {position.y})</span>
-                      </div>
-                      <div className="status-item" style={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
-                        marginBottom: '4px',
-                        fontSize: '0.85rem',
-                        fontWeight: 'bold'
-                      }}>
-                        <span style={{ color: '#333' }}>Direction:</span>
-                        <span style={{ color: '#2980b9' }}>{direction}</span>
-                      </div>
-                      <div className="status-item" style={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between',
-                        marginBottom: '4px',
-                        fontSize: '0.85rem',
-                        fontWeight: 'bold'
-                      }}>
-                        <span style={{ color: '#333' }}>Diamonds:</span>
-                        <span style={{ 
-                          color: diamonds > 0 ? '#e67e22' : '#2980b9',
-                          fontWeight: diamonds > 0 ? 'bold' : 'bold'
-                        }}>{diamonds}/3</span>
-                      </div>
-                      <div className="status-item" style={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between',
-                        marginBottom: '4px',
-                        fontSize: '0.85rem',
-                        fontWeight: 'bold'
-                      }}>
-                        <span style={{ color: '#333' }}>Coins:</span>
-                        <span style={{ color: '#f39c12', fontWeight: 'bold' }}>🪙 {character.coins || 0}</span>
-                      </div>
-                      <div className="status-item" style={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between',
-                        marginBottom: '0',
-                        fontSize: '0.85rem',
-                        fontWeight: 'bold'
-                      }}>
-                        <span style={{ color: '#333' }}>Points:</span>
-                        <span style={{ color: '#9b59b6', fontWeight: 'bold' }}>🏆 {character.points || 0}</span>
-                      </div>
-                    </div>
-                    
-                    {/* Log Panel */}
-                    <div className="log-panel" style={{
-                      backgroundColor: 'white',
-                      borderRadius: '8px',
-                      padding: '8px 10px',
-                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                      flex: 1
-                    }}>
-                      <h3 style={{ margin: '0 0 6px 0', fontSize: '0.9rem' }}>Log</h3>
-                      <div className="log-content" style={{
-                        height: '100px',
-                        overflowY: 'auto',
-                        padding: '4px',
-                        backgroundColor: '#f8f9fa',
-                        borderRadius: '4px',
-                        fontSize: '0.8rem'
-                      }}>
-                        {log.map((entry, index) => (
-                          <div key={index} className="log-entry" style={{
-                            marginBottom: '2px',
-                            padding: '2px',
-                            borderLeft: '2px solid #3498db'
-                          }}>{entry}</div>
-                        ))}
-                      </div>
                     </div>
                   </div>
                 </div>
