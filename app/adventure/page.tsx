@@ -1511,7 +1511,8 @@ function AdventurePage() {
                       padding: '15px',
                       marginBottom: '12px',
                       position: 'relative',
-                      touchAction: 'none'
+                      touchAction: 'none',
+                      overflow: 'visible' // Ensure connector lines are visible
                     }}
                   >
                     {connectedBlocks.length === 0 ? (
