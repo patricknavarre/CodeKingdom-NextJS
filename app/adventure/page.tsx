@@ -310,8 +310,8 @@ function AdventurePage() {
       }
       
       // Calculate position: if snapping, place directly adjacent (touching, no gap)
-      let newX: number;
-      let newY: number;
+      let newX: number = 20; // Default to left edge
+      let newY: number = 20; // Default to top
       const BASE_Y = 20; // Starting Y position
       
       if (snapToBlock && snapDirection) {
