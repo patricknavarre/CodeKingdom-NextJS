@@ -451,114 +451,114 @@ export default function CharacterPage() {
                     }}>
                       {otherItems.filter(item => item && item.id).map((item) => (
                         <div
-                      key={item.id}
-                      onClick={() => toggleAccessory(item.id)}
-                      style={{
-                        backgroundColor: item.isEquipped ? '#e8f5e9' : '#fff',
-                        border: item.isEquipped ? '3px solid #4caf50' : '2px solid #ddd',
-                        borderRadius: '10px',
-                        padding: '15px',
-                        textAlign: 'center',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease',
-                        position: 'relative',
-                        boxShadow: item.isEquipped ? '0 4px 8px rgba(76, 175, 80, 0.3)' : '0 2px 4px rgba(0,0,0,0.1)'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'scale(1.05)';
-                        e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.2)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'scale(1)';
-                        e.currentTarget.style.boxShadow = item.isEquipped 
-                          ? '0 4px 8px rgba(76, 175, 80, 0.3)' 
-                          : '0 2px 4px rgba(0,0,0,0.1)';
-                      }}
-                    >
-                      {item.isEquipped && (
-                        <div style={{
-                          position: 'absolute',
-                          top: '5px',
-                          right: '5px',
-                          backgroundColor: '#4caf50',
-                          color: 'white',
-                          borderRadius: '50%',
-                          width: '24px',
-                          height: '24px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '14px',
-                          fontWeight: 'bold'
-                        }}>
-                          ✓
-                        </div>
-                      )}
-                      <div style={{
-                        width: '100px',
-                        height: '100px',
-                        margin: '0 auto 10px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: '#f0f8ff',
-                        borderRadius: '8px',
-                        border: '1px solid #ddd',
-                        overflow: 'hidden'
-                      }}>
-                        {item.image && (item.image.startsWith('http') || item.image.includes('.png') || item.image.includes('.jpg') || item.image.includes('/')) ? (
-                          <img 
-                            src={item.image} 
-                            alt={item.name}
-                            style={{
-                              maxWidth: '100%',
-                              maxHeight: '100%',
-                              objectFit: 'contain'
-                            }}
-                          />
-                        ) : (
-                          <span style={{ fontSize: '50px' }}>{item.image || '📦'}</span>
-                        )}
-                      </div>
-                      <h4 style={{ 
-                        margin: '5px 0',
-                        fontSize: '1rem',
-                        color: '#333',
-                        fontWeight: 'bold'
-                      }}>
-                        {item.name}
-                      </h4>
-                      <p style={{ 
-                        margin: '5px 0',
-                        fontSize: '0.85rem',
-                        color: '#666'
-                      }}>
-                        {item.description}
-                      </p>
-                      <div style={{
-                        display: 'inline-block',
-                        padding: '3px 8px',
-                        borderRadius: '12px',
-                        fontSize: '0.75rem',
-                        fontWeight: 'bold',
-                        marginTop: '5px',
-                        backgroundColor: item.rarity === 'rare' ? '#ffd700' : 
-                                        item.rarity === 'epic' ? '#9b59b6' :
-                                        item.rarity === 'legendary' ? '#e74c3c' : '#95a5a6',
-                        color: 'white'
-                      }}>
-                        {item.rarity?.toUpperCase()}
-                      </div>
-                      {item.isEquipped && (
-                        <p style={{
-                          marginTop: '8px',
-                          fontSize: '0.8rem',
-                          color: '#4caf50',
-                          fontWeight: 'bold'
-                        }}>
-                          EQUIPPED
-                        </p>
-                      )}
+                          key={item.id}
+                          onClick={() => toggleAccessory(item.id)}
+                          style={{
+                            backgroundColor: item.isEquipped ? '#e8f5e9' : '#fff',
+                            border: item.isEquipped ? '3px solid #4caf50' : '2px solid #ddd',
+                            borderRadius: '10px',
+                            padding: '15px',
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            position: 'relative',
+                            boxShadow: item.isEquipped ? '0 4px 8px rgba(76, 175, 80, 0.3)' : '0 2px 4px rgba(0,0,0,0.1)'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'scale(1.05)';
+                            e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.2)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.style.boxShadow = item.isEquipped 
+                              ? '0 4px 8px rgba(76, 175, 80, 0.3)' 
+                              : '0 2px 4px rgba(0,0,0,0.1)';
+                          }}
+                        >
+                          {item.isEquipped && (
+                            <div style={{
+                              position: 'absolute',
+                              top: '5px',
+                              right: '5px',
+                              backgroundColor: '#4caf50',
+                              color: 'white',
+                              borderRadius: '50%',
+                              width: '24px',
+                              height: '24px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '14px',
+                              fontWeight: 'bold'
+                            }}>
+                              ✓
+                            </div>
+                          )}
+                          <div style={{
+                            width: '100px',
+                            height: '100px',
+                            margin: '0 auto 10px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: '#f0f8ff',
+                            borderRadius: '8px',
+                            border: '1px solid #ddd',
+                            overflow: 'hidden'
+                          }}>
+                            {item.image && (item.image.startsWith('http') || item.image.includes('.png') || item.image.includes('.jpg') || item.image.includes('/')) ? (
+                              <img 
+                                src={item.image} 
+                                alt={item.name}
+                                style={{
+                                  maxWidth: '100%',
+                                  maxHeight: '100%',
+                                  objectFit: 'contain'
+                                }}
+                              />
+                            ) : (
+                              <span style={{ fontSize: '50px' }}>{item.image || '📦'}</span>
+                            )}
+                          </div>
+                          <h4 style={{ 
+                            margin: '5px 0',
+                            fontSize: '1rem',
+                            color: '#333',
+                            fontWeight: 'bold'
+                          }}>
+                            {item.name}
+                          </h4>
+                          <p style={{ 
+                            margin: '5px 0',
+                            fontSize: '0.85rem',
+                            color: '#666'
+                          }}>
+                            {item.description}
+                          </p>
+                          <div style={{
+                            display: 'inline-block',
+                            padding: '3px 8px',
+                            borderRadius: '12px',
+                            fontSize: '0.75rem',
+                            fontWeight: 'bold',
+                            marginTop: '5px',
+                            backgroundColor: item.rarity === 'rare' ? '#ffd700' : 
+                                            item.rarity === 'epic' ? '#9b59b6' :
+                                            item.rarity === 'legendary' ? '#e74c3c' : '#95a5a6',
+                            color: 'white'
+                          }}>
+                            {item.rarity?.toUpperCase()}
+                          </div>
+                          {item.isEquipped && (
+                            <p style={{
+                              marginTop: '8px',
+                              fontSize: '0.8rem',
+                              color: '#4caf50',
+                              fontWeight: 'bold'
+                            }}>
+                              EQUIPPED
+                            </p>
+                          )}
                         </div>
                       ))}
                     </div>
