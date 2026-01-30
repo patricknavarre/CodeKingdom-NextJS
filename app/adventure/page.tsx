@@ -409,6 +409,7 @@ function AdventurePage() {
             }
             
             // Connect the last block to the new block
+            playSnapSound();
             return prev.map(b => {
               if (b.id === lastBlock.id) {
                 return { ...b, connectedTo: newBlock.id };
@@ -417,6 +418,7 @@ function AdventurePage() {
             }).concat(newBlock);
           }
           // First block, no connection needed
+          playSnapSound();
           return [...prev, newBlock];
         }
       });
