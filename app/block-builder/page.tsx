@@ -502,6 +502,54 @@ export default function BlockBuilderPage() {
     };
   }, []);
 
+  // Update background when character background changes
+  useEffect(() => {
+    if (!sceneRef3D.current) return;
+    
+    const scene = sceneRef3D.current;
+    if (character.background?.value) {
+      const bgValue = character.background.value;
+      if (bgValue.startsWith('#')) {
+        // Hex color
+        scene.background = new THREE.Color(bgValue);
+      } else if (bgValue.startsWith('rgb') || bgValue.startsWith('rgba')) {
+        // RGB/RGBA color - parse it
+        const match = bgValue.match(/(\d+),\s*(\d+),\s*(\d+)/);
+        if (match) {
+          scene.background = new THREE.Color(
+            parseInt(match[1]) / 255,
+            parseInt(match[2]) / 255,
+            parseInt(match[3]) / 255
+          );
+        } else {
+          scene.background = new THREE.Color(0x87ceeb); // Fallback to sky blue
+        }
+      } else if (bgValue.includes('gradient')) {
+        // For gradients, extract the first color or use a solid color approximation
+        const colorMatch = bgValue.match(/#([0-9a-fA-F]{6})/);
+        if (colorMatch) {
+          scene.background = new THREE.Color('#' + colorMatch[1]);
+        } else {
+          // Try to extract RGB from gradient
+          const rgbMatch = bgValue.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+          if (rgbMatch) {
+            scene.background = new THREE.Color(
+              parseInt(rgbMatch[1]) / 255,
+              parseInt(rgbMatch[2]) / 255,
+              parseInt(rgbMatch[3]) / 255
+            );
+          } else {
+            scene.background = new THREE.Color(0x87ceeb); // Fallback
+          }
+        }
+      } else {
+        scene.background = new THREE.Color(0x87ceeb); // Fallback to sky blue
+      }
+    } else {
+      scene.background = new THREE.Color(0x87ceeb); // Default sky blue
+    }
+  }, [character.background]);
+
   // Update 3D scene when blocks change
   useEffect(() => {
     if (!sceneRef3D.current) return;
