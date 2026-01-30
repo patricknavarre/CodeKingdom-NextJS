@@ -52,8 +52,17 @@ export default function CharacterPage() {
   const collectedItems = (character?.accessories || []).filter(item => item && item.source !== 'default');
   
   // Separate backgrounds from other items
-  const backgrounds = collectedItems.filter(item => item.backgroundData);
-  const otherItems = collectedItems.filter(item => !item.backgroundData);
+  // Backgrounds are identified by: having backgroundData, id starting with 'bg-', or type being 'background'
+  const backgrounds = collectedItems.filter(item => 
+    item.backgroundData || 
+    (item.id && item.id.startsWith('bg-')) || 
+    item.type === 'background'
+  );
+  const otherItems = collectedItems.filter(item => 
+    !item.backgroundData && 
+    !(item.id && item.id.startsWith('bg-')) && 
+    item.type !== 'background'
+  );
   
   // Check if accessories are equipped
   const pinkHoodieEquipped = character?.accessories?.some(
