@@ -40,13 +40,10 @@ function AdventurePage() {
   preloadImage(brownBoyCharacter);
   preloadImage(blondeGirlCharacter);
 
-  // Hooks MUST be called at the top level, not inside try-catch
+  // Hooks MUST be called at the top level
   const { character, addCoins, addExperience, addAccessory, addPoints } = useCharacter();
   
-  // Basic error handling to prevent white screen
-  try {
-    
-    // Check if accessories are equipped
+  // Check if accessories are equipped
     const pinkHoodieEquipped = character?.accessories?.some(
       acc => acc.name === 'Pink Hoodie' && acc.isEquipped
     ) || false;
@@ -2169,16 +2166,6 @@ function AdventurePage() {
         </div>
       </ProtectedRoute>
     );
-  } catch (error) {
-    console.error('Error rendering AdventurePage:', error);
-    return (
-      <div style={{ padding: '20px', textAlign: 'center' }}>
-        <h2>Something went wrong</h2>
-        <p>There was an error loading the adventure game.</p>
-        <button onClick={() => window.location.reload()}>Try Again</button>
-      </div>
-    );
-  }
 }
 
 export default AdventurePage;
