@@ -1541,72 +1541,8 @@ function AdventurePage() {
                             return `say ${block.value || 'Hello!'}`;
                           };
                           
-                          // Find the block this one connects to (for drawing connector)
-                          const connectsTo = connectedBlocks.find(b => b.id === block.connectedTo);
-                          
-                          // Calculate block dimensions - need to match actual rendered size
-                          const BLOCK_WIDTH = 120; // Approximate width including padding
-                          const BLOCK_HEIGHT = 50; // Approximate height including gap
-                          
                           return (
                             <React.Fragment key={block.id}>
-                              {/* Connector line to next block - render BEFORE block so it's behind */}
-                              {connectsTo && (
-                                <>
-                                  {/* Check if blocks are on same line or wrapped */}
-                                  {connectsTo.y === block.y ? (
-                                    // Same line: horizontal connector
-                                    <div
-                                      style={{
-                                        position: 'absolute',
-                                        left: `${block.x + BLOCK_WIDTH}px`,
-                                        top: `${block.y + BLOCK_HEIGHT / 2 - 3}px`, // Center vertically
-                                        width: `${Math.max(0, connectsTo.x - block.x - BLOCK_WIDTH)}px`,
-                                        height: '6px',
-                                        backgroundColor: '#2980b9',
-                                        zIndex: 4, // Above workspace background, below blocks
-                                        borderRadius: '3px',
-                                        boxShadow: '0 0 6px rgba(41, 128, 185, 1), 0 2px 4px rgba(0, 0, 0, 0.2)',
-                                        border: '1px solid #1f5f8b'
-                                      }}
-                                    />
-                                  ) : (
-                                    // Wrapped: L-shaped connector (down then right)
-                                    <>
-                                      {/* Vertical line going down from current block */}
-                                      <div
-                                        style={{
-                                          position: 'absolute',
-                                          left: `${block.x + BLOCK_WIDTH / 2 - 3}px`, // Center horizontally
-                                          top: `${block.y + BLOCK_HEIGHT}px`,
-                                          width: '6px',
-                                          height: `${Math.max(0, connectsTo.y - block.y - BLOCK_HEIGHT)}px`,
-                                          backgroundColor: '#2980b9',
-                                          zIndex: 4,
-                                          borderRadius: '3px',
-                                          boxShadow: '0 0 6px rgba(41, 128, 185, 1), 0 2px 4px rgba(0, 0, 0, 0.2)',
-                                          border: '1px solid #1f5f8b'
-                                        }}
-                                      />
-                                      {/* Horizontal line going right to next block */}
-                                      <div
-                                        style={{
-                                          position: 'absolute',
-                                          left: `${block.x + BLOCK_WIDTH / 2}px`,
-                                          top: `${connectsTo.y + BLOCK_HEIGHT / 2 - 3}px`, // Center vertically
-                                          width: `${Math.max(0, connectsTo.x - block.x - BLOCK_WIDTH / 2)}px`,
-                                          height: '6px',
-                                          backgroundColor: '#2980b9',
-                                          zIndex: 4,
-                                          borderRadius: '3px',
-                                          boxShadow: '0 0 6px rgba(41, 128, 185, 1), 0 2px 4px rgba(0, 0, 0, 0.2)',
-                                          border: '1px solid #1f5f8b'
-                                        }}
-                                      />
-                                    </>
-                                  )}
-                                </>
-                              )}
                               {/* Block */}
                               <div
                                 style={{
@@ -1625,12 +1561,14 @@ function AdventurePage() {
                                     : '0 3px 6px rgba(0,0,0,0.3)',
                                   transform: snapTarget === block.id ? 'scale(1.05)' : 'scale(1)',
                                   transition: 'all 0.2s ease',
-                                  zIndex: snapTarget === block.id ? 10 : 5, // Higher than connector lines
+                                  zIndex: snapTarget === block.id ? 10 : 5,
                                   display: 'flex',
                                   alignItems: 'center',
                                   gap: '8px',
                                   minWidth: '100px',
-                                  whiteSpace: 'nowrap'
+                                  whiteSpace: 'nowrap',
+                                  width: '100px', // Fixed width so blocks align perfectly
+                                  boxSizing: 'border-box' // Include padding in width
                                 }}
                               >
                                 <span>{getBlockText()}</span>
