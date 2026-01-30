@@ -276,6 +276,10 @@ function AdventurePage() {
       
       const SNAP_DISTANCE = 60;
       const BLOCK_WIDTH = 120; // Approximate block width + gap
+      const BLOCK_HEIGHT = 50; // Block height + gap for wrapping
+      const WORKSPACE_PADDING = 30; // Padding on left and right
+      const workspaceWidth = workspaceRef.current.clientWidth - WORKSPACE_PADDING;
+      
       let snapToBlock: Block | null = null;
       let minDistance = Infinity;
       
@@ -292,12 +296,22 @@ function AdventurePage() {
       // Calculate position: if snapping, place to the right; otherwise append to end of chain
       let newX: number;
       let newY: number;
-      const BASE_Y = 20; // All blocks align on same horizontal line
+      const BASE_Y = 20; // Starting Y position
       
       if (snapToBlock) {
         // Snap to the right of the target block
-        newX = snapToBlock.x + BLOCK_WIDTH;
-        newY = snapToBlock.y; // Same vertical position
+        const proposedX = snapToBlock.x + BLOCK_WIDTH;
+        
+        // Check if this would extend past the workspace width
+        if (proposedX + BLOCK_WIDTH > workspaceWidth) {
+          // Wrap to new line: start at left edge, one line down
+          newX = 20;
+          newY = snapToBlock.y + BLOCK_HEIGHT;
+        } else {
+          // Place to the right on same line
+          newX = proposedX;
+          newY = snapToBlock.y;
+        }
       } else {
         // If no blocks exist, start at left edge
         if (connectedBlocks.length === 0) {
@@ -325,8 +339,17 @@ function AdventurePage() {
             }
           }
           
-          newX = lastBlock.x + BLOCK_WIDTH;
-          newY = BASE_Y; // Align all blocks on same line
+          // Check if placing to the right would extend past workspace
+          const proposedX = lastBlock.x + BLOCK_WIDTH;
+          if (proposedX + BLOCK_WIDTH > workspaceWidth) {
+            // Wrap to new line
+            newX = 20;
+            newY = lastBlock.y + BLOCK_HEIGHT;
+          } else {
+            // Place to the right on same line
+            newX = proposedX;
+            newY = lastBlock.y;
+          }
         }
       }
       
