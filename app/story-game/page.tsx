@@ -35,37 +35,14 @@ interface StoryProgress {
   hintsUsed: any[];
 }
 
-const SCENES = {
-  forest: {
-    name: 'Mystical Forest',
-    background: 'linear-gradient(135deg, #2d5016 0%, #1a3009 100%)',
-    locations: ['forest_entrance', 'forest_path', 'forest_clearing', 'forest_exit'],
-  },
-  castle: {
-    name: 'Ancient Castle',
-    background: 'linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%)',
-    locations: ['castle_gate', 'castle_courtyard', 'castle_hall', 'castle_tower'],
-  },
-  town: {
-    name: 'Medieval Town',
-    background: 'linear-gradient(135deg, #8b6f47 0%, #5a4a3a 100%)',
-    locations: ['town_gate', 'town_square', 'town_market', 'town_exit'],
-  },
-  ocean: {
-    name: 'Mystical Ocean',
-    background: 'linear-gradient(135deg, #1e3a5f 0%, #0a1f3d 50%, #006994 100%)',
-    locations: ['beach_shore', 'tide_pool', 'cave_entrance', 'treasure_cove'],
-  },
-  mountain: {
-    name: 'Mountain Peak',
-    background: 'linear-gradient(135deg, #8b7355 0%, #5a4a3a 50%, #3d2f1f 100%)',
-    locations: ['mountain_base', 'cliff_path', 'summit', 'cave'],
-  },
-  desert: {
-    name: 'Ancient Desert',
-    background: 'linear-gradient(135deg, #d4a574 0%, #c19a6b 50%, #8b6914 100%)',
-    locations: ['oasis', 'sand_dunes', 'ancient_ruins', 'temple'],
-  },
+// Scene backgrounds for visual display
+const SCENE_BACKGROUNDS: Record<string, string> = {
+  forest: 'linear-gradient(135deg, #2d5016 0%, #1a3009 100%)',
+  castle: 'linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%)',
+  town: 'linear-gradient(135deg, #8b6f47 0%, #5a4a3a 100%)',
+  ocean: 'linear-gradient(135deg, #1e3a5f 0%, #0a1f3d 50%, #006994 100%)',
+  mountain: 'linear-gradient(135deg, #8b7355 0%, #5a4a3a 50%, #3d2f1f 100%)',
+  desert: 'linear-gradient(135deg, #d4a574 0%, #c19a6b 50%, #8b6914 100%)',
 };
 
 export default function StoryGamePage() {
@@ -867,7 +844,7 @@ export default function StoryGamePage() {
             <div className="story-game-scene-panel">
               <div
                 className="scene-background"
-                style={{ background: currentScene.background }}
+                style={{ background: SCENE_BACKGROUNDS[storyProgress?.currentScene || 'forest'] || SCENE_BACKGROUNDS.forest }}
               >
                 {/* Character */}
                 <div
