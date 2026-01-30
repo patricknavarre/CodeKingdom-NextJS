@@ -745,13 +745,9 @@ export default function WebDevGamePage() {
 
   const backgroundStyle = character.background ? {
     background: character.background.value,
-    backgroundAttachment: 'fixed',
-    minHeight: '100vh',
-    width: '100%'
+    backgroundAttachment: 'fixed'
   } : {
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    minHeight: '100vh',
-    width: '100%'
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
   };
 
   return (
