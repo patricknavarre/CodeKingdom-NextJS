@@ -1103,7 +1103,7 @@ function AdventurePage() {
 
     return (
       <ProtectedRoute>
-        <div style={containerStyle}>
+        <div style={containerStyle as React.CSSProperties}>
           <Navigation />
           <div className="adventure-game" style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             <div style={{ marginBottom: '8px', flexShrink: 0 }}>
