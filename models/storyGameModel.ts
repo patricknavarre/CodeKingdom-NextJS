@@ -14,6 +14,13 @@ export interface IStoryGame extends Document {
     completedAt: Date;
   }>;
   storyProgress: number; // 0-100 percentage
+  choices: Array<{
+    scene: string;
+    location: string;
+    choice: string; // e.g., "path_a", "path_b", "help_merchant", etc.
+    chosenAt: Date;
+  }>;
+  unlockedScenes: string[]; // Scenes unlocked through choices
   hintsUsed: Array<{
     scene: string;
     hintLevel: number; // 1, 2, or 3
@@ -68,6 +75,18 @@ const storyGameSchema = new Schema<IStoryGame>(
       type: Number,
       default: 0, // 0-100 percentage
     },
+    choices: [{
+      scene: String,
+      location: String,
+      choice: String,
+      chosenAt: {
+        type: Date,
+        default: Date.now,
+      },
+    }],
+    unlockedScenes: [{
+      type: String,
+    }],
     hintsUsed: [{
       scene: String,
       hintLevel: Number, // 1, 2, or 3 (progressive detail)

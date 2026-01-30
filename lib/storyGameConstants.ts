@@ -1,4 +1,111 @@
 // Story scenes configuration - shared across story game API routes
+// Decision points: locations where players can make choices that affect the story
+export const DECISION_POINTS: Record<string, {
+  location: string;
+  choices: Array<{
+    id: string;
+    description: string;
+    requiredItem?: string; // Item needed to unlock this choice
+    unlocksScene?: string; // Scene this choice unlocks
+    unlocksLocation?: string; // Location this choice unlocks
+    nextScene?: string; // Scene to move to after choice
+    nextLocation?: string; // Location to move to after choice
+  }>;
+}> = {
+  forest_exit: {
+    location: 'forest_exit',
+    choices: [
+      {
+        id: 'path_castle',
+        description: 'Take the path to the ancient castle',
+        nextScene: 'castle',
+        nextLocation: 'castle_gate',
+      },
+      {
+        id: 'path_town',
+        description: 'Head towards the medieval town',
+        nextScene: 'town',
+        nextLocation: 'town_gate',
+      },
+    ],
+  },
+  castle_tower: {
+    location: 'castle_tower',
+    choices: [
+      {
+        id: 'explore_ocean',
+        description: 'Use the telescope to spot the ocean',
+        requiredItem: 'crown',
+        unlocksScene: 'ocean',
+        nextScene: 'ocean',
+        nextLocation: 'beach_shore',
+      },
+      {
+        id: 'continue_town',
+        description: 'Leave the castle and go to town',
+        nextScene: 'town',
+        nextLocation: 'town_gate',
+      },
+    ],
+  },
+  town_market: {
+    location: 'town_market',
+    choices: [
+      {
+        id: 'help_merchant',
+        description: 'Help the merchant (requires bread)',
+        requiredItem: 'bread',
+        unlocksScene: 'ocean',
+        message: 'The merchant rewards you with a map to the ocean!',
+      },
+      {
+        id: 'ignore_merchant',
+        description: 'Continue exploring the town',
+        // No special unlock, just continue
+      },
+    ],
+  },
+  treasure_cove: {
+    location: 'treasure_cove',
+    choices: [
+      {
+        id: 'path_mountain',
+        description: 'Follow the map to the mountains',
+        requiredItem: 'treasure_map',
+        unlocksScene: 'mountain',
+        nextScene: 'mountain',
+        nextLocation: 'mountain_base',
+      },
+      {
+        id: 'path_desert',
+        description: 'Take the ancient scroll to the desert',
+        requiredItem: 'scroll',
+        unlocksScene: 'desert',
+        nextScene: 'desert',
+        nextLocation: 'oasis',
+      },
+    ],
+  },
+  mountain_cave: {
+    location: 'cave',
+    choices: [
+      {
+        id: 'path_desert',
+        description: 'Use the crystal to find the desert path',
+        requiredItem: 'crystal',
+        unlocksScene: 'desert',
+        nextScene: 'desert',
+        nextLocation: 'oasis',
+      },
+      {
+        id: 'return_base',
+        description: 'Return to the mountain base',
+        nextLocation: 'mountain_base',
+      },
+    ],
+  },
+};
+
 export const SCENES = {
   forest: {
     name: 'Mystical Forest',

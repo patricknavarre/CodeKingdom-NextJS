@@ -157,6 +157,7 @@ export default function StoryGamePage() {
   const [sceneChanged, setSceneChanged] = useState(false);
   const [lastRewards, setLastRewards] = useState({ coins: 0, experience: 0 });
   const [availableItems, setAvailableItems] = useState<string[]>([]);
+  const [availableChoices, setAvailableChoices] = useState<Array<{id: string; description: string; requiredItem?: string; available: boolean}>>([]);
   const [collectedItem, setCollectedItem] = useState<string | null>(null);
   const [showCharacterCollectEffect, setShowCharacterCollectEffect] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(true); // Start expanded by default
@@ -222,8 +223,11 @@ export default function StoryGamePage() {
       setStoryProgress(response.data);
       // Set available items from backend
       const items = response.data.availableItems || [];
+      const choices = response.data.availableChoices || [];
       console.log('Available items loaded:', items);
+      console.log('Available choices loaded:', choices);
       setAvailableItems(items);
+      setAvailableChoices(choices);
       // Set default code based on current scene
       if (response.data.currentScene) {
         setCode(getDefaultCode(response.data.currentScene));
@@ -308,6 +312,7 @@ export default function StoryGamePage() {
         responseKeys: Object.keys(response.data)
       });
       setAvailableItems(newAvailableItems);
+      setAvailableChoices(response.data.availableChoices || []);
       
       // If it was a move action, reload progress to ensure sync
       if (response.data.action === 'move' && response.data.success) {
@@ -365,6 +370,7 @@ export default function StoryGamePage() {
               inventory: progressResponse.data.inventory
             });
             setAvailableItems(progressResponse.data.availableItems || []);
+            setAvailableChoices(progressResponse.data.availableChoices || []);
             setStoryProgress(progressResponse.data);
           } catch (err) {
             console.error('Error reloading progress after door open:', err);
@@ -393,6 +399,7 @@ export default function StoryGamePage() {
               inventory: progressResponse.data.inventory
             });
             setAvailableItems(progressResponse.data.availableItems || []);
+            setAvailableChoices(progressResponse.data.availableChoices || []);
             setStoryProgress(progressResponse.data);
           } catch (err) {
             console.error('Error reloading progress after scene change:', err);
@@ -589,6 +596,54 @@ export default function StoryGamePage() {
                         </>
                       )}
                     </div>
+                    {availableChoices.length > 0 && (
+                      <div className="decision-point-hint" style={{ 
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        padding: '15px',
+                        borderRadius: '10px',
+                        marginBottom: '15px',
+                        color: 'white',
+                        border: '2px solid #fff',
+                        boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
+                      }}>
+                        <strong>🔀 Decision Point!</strong>
+                        <p style={{ marginTop: '10px', marginBottom: '10px' }}>You've reached a choice! Use <code style={{ background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: '4px' }}>choose_path("choice_id")</code> to make your decision:</p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          {availableChoices.map((choice) => (
+                            <div key={choice.id} style={{
+                              background: choice.available ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.3)',
+                              padding: '10px',
+                              borderRadius: '6px',
+                              border: `2px solid ${choice.available ? '#fff' : '#999'}`,
+                              opacity: choice.available ? 1 : 0.6
+                            }}>
+                              <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+                                {choice.available ? '✅' : '🔒'} {choice.description}
+                              </div>
+                              {choice.requiredItem && (
+                                <div style={{ fontSize: '0.85rem', marginTop: '4px' }}>
+                                  {choice.available ? (
+                                    <span>✓ You have: {choice.requiredItem}</span>
+                                  ) : (
+                                    <span>⚠️ Requires: {choice.requiredItem}</span>
+                                  )}
+                                </div>
+                              )}
+                              <code style={{ 
+                                display: 'block', 
+                                marginTop: '6px', 
+                                fontSize: '0.8rem',
+                                background: 'rgba(0,0,0,0.3)',
+                                padding: '4px 8px',
+                                borderRadius: '4px'
+                              }}>
+                                choose_path("{choice.id}")
+                              </code>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                     {availableItems.length > 0 && (
                       <div className="available-items-hint">
                         <strong>💡 Tip:</strong> Look for glowing items in the scene! Use <code>collect_item("{availableItems[0]}")</code> to collect them.

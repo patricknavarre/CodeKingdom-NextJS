@@ -73,6 +73,7 @@ const executeCodeBlock = (
   const collectRegex = /collect_item\(\s*["']([\w_]+)["']\s*\)/;
   const openDoorRegex = /open_door\(\s*\)/;
   const messageRegex = /show_message\(\s*["']([^"']+)["']\s*\)/;
+  const choosePathRegex = /choose_path\(\s*["']([\w_]+)["']\s*\)/;
   
   let result: any = { action: 'continue', success: true };
   let i = startIndex;
@@ -132,6 +133,7 @@ export const executePython = (code: string, context: Record<string, any> = {}): 
       const collectRegex = /collect_item\(\s*["']([\w_]+)["']\s*\)/;
       const openDoorRegex = /open_door\(\s*\)/;
       const messageRegex = /show_message\(\s*["']([^"']+)["']\s*\)/;
+      const choosePathRegex = /choose_path\(\s*["']([\w_]+)["']\s*\)/;
 
       let i = 0;
       while (i < lines.length) {
@@ -207,6 +209,8 @@ export const executePython = (code: string, context: Record<string, any> = {}): 
           result = { action: 'open_door', success: true, message: 'The door opens!' };
         } else if ((match = trimmed.match(messageRegex))) {
           result = { action: 'message', text: match[1], success: true };
+        } else if ((match = trimmed.match(choosePathRegex))) {
+          result = { action: 'choose_path', choiceId: match[1], success: true };
         }
         
         i++;

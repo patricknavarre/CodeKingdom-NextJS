@@ -3,7 +3,7 @@ import connectDB from '@/lib/mongodb';
 import StoryGame from '@/models/storyGameModel';
 import User from '@/models/userModel';
 import { executePython, validatePythonCode } from '@/services/pythonExecutor';
-import { SCENES } from '@/lib/storyGameConstants';
+import { SCENES, DECISION_POINTS } from '@/lib/storyGameConstants';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_jwt_secret';
@@ -76,45 +76,104 @@ export async function POST(req: NextRequest) {
           coinsEarned = 20;
           experienceEarned = 25;
         } else {
-          // Scene completed, move to next scene
-          if (storyGame.currentScene === 'forest') {
-            storyGame.currentScene = 'castle';
-            updatedLocation = 'castle_gate';
-            message = 'Forest completed! You enter the castle.';
-            coinsEarned = 50;
-            experienceEarned = 50;
-          } else if (storyGame.currentScene === 'castle') {
-            storyGame.currentScene = 'town';
-            updatedLocation = 'town_gate';
-            message = 'Castle completed! You enter the town.';
-            coinsEarned = 50;
-            experienceEarned = 50;
-          } else if (storyGame.currentScene === 'town') {
-            storyGame.currentScene = 'ocean';
-            updatedLocation = 'beach_shore';
-            message = 'Town completed! You arrive at the mystical ocean.';
-            coinsEarned = 50;
-            experienceEarned = 50;
-          } else if (storyGame.currentScene === 'ocean') {
-            storyGame.currentScene = 'mountain';
-            updatedLocation = 'mountain_base';
-            message = 'Ocean completed! You reach the mountain peak.';
-            coinsEarned = 50;
-            experienceEarned = 50;
-          } else if (storyGame.currentScene === 'mountain') {
-            storyGame.currentScene = 'desert';
-            updatedLocation = 'oasis';
-            message = 'Mountain completed! You arrive at the ancient desert.';
-            coinsEarned = 50;
-            experienceEarned = 50;
-          } else if (storyGame.currentScene === 'desert') {
-            message = 'Congratulations! You completed all scenes! You are a true coding adventurer!';
-            coinsEarned = 100;
-            experienceEarned = 100;
+          // Scene completed - check if there's a decision point here
+          const decisionPoint = DECISION_POINTS[storyGame.currentLocation];
+          if (decisionPoint && decisionPoint.choices.length > 0) {
+            // There are choices available - don't auto-advance, let player choose
+            message = 'You\'ve reached a decision point! Use choose_path("choice_id") to make your choice.';
+            coinsEarned = 20;
+            experienceEarned = 25;
           } else {
-            message = 'Congratulations! You completed all scenes!';
-            coinsEarned = 100;
-            experienceEarned = 100;
+            // No decision point, check unlocked scenes or default progression
+            const unlockedScenes = storyGame.unlockedScenes || [];
+            
+            // Try to go to an unlocked scene first, otherwise default progression
+            if (unlockedScenes.length > 0 && !unlockedScenes.includes(storyGame.currentScene)) {
+              // Move to first unlocked scene not yet visited
+              const nextUnlocked = unlockedScenes.find(s => s !== storyGame.currentScene);
+              if (nextUnlocked) {
+                storyGame.currentScene = nextUnlocked as any;
+                const nextScene = SCENES[nextUnlocked as keyof typeof SCENES];
+                updatedLocation = nextScene.locations[0];
+                message = `You discovered a new path! You arrive at the ${nextScene.name}.`;
+                coinsEarned = 50;
+                experienceEarned = 50;
+              }
+            } else {
+              // Default linear progression (fallback)
+              if (storyGame.currentScene === 'forest') {
+                // Forest can branch to castle or town
+                if (unlockedScenes.includes('town')) {
+                  storyGame.currentScene = 'town';
+                  updatedLocation = 'town_gate';
+                  message = 'Forest completed! You head to the town.';
+                } else {
+                  storyGame.currentScene = 'castle';
+                  updatedLocation = 'castle_gate';
+                  message = 'Forest completed! You enter the castle.';
+                }
+                coinsEarned = 50;
+                experienceEarned = 50;
+              } else if (storyGame.currentScene === 'castle') {
+                // Castle can branch to town or ocean (if unlocked)
+                if (unlockedScenes.includes('ocean')) {
+                  storyGame.currentScene = 'ocean';
+                  updatedLocation = 'beach_shore';
+                  message = 'Castle completed! You arrive at the mystical ocean.';
+                } else {
+                  storyGame.currentScene = 'town';
+                  updatedLocation = 'town_gate';
+                  message = 'Castle completed! You enter the town.';
+                }
+                coinsEarned = 50;
+                experienceEarned = 50;
+              } else if (storyGame.currentScene === 'town') {
+                // Town can branch to ocean (if unlocked) or continue linearly
+                if (unlockedScenes.includes('ocean')) {
+                  storyGame.currentScene = 'ocean';
+                  updatedLocation = 'beach_shore';
+                  message = 'Town completed! You arrive at the mystical ocean.';
+                } else {
+                  message = 'Town completed! Explore more to unlock new paths.';
+                }
+                coinsEarned = 50;
+                experienceEarned = 50;
+              } else if (storyGame.currentScene === 'ocean') {
+                // Ocean can branch to mountain or desert
+                if (unlockedScenes.includes('desert')) {
+                  storyGame.currentScene = 'desert';
+                  updatedLocation = 'oasis';
+                  message = 'Ocean completed! You arrive at the ancient desert.';
+                } else if (unlockedScenes.includes('mountain')) {
+                  storyGame.currentScene = 'mountain';
+                  updatedLocation = 'mountain_base';
+                  message = 'Ocean completed! You reach the mountain peak.';
+                } else {
+                  message = 'Ocean completed! Make choices to unlock new paths.';
+                }
+                coinsEarned = 50;
+                experienceEarned = 50;
+              } else if (storyGame.currentScene === 'mountain') {
+                // Mountain can branch to desert
+                if (unlockedScenes.includes('desert')) {
+                  storyGame.currentScene = 'desert';
+                  updatedLocation = 'oasis';
+                  message = 'Mountain completed! You arrive at the ancient desert.';
+                } else {
+                  message = 'Mountain completed! Make choices to unlock the desert.';
+                }
+                coinsEarned = 50;
+                experienceEarned = 50;
+              } else if (storyGame.currentScene === 'desert') {
+                message = 'Congratulations! You completed all scenes! You are a true coding adventurer!';
+                coinsEarned = 100;
+                experienceEarned = 100;
+              } else {
+                message = 'Congratulations! You completed all scenes!';
+                coinsEarned = 100;
+                experienceEarned = 100;
+              }
+            }
           }
         }
       } else {
@@ -163,6 +222,88 @@ export async function POST(req: NextRequest) {
           message = `You already have a ${result.item}!`;
         }
       }
+    } else if (result.action === 'choose_path' && result.choiceId) {
+      // Handle path choice at decision points
+      const decisionPoint = DECISION_POINTS[storyGame.currentLocation];
+      if (decisionPoint) {
+        const choice = decisionPoint.choices.find(c => c.id === result.choiceId);
+        if (choice) {
+          // Check if choice requires an item
+          if (choice.requiredItem) {
+            const hasItem = storyGame.inventory.some(item => item.name === choice.requiredItem);
+            if (!hasItem) {
+              message = `You need a ${choice.requiredItem} to choose this path!`;
+              result.success = false;
+            } else {
+              // Record the choice
+              storyGame.choices.push({
+                scene: storyGame.currentScene,
+                location: storyGame.currentLocation,
+                choice: result.choiceId,
+                chosenAt: new Date(),
+              });
+              
+              // Unlock scene if specified
+              if (choice.unlocksScene && !storyGame.unlockedScenes.includes(choice.unlocksScene)) {
+                storyGame.unlockedScenes.push(choice.unlocksScene);
+              }
+              
+              // Move to next scene/location if specified
+              if (choice.nextScene) {
+                storyGame.currentScene = choice.nextScene as any;
+                updatedLocation = choice.nextLocation || (SCENES[choice.nextScene as keyof typeof SCENES]?.locations[0] || storyGame.currentLocation);
+                message = choice.message || `You chose: ${choice.description}`;
+                coinsEarned = 30;
+                experienceEarned = 30;
+              } else if (choice.nextLocation) {
+                updatedLocation = choice.nextLocation;
+                message = choice.message || `You chose: ${choice.description}`;
+                coinsEarned = 15;
+                experienceEarned = 15;
+              } else {
+                message = choice.message || `You chose: ${choice.description}`;
+                coinsEarned = 10;
+                experienceEarned = 10;
+              }
+            }
+          } else {
+            // No item required, just record choice
+            storyGame.choices.push({
+              scene: storyGame.currentScene,
+              location: storyGame.currentLocation,
+              choice: result.choiceId,
+              chosenAt: new Date(),
+            });
+            
+            if (choice.unlocksScene && !storyGame.unlockedScenes.includes(choice.unlocksScene)) {
+              storyGame.unlockedScenes.push(choice.unlocksScene);
+            }
+            
+            if (choice.nextScene) {
+              storyGame.currentScene = choice.nextScene as any;
+              updatedLocation = choice.nextLocation || (SCENES[choice.nextScene as keyof typeof SCENES]?.locations[0] || storyGame.currentLocation);
+              message = choice.message || `You chose: ${choice.description}`;
+              coinsEarned = 30;
+              experienceEarned = 30;
+            } else if (choice.nextLocation) {
+              updatedLocation = choice.nextLocation;
+              message = choice.message || `You chose: ${choice.description}`;
+              coinsEarned = 15;
+              experienceEarned = 15;
+            } else {
+              message = choice.message || `You chose: ${choice.description}`;
+              coinsEarned = 10;
+              experienceEarned = 10;
+            }
+          }
+        } else {
+          message = 'Invalid choice! Check available choices at this location.';
+          result.success = false;
+        }
+      } else {
+        message = 'No decision point available at this location.';
+        result.success = false;
+      }
     } else if (result.action === 'message' && result.text) {
       message = result.text;
     } else if (result.action === 'continue') {
@@ -172,6 +313,14 @@ export async function POST(req: NextRequest) {
     // Update story game progress
     storyGame.currentLocation = updatedLocation;
     storyGame.inventory = updatedInventory;
+    
+    // Initialize arrays if they don't exist
+    if (!storyGame.choices) {
+      storyGame.choices = [];
+    }
+    if (!storyGame.unlockedScenes) {
+      storyGame.unlockedScenes = [];
+    }
     
     // Update story progress percentage
     const totalLocations = Object.values(SCENES).reduce((sum, scene) => sum + scene.locations.length, 0);
