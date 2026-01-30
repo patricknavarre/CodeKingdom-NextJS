@@ -226,6 +226,8 @@ function AdventurePage() {
     
     // Block drag handlers (mouse)
     const handleBlockDragStart = (e: React.DragEvent, type: string, value?: string | number) => {
+      // Initialize audio on drag start (user interaction)
+      initAudio();
       setDraggedBlock({ type, value });
       e.dataTransfer.effectAllowed = 'move';
       if (e.dataTransfer) {
@@ -266,6 +268,8 @@ function AdventurePage() {
     // Touch event handlers for mobile
     const handleBlockTouchStart = (e: React.TouchEvent, type: string, value?: string | number) => {
       e.preventDefault(); // Prevent scrolling
+      // Initialize audio on touch start (user interaction)
+      initAudio();
       setDraggedBlock({ type, value });
       const coords = getClientCoordinates(e);
       if (workspaceRef.current) {
