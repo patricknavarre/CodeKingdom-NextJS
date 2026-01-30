@@ -24,25 +24,27 @@ const girlHoodieSneakersCharacter = '/images/characters/Girl_Character_In_PinkHo
 function AdventurePage() {
   console.log('AdventurePage rendering');
   
+  // Add debug logging
+  console.log('AdventurePage: About to use character context');
+  
+  // Preload character images
+  const preloadImage = (src: string) => {
+    const img = new Image();
+    img.src = src;
+    console.log('Preloading image:', src);
+  };
+  
+  preloadImage(girlCharacter);
+  preloadImage(boyCharacter);
+  preloadImage(brownGirlCharacter);
+  preloadImage(brownBoyCharacter);
+  preloadImage(blondeGirlCharacter);
+
+  // Hooks MUST be called at the top level, not inside try-catch
+  const { character, addCoins, addExperience, addAccessory, addPoints } = useCharacter();
+  
   // Basic error handling to prevent white screen
   try {
-    // Add debug logging
-    console.log('AdventurePage: About to use character context');
-    
-    // Preload character images
-    const preloadImage = (src: string) => {
-      const img = new Image();
-      img.src = src;
-      console.log('Preloading image:', src);
-    };
-    
-    preloadImage(girlCharacter);
-    preloadImage(boyCharacter);
-    preloadImage(brownGirlCharacter);
-    preloadImage(brownBoyCharacter);
-    preloadImage(blondeGirlCharacter);
-  
-    const { character, addCoins, addExperience, addAccessory, addPoints } = useCharacter();
     
     // Check if accessories are equipped
     const pinkHoodieEquipped = character?.accessories?.some(
@@ -1238,10 +1240,54 @@ function AdventurePage() {
             )}
             
             
-            <div className="game-container" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'hidden', minHeight: 0 }}>
-              {/* Top Row - Game Grid and Character/Status/Log */}
-              <div style={{ display: 'flex', flexDirection: 'row', gap: '20px', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-                {/* Game Grid - Left Side */}
+            <div className="game-container" style={{ flex: 1, display: 'flex', flexDirection: 'row', gap: '20px', overflow: 'hidden', minHeight: 0 }}>
+              {/* Left Column - Instructions and Game Grid */}
+              <div style={{ flex: '0 0 50%', display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'hidden', minHeight: 0 }}>
+                {/* Instructions Panel - Collapsible */}
+                <div className="instructions-panel" style={{ 
+                  padding: '15px 20px',
+                  overflowY: 'auto',
+                  flexShrink: 0,
+                  maxHeight: showHowToPlay ? '300px' : '60px',
+                  transition: 'max-height 0.3s ease',
+                  backgroundColor: 'white',
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+                  borderLeft: '4px solid #27ae60'
+                }}>
+                  <div 
+                    style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center',
+                      cursor: 'pointer',
+                      userSelect: 'none'
+                    }}
+                    onClick={() => setShowHowToPlay(!showHowToPlay)}
+                  >
+                    <h3 style={{ margin: 0, color: '#27ae60' }}>How to Play</h3>
+                    <span style={{ 
+                      fontSize: '1.2rem', 
+                      color: '#27ae60',
+                      transition: 'transform 0.3s ease',
+                      transform: showHowToPlay ? 'rotate(180deg)' : 'rotate(0deg)'
+                    }}>
+                      ▼
+                    </span>
+                  </div>
+                  {showHowToPlay && (
+                    <ol className="instruction-steps" style={{ marginTop: '10px', marginBottom: 0 }}>
+                      <li>Type commands in the box on the right (you can use multiple commands separated by commas, like "turn right, move 2")</li>
+                      <li>Use <code>move 2</code> to move 2 spaces forward</li>
+                      <li>Use <code>turn right</code>, <code>turn left</code>, <code>turn up</code>, or <code>turn down</code> to change direction</li>
+                      <li>Use <code>collect</code> when on a diamond to collect it</li>
+                      <li>Use <code>say Hello!</code> to make your character say something in a speech bubble!</li>
+                      <li>Collect all {diamondPositions.length} diamonds to complete the level!</li>
+                    </ol>
+                  )}
+                </div>
+                
+                {/* Game Grid */}
                 <div className="game-grid-container" style={{ 
                   flex: 1,
                   display: 'flex',
@@ -1335,10 +1381,501 @@ function AdventurePage() {
                     )}
                   </div>
                 </div>
-                
-                {/* Character, Status, and Log - Right Side */}
-                <div style={{ flex: '0 0 400px', display: 'flex', flexDirection: 'column', gap: '10px', overflow: 'auto', minHeight: 0 }}>
-                  <div style={{ display: 'flex', gap: '10px', flexShrink: 0 }}>
+              </div>
+              
+              {/* Right Column - Commands, Character, Status, Log */}
+              <div style={{ flex: '0 0 50%', display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'auto', minHeight: 0 }}>
+                {/* Commands Panel */}
+                <div className="command-panel" style={{
+                  backgroundColor: 'white',
+                  borderRadius: '6px',
+                  padding: '12px',
+                  paddingBottom: '20px',
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                  borderLeft: '3px solid #3498db',
+                  flex: 1,
+                  overflow: 'auto',
+                  minHeight: 0
+                }}>
+                  <h3>Drag & Connect Blocks</h3>
+                  <div style={{ marginBottom: '12px', fontSize: '0.85rem', color: '#666' }}>
+                    Drag blocks from the palette below into the workspace. Connect them in a line to build your program!
+                  </div>
+                  
+                  {/* Block Palette */}
+                  <div style={{ 
+                    display: 'flex', 
+                    flexWrap: 'wrap', 
+                    gap: '8px', 
+                    marginBottom: '12px',
+                    padding: '10px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '6px',
+                    border: '2px dashed #bdc3c7'
+                  }}>
+                    {/* Move blocks */}
+                    <div
+                      draggable
+                      onDragStart={(e) => handleBlockDragStart(e, 'move', 1)}
+                      onTouchStart={(e) => handleBlockTouchStart(e, 'move', 1)}
+                      onTouchMove={handleBlockTouchMove}
+                      onTouchEnd={handleBlockTouchEnd}
+                      className="block-palette-item"
+                      style={{
+                        backgroundColor: '#3498db',
+                        color: 'white',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        cursor: 'grab',
+                        fontWeight: 'bold',
+                        fontSize: '0.9rem',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        userSelect: 'none',
+                        touchAction: 'none'
+                      }}
+                    >
+                      move 1
+                    </div>
+                    <div
+                      draggable
+                      onDragStart={(e) => handleBlockDragStart(e, 'move', 2)}
+                      onTouchStart={(e) => handleBlockTouchStart(e, 'move', 2)}
+                      onTouchMove={handleBlockTouchMove}
+                      onTouchEnd={handleBlockTouchEnd}
+                      className="block-palette-item"
+                      style={{
+                        backgroundColor: '#3498db',
+                        color: 'white',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        cursor: 'grab',
+                        fontWeight: 'bold',
+                        fontSize: '0.9rem',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        userSelect: 'none',
+                        touchAction: 'none'
+                      }}
+                    >
+                      move 2
+                    </div>
+                    {/* Turn blocks */}
+                    <div
+                      draggable
+                      onDragStart={(e) => handleBlockDragStart(e, 'turn', 'right')}
+                      onTouchStart={(e) => handleBlockTouchStart(e, 'turn', 'right')}
+                      onTouchMove={handleBlockTouchMove}
+                      onTouchEnd={handleBlockTouchEnd}
+                      className="block-palette-item"
+                      style={{
+                        backgroundColor: '#9b59b6',
+                        color: 'white',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        cursor: 'grab',
+                        fontWeight: 'bold',
+                        fontSize: '0.9rem',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        userSelect: 'none',
+                        touchAction: 'none'
+                      }}
+                    >
+                      turn right
+                    </div>
+                    <div
+                      draggable
+                      onDragStart={(e) => handleBlockDragStart(e, 'turn', 'left')}
+                      onTouchStart={(e) => handleBlockTouchStart(e, 'turn', 'left')}
+                      onTouchMove={handleBlockTouchMove}
+                      onTouchEnd={handleBlockTouchEnd}
+                      className="block-palette-item"
+                      style={{
+                        backgroundColor: '#9b59b6',
+                        color: 'white',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        cursor: 'grab',
+                        fontWeight: 'bold',
+                        fontSize: '0.9rem',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        userSelect: 'none',
+                        touchAction: 'none'
+                      }}
+                    >
+                      turn left
+                    </div>
+                    <div
+                      draggable
+                      onDragStart={(e) => handleBlockDragStart(e, 'turn', 'up')}
+                      onTouchStart={(e) => handleBlockTouchStart(e, 'turn', 'up')}
+                      onTouchMove={handleBlockTouchMove}
+                      onTouchEnd={handleBlockTouchEnd}
+                      className="block-palette-item"
+                      style={{
+                        backgroundColor: '#9b59b6',
+                        color: 'white',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        cursor: 'grab',
+                        fontWeight: 'bold',
+                        fontSize: '0.9rem',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        userSelect: 'none',
+                        touchAction: 'none'
+                      }}
+                    >
+                      turn up
+                    </div>
+                    <div
+                      draggable
+                      onDragStart={(e) => handleBlockDragStart(e, 'turn', 'down')}
+                      onTouchStart={(e) => handleBlockTouchStart(e, 'turn', 'down')}
+                      onTouchMove={handleBlockTouchMove}
+                      onTouchEnd={handleBlockTouchEnd}
+                      className="block-palette-item"
+                      style={{
+                        backgroundColor: '#9b59b6',
+                        color: 'white',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        cursor: 'grab',
+                        fontWeight: 'bold',
+                        fontSize: '0.9rem',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        userSelect: 'none',
+                        touchAction: 'none'
+                      }}
+                    >
+                      turn down
+                    </div>
+                    {/* Collect block */}
+                    <div
+                      draggable
+                      onDragStart={(e) => handleBlockDragStart(e, 'collect')}
+                      onTouchStart={(e) => handleBlockTouchStart(e, 'collect')}
+                      onTouchMove={handleBlockTouchMove}
+                      onTouchEnd={handleBlockTouchEnd}
+                      className="block-palette-item"
+                      style={{
+                        backgroundColor: '#f39c12',
+                        color: 'white',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        cursor: 'grab',
+                        fontWeight: 'bold',
+                        fontSize: '0.9rem',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        userSelect: 'none',
+                        touchAction: 'none'
+                      }}
+                    >
+                      collect
+                    </div>
+                  </div>
+                  
+                  {/* Workspace for connected blocks */}
+                  <div style={{
+                    position: 'relative',
+                    minHeight: '200px',
+                    padding: '20px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '6px',
+                    border: '2px dashed #bdc3c7',
+                    marginBottom: '12px'
+                  }}>
+                    {connectedBlocks.length === 0 ? (
+                      <div style={{
+                        textAlign: 'center',
+                        color: '#999',
+                        fontSize: '0.9rem',
+                        padding: '40px 20px'
+                      }}>
+                        Drag blocks here to build your program! 🍀
+                      </div>
+                    ) : (
+                      <>
+                        {connectedBlocks.map((block) => {
+                          const getBlockColor = () => {
+                            if (block.type === 'move') return '#3498db';
+                            if (block.type === 'turn') return '#9b59b6';
+                            if (block.type === 'collect') return '#f39c12';
+                            return '#2ecc71';
+                          };
+                          
+                          const getBlockText = () => {
+                            if (block.type === 'move') return `move ${block.value || 1}`;
+                            if (block.type === 'turn') return `turn ${block.value || 'right'}`;
+                            if (block.type === 'collect') return 'collect';
+                            return `say ${block.value || 'Hello!'}`;
+                          };
+                          
+                          // Find the block this one connects to (for drawing connector)
+                          const connectsTo = block.connectedTo 
+                            ? connectedBlocks.find(b => b.id === block.connectedTo)
+                            : null;
+                          
+                          // Block dimensions
+                          const BLOCK_WIDTH = 100;
+                          const BLOCK_HEIGHT = 40;
+                          const CONNECTOR_GAP = 8;
+                          
+                          return (
+                            <React.Fragment key={block.id}>
+                              {/* Connector line to next block */}
+                              {connectsTo && (
+                                <>
+                                  {connectsTo.y === block.y ? (
+                                    // Same line: horizontal connector
+                                    <div
+                                      style={{
+                                        position: 'absolute',
+                                        left: `${block.x + BLOCK_WIDTH}px`,
+                                        top: `${block.y + BLOCK_HEIGHT / 2 - 2}px`,
+                                        width: `${CONNECTOR_GAP}px`,
+                                        height: '4px',
+                                        backgroundColor: '#3498db',
+                                        zIndex: 3,
+                                        borderRadius: '2px',
+                                        boxShadow: '0 1px 3px rgba(52, 152, 219, 0.5)'
+                                      }}
+                                    />
+                                  ) : (
+                                    // Wrapped: L-shaped connector
+                                    <>
+                                      {/* Vertical line going down from current block */}
+                                      <div
+                                        style={{
+                                          position: 'absolute',
+                                          left: `${block.x + BLOCK_WIDTH / 2 - 2}px`,
+                                          top: `${block.y + BLOCK_HEIGHT}px`,
+                                          width: '4px',
+                                          height: `${connectsTo.y - block.y - BLOCK_HEIGHT}px`,
+                                          backgroundColor: '#3498db',
+                                          zIndex: 3,
+                                          borderRadius: '2px',
+                                          boxShadow: '0 1px 3px rgba(52, 152, 219, 0.5)'
+                                        }}
+                                      />
+                                      {/* Horizontal line going right to next block */}
+                                      <div
+                                        style={{
+                                          position: 'absolute',
+                                          left: `${block.x + BLOCK_WIDTH / 2}px`,
+                                          top: `${connectsTo.y + BLOCK_HEIGHT / 2 - 2}px`,
+                                          width: `${connectsTo.x - (block.x + BLOCK_WIDTH / 2)}px`,
+                                          height: '4px',
+                                          backgroundColor: '#3498db',
+                                          zIndex: 3,
+                                          borderRadius: '2px',
+                                          boxShadow: '0 1px 3px rgba(52, 152, 219, 0.5)'
+                                        }}
+                                      />
+                                    </>
+                                  )}
+                                </>
+                              )}
+                              {/* Block */}
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  left: `${block.x}px`,
+                                  top: `${block.y}px`,
+                                  backgroundColor: getBlockColor(),
+                                  color: 'white',
+                                  padding: '10px 14px',
+                                  borderRadius: '8px',
+                                  fontWeight: 'bold',
+                                  fontSize: '0.9rem',
+                                  cursor: 'move',
+                                  boxShadow: snapTarget === block.id 
+                                    ? '0 0 15px rgba(52, 152, 219, 0.8)' 
+                                    : '0 3px 6px rgba(0,0,0,0.3)',
+                                  transform: snapTarget === block.id ? 'scale(1.05)' : 'scale(1)',
+                                  transition: 'all 0.2s ease',
+                                  zIndex: snapTarget === block.id ? 10 : 5,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '8px',
+                                  minWidth: '100px',
+                                  whiteSpace: 'nowrap',
+                                  width: '100px',
+                                  height: '40px',
+                                  boxSizing: 'border-box'
+                                }}
+                              >
+                                <span>{getBlockText()}</span>
+                                <button
+                                  onClick={() => handleBlockDelete(block.id)}
+                                  style={{
+                                    background: 'rgba(255,255,255,0.3)',
+                                    border: 'none',
+                                    color: 'white',
+                                    borderRadius: '4px',
+                                    padding: '2px 6px',
+                                    cursor: 'pointer',
+                                    fontSize: '0.8rem',
+                                    marginLeft: 'auto'
+                                  }}
+                                >
+                                  ×
+                                </button>
+                              </div>
+                            </React.Fragment>
+                          );
+                        })}
+                      </>
+                    )}
+                  </div>
+                  
+                  {connectedBlocks.length > 0 && (
+                    <button
+                      onClick={clearAllBlocks}
+                      style={{
+                        backgroundColor: '#e74c3c',
+                        color: 'white',
+                        border: 'none',
+                        padding: '6px 12px',
+                        borderRadius: '5px',
+                        fontSize: '0.85rem',
+                        cursor: 'pointer',
+                        marginBottom: '8px'
+                      }}
+                    >
+                      Clear All Blocks
+                    </button>
+                  )}
+                  
+                  {/* Run My Code button - between drag section and command buttons */}
+                  <button 
+                    onClick={executeCommand}
+                    className="run-button"
+                    style={{ 
+                      backgroundColor: '#2ecc71', 
+                      color: 'white', 
+                      border: 'none', 
+                      padding: '10px 20px', 
+                      borderRadius: '8px', 
+                      fontSize: '1rem', 
+                      fontWeight: 'bold', 
+                      marginTop: '12px',
+                      marginBottom: '12px',
+                      width: '100%', 
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 8px rgba(46, 204, 113, 0.3)',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 12px rgba(46, 204, 113, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 4px 8px rgba(46, 204, 113, 0.3)';
+                    }}
+                  >
+                    Run My Code! 🚀
+                  </button>
+                  
+                  {/* Fallback text input */}
+                  <div className="command-input">
+                    <div className="command-buttons" style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginBottom: '8px' }}>
+                      <button 
+                        onClick={() => {
+                          const input = document.getElementById('commandInput') as HTMLTextAreaElement;
+                          input.value += 'move 1\n';
+                          input.focus();
+                        }}
+                        className="command-quick-button"
+                        style={{ backgroundColor: '#3498db', color: 'white', border: 'none', padding: '3px 8px', borderRadius: '3px', fontSize: '0.8rem', cursor: 'pointer' }}
+                      >
+                        move 1
+                      </button>
+                      <button 
+                        onClick={() => {
+                          const input = document.getElementById('commandInput') as HTMLTextAreaElement;
+                          input.value += 'move 2\n';
+                          input.focus();
+                        }}
+                        className="command-quick-button"
+                        style={{ backgroundColor: '#3498db', color: 'white', border: 'none', padding: '3px 8px', borderRadius: '3px', fontSize: '0.8rem', cursor: 'pointer' }}
+                      >
+                        move 2
+                      </button>
+                      <button 
+                        onClick={() => {
+                          const input = document.getElementById('commandInput') as HTMLTextAreaElement;
+                          input.value += 'turn right\n';
+                          input.focus();
+                        }}
+                        className="command-quick-button"
+                        style={{ backgroundColor: '#9b59b6', color: 'white', border: 'none', padding: '3px 8px', borderRadius: '3px', fontSize: '0.8rem', cursor: 'pointer' }}
+                      >
+                        turn right
+                      </button>
+                      <button 
+                        onClick={() => {
+                          const input = document.getElementById('commandInput') as HTMLTextAreaElement;
+                          input.value += 'turn left\n';
+                          input.focus();
+                        }}
+                        className="command-quick-button"
+                        style={{ backgroundColor: '#9b59b6', color: 'white', border: 'none', padding: '3px 8px', borderRadius: '3px', fontSize: '0.8rem', cursor: 'pointer' }}
+                      >
+                        turn left
+                      </button>
+                      <button 
+                        onClick={() => {
+                          const input = document.getElementById('commandInput') as HTMLTextAreaElement;
+                          input.value += 'turn up\n';
+                          input.focus();
+                        }}
+                        className="command-quick-button"
+                        style={{ backgroundColor: '#9b59b6', color: 'white', border: 'none', padding: '3px 8px', borderRadius: '3px', fontSize: '0.8rem', cursor: 'pointer' }}
+                      >
+                        turn up
+                      </button>
+                      <button 
+                        onClick={() => {
+                          const input = document.getElementById('commandInput') as HTMLTextAreaElement;
+                          input.value += 'turn down\n';
+                          input.focus();
+                        }}
+                        className="command-quick-button"
+                        style={{ backgroundColor: '#9b59b6', color: 'white', border: 'none', padding: '3px 8px', borderRadius: '3px', fontSize: '0.8rem', cursor: 'pointer' }}
+                      >
+                        turn down
+                      </button>
+                      <button 
+                        onClick={() => {
+                          const input = document.getElementById('commandInput') as HTMLTextAreaElement;
+                          input.value += 'collect\n';
+                          input.focus();
+                        }}
+                        className="command-quick-button collect-button"
+                        style={{ backgroundColor: '#f39c12', color: 'white', border: 'none', padding: '3px 8px', borderRadius: '3px', fontSize: '0.8rem', cursor: 'pointer' }}
+                      >
+                        collect
+                      </button>
+                    </div>
+                    <textarea 
+                      id="commandInput" 
+                      placeholder="Or type your own commands here..."
+                      rows={3}
+                      className="command-textarea"
+                      style={{ width: '100%', padding: '8px', borderRadius: '3px', border: '1px solid #ddd', fontSize: '0.9rem', fontFamily: 'monospace', resize: 'vertical' }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          executeCommand();
+                        }
+                      }}
+                    />
+                    <div className="command-tip" style={{ fontSize: '0.8rem', color: '#666', marginTop: '6px' }}>
+                      Tip: You can **click the command buttons above** or **type your own commands** (separate multiple commands with commas, e.g. "turn right, move 2").
+                    </div>
+                  </div>
+                  
+                  {/* Status and Log side by side */}
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
                     {/* Character and Pet display */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: '0 0 auto' }}>
                       {/* Character display */}
@@ -1627,12 +2164,24 @@ function AdventurePage() {
                   </div>
                 </div>
               </div>
-              
-              {/* Bottom Row - Instructions and Commands */}
-              <div style={{ display: 'flex', flexDirection: 'row', gap: '20px', flexShrink: 0, marginTop: '20px' }}>
-                {/* Instructions Panel - Left Side */}
-                <div style={{ flex: '0 0 50%' }}>
-                  <div className="instructions-panel" style={{ 
+            </div>
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
+  } catch (error) {
+    console.error('Error rendering AdventurePage:', error);
+    return (
+      <div style={{ padding: '20px', textAlign: 'center' }}>
+        <h2>Something went wrong</h2>
+        <p>There was an error loading the adventure game.</p>
+        <button onClick={() => window.location.reload()}>Try Again</button>
+      </div>
+    );
+  }
+}
+
+export default AdventurePage; 
                     padding: '15px 20px',
                     overflowY: 'auto',
                     maxHeight: showHowToPlay ? '300px' : '60px',
