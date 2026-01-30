@@ -282,57 +282,40 @@ function AdventurePage() {
       const workspaceWidth = workspaceRef.current.clientWidth - WORKSPACE_PADDING;
       
       let snapToBlock: Block | null = null;
-      let snapDirection: 'right' | 'below' | null = null;
       let minDistance = Infinity;
       
+      // Only check horizontal snapping (to the right) - blocks connect in a line
       for (const block of connectedBlocks) {
-        // Calculate actual block edges
+        // Calculate actual block right edge
         const blockRightEdge = block.x + BLOCK_WIDTH;
-        const blockBottomEdge = block.y + BLOCK_HEIGHT;
-        
-        // Check horizontal snap (to the right)
         const horizontalDistance = Math.abs(dropX - blockRightEdge);
         const verticalAlignment = Math.abs(dropY - block.y);
+        // Snap if horizontally close to right edge AND vertically aligned
         if (horizontalDistance < SNAP_DISTANCE && verticalAlignment < 30 && horizontalDistance < minDistance) {
           minDistance = horizontalDistance;
           snapToBlock = block;
-          snapDirection = 'right';
-        }
-        
-        // Check vertical snap (below) - only if not already snapping horizontally
-        const verticalDistance = Math.abs(dropY - blockBottomEdge);
-        const horizontalAlignment = Math.abs(dropX - block.x);
-        if (verticalDistance < SNAP_DISTANCE && horizontalAlignment < 30 && verticalDistance < minDistance) {
-          minDistance = verticalDistance;
-          snapToBlock = block;
-          snapDirection = 'below';
         }
       }
       
-      // Calculate position: if snapping, place directly adjacent (touching, no gap)
+      // Calculate position: if snapping, place to the right with small gap for connector line
       let newX: number = 20; // Default to left edge
       let newY: number = 20; // Default to top
       const BASE_Y = 20; // Starting Y position
+      const CONNECTOR_GAP = 8; // Small gap between blocks for connector line
       
-      if (snapToBlock && snapDirection) {
-        if (snapDirection === 'right') {
-          // Snap directly to the right of the target block (touching, no gap)
-          const proposedX = snapToBlock.x + BLOCK_WIDTH;
-          
-          // Check if this would extend past the workspace width
-          if (proposedX + BLOCK_WIDTH > workspaceWidth) {
-            // Wrap to new line: start at left edge, directly below (touching)
-            newX = 20;
-            newY = snapToBlock.y + BLOCK_HEIGHT;
-          } else {
-            // Place directly to the right on same line (touching)
-            newX = proposedX;
-            newY = snapToBlock.y;
-          }
-        } else if (snapDirection === 'below') {
-          // Snap directly below the target block (touching, no gap, same X position)
-          newX = snapToBlock.x;
-          newY = snapToBlock.y + BLOCK_HEIGHT;
+      if (snapToBlock) {
+        // Snap to the right of the target block with small gap
+        const proposedX = snapToBlock.x + BLOCK_WIDTH + CONNECTOR_GAP;
+        
+        // Check if this would extend past the workspace width
+        if (proposedX + BLOCK_WIDTH > workspaceWidth) {
+          // Wrap to new line: start at left edge, one line down
+          newX = 20;
+          newY = snapToBlock.y + BLOCK_HEIGHT + 10; // Small gap for visual separation
+        } else {
+          // Place to the right on same line with gap for connector
+          newX = proposedX;
+          newY = snapToBlock.y;
         }
       } else {
         // If no blocks exist, start at left edge
@@ -361,14 +344,14 @@ function AdventurePage() {
             }
           }
           
-          // Place new block directly to the right of the last block (touching, no gap)
-          const proposedX = lastBlock.x + BLOCK_WIDTH;
+          // Place new block to the right of the last block with gap for connector
+          const proposedX = lastBlock.x + BLOCK_WIDTH + CONNECTOR_GAP;
           if (proposedX + BLOCK_WIDTH > workspaceWidth) {
-            // Wrap to new line: start at left edge, directly below (touching)
+            // Wrap to new line: start at left edge, one line down
             newX = 20;
-            newY = lastBlock.y + BLOCK_HEIGHT;
+            newY = lastBlock.y + BLOCK_HEIGHT + 10; // Small gap for visual separation
           } else {
-            // Place directly to the right on same line (touching)
+            // Place to the right on same line with gap for connector
             newX = proposedX;
             newY = lastBlock.y;
           }
@@ -1334,7 +1317,7 @@ function AdventurePage() {
                 }}>
                   <h3>Drag & Connect Blocks</h3>
                   <div style={{ marginBottom: '12px', fontSize: '0.85rem', color: '#666' }}>
-                    Drag blocks from the palette below into the workspace. They'll snap together with a satisfying click! 🧲
+                    Drag blocks from the palette below into the workspace. Connect them in a line to build your program!
                   </div>
                   
                   {/* Block Palette */}
@@ -1563,8 +1546,71 @@ function AdventurePage() {
                             return `say ${block.value || 'Hello!'}`;
                           };
                           
+                          // Find the block this one connects to (for drawing connector)
+                          const connectsTo = block.connectedTo 
+                            ? connectedBlocks.find(b => b.id === block.connectedTo)
+                            : null;
+                          
+                          // Block dimensions
+                          const BLOCK_WIDTH = 100;
+                          const BLOCK_HEIGHT = 40;
+                          const CONNECTOR_GAP = 8;
+                          
                           return (
                             <React.Fragment key={block.id}>
+                              {/* Connector line to next block */}
+                              {connectsTo && (
+                                <>
+                                  {connectsTo.y === block.y ? (
+                                    // Same line: horizontal connector
+                                    <div
+                                      style={{
+                                        position: 'absolute',
+                                        left: `${block.x + BLOCK_WIDTH}px`,
+                                        top: `${block.y + BLOCK_HEIGHT / 2 - 2}px`,
+                                        width: `${CONNECTOR_GAP}px`,
+                                        height: '4px',
+                                        backgroundColor: '#3498db',
+                                        zIndex: 3,
+                                        borderRadius: '2px',
+                                        boxShadow: '0 1px 3px rgba(52, 152, 219, 0.5)'
+                                      }}
+                                    />
+                                  ) : (
+                                    // Wrapped: L-shaped connector
+                                    <>
+                                      {/* Vertical line going down from current block */}
+                                      <div
+                                        style={{
+                                          position: 'absolute',
+                                          left: `${block.x + BLOCK_WIDTH / 2 - 2}px`,
+                                          top: `${block.y + BLOCK_HEIGHT}px`,
+                                          width: '4px',
+                                          height: `${connectsTo.y - block.y - BLOCK_HEIGHT}px`,
+                                          backgroundColor: '#3498db',
+                                          zIndex: 3,
+                                          borderRadius: '2px',
+                                          boxShadow: '0 1px 3px rgba(52, 152, 219, 0.5)'
+                                        }}
+                                      />
+                                      {/* Horizontal line going right to next block */}
+                                      <div
+                                        style={{
+                                          position: 'absolute',
+                                          left: `${block.x + BLOCK_WIDTH / 2}px`,
+                                          top: `${connectsTo.y + BLOCK_HEIGHT / 2 - 2}px`,
+                                          width: `${connectsTo.x - (block.x + BLOCK_WIDTH / 2)}px`,
+                                          height: '4px',
+                                          backgroundColor: '#3498db',
+                                          zIndex: 3,
+                                          borderRadius: '2px',
+                                          boxShadow: '0 1px 3px rgba(52, 152, 219, 0.5)'
+                                        }}
+                                      />
+                                    </>
+                                  )}
+                                </>
+                              )}
                               {/* Block */}
                               <div
                                 style={{
