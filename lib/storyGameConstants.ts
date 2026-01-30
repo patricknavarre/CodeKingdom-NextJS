@@ -10,6 +10,7 @@ export const DECISION_POINTS: Record<string, {
     unlocksLocation?: string; // Location this choice unlocks
     nextScene?: string; // Scene to move to after choice
     nextLocation?: string; // Location to move to after choice
+    message?: string; // Custom message when this choice is made
   }>;
 }> = {
   forest_exit: {
