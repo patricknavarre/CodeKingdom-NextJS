@@ -285,6 +285,10 @@ export default function ShopPage() {
       // For backgrounds, check if it's already equipped
       return character.background?.id === itemId || false;
     }
+    // For items with variants (like axolotyl), check if any variant is owned
+    if (itemId === 'axolotyl-pet') {
+      return character.accessories?.some(acc => acc.id?.startsWith('axolotyl-pet-')) || false;
+    }
     return character.accessories?.some(acc => acc.id === itemId) || false;
   };
 
