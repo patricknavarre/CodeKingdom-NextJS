@@ -277,43 +277,62 @@ function AdventurePage() {
       const SNAP_DISTANCE = 60;
       // Block dimensions - actual rendered size (no gaps, blocks touch)
       const BLOCK_WIDTH = 100; // Fixed width: padding 10px*2 + content ~80px
-      const BLOCK_HEIGHT = 40; // Fixed height: padding 10px*2 + content ~20px
+      const BLOCK_HEIGHT = 40; // Fixed height: padding 10px*2 + content ~20px (matches block styling)
       const WORKSPACE_PADDING = 30; // Padding on left and right
       const workspaceWidth = workspaceRef.current.clientWidth - WORKSPACE_PADDING;
       
       let snapToBlock: Block | null = null;
+      let snapDirection: 'right' | 'below' | null = null;
       let minDistance = Infinity;
       
       for (const block of connectedBlocks) {
-        // Calculate actual block right edge (x + width)
+        // Calculate actual block edges
         const blockRightEdge = block.x + BLOCK_WIDTH;
+        const blockBottomEdge = block.y + BLOCK_HEIGHT;
+        
+        // Check horizontal snap (to the right)
         const horizontalDistance = Math.abs(dropX - blockRightEdge);
-        const verticalDistance = Math.abs(dropY - block.y);
-        // Snap if horizontally close to right edge AND vertically aligned
-        if (horizontalDistance < SNAP_DISTANCE && verticalDistance < 30 && horizontalDistance < minDistance) {
+        const verticalAlignment = Math.abs(dropY - block.y);
+        if (horizontalDistance < SNAP_DISTANCE && verticalAlignment < 30 && horizontalDistance < minDistance) {
           minDistance = horizontalDistance;
           snapToBlock = block;
+          snapDirection = 'right';
+        }
+        
+        // Check vertical snap (below) - only if not already snapping horizontally
+        const verticalDistance = Math.abs(dropY - blockBottomEdge);
+        const horizontalAlignment = Math.abs(dropX - block.x);
+        if (verticalDistance < SNAP_DISTANCE && horizontalAlignment < 30 && verticalDistance < minDistance) {
+          minDistance = verticalDistance;
+          snapToBlock = block;
+          snapDirection = 'below';
         }
       }
       
-      // Calculate position: if snapping, place directly to the right (touching, no gap)
+      // Calculate position: if snapping, place directly adjacent (touching, no gap)
       let newX: number;
       let newY: number;
       const BASE_Y = 20; // Starting Y position
       
-      if (snapToBlock) {
-        // Snap directly to the right of the target block (touching, no gap)
-        const proposedX = snapToBlock.x + BLOCK_WIDTH;
-        
-        // Check if this would extend past the workspace width
-        if (proposedX + BLOCK_WIDTH > workspaceWidth) {
-          // Wrap to new line: start at left edge, one line down
-          newX = 20;
+      if (snapToBlock && snapDirection) {
+        if (snapDirection === 'right') {
+          // Snap directly to the right of the target block (touching, no gap)
+          const proposedX = snapToBlock.x + BLOCK_WIDTH;
+          
+          // Check if this would extend past the workspace width
+          if (proposedX + BLOCK_WIDTH > workspaceWidth) {
+            // Wrap to new line: start at left edge, directly below (touching)
+            newX = 20;
+            newY = snapToBlock.y + BLOCK_HEIGHT;
+          } else {
+            // Place directly to the right on same line (touching)
+            newX = proposedX;
+            newY = snapToBlock.y;
+          }
+        } else if (snapDirection === 'below') {
+          // Snap directly below the target block (touching, no gap, same X position)
+          newX = snapToBlock.x;
           newY = snapToBlock.y + BLOCK_HEIGHT;
-        } else {
-          // Place directly to the right on same line (touching)
-          newX = proposedX;
-          newY = snapToBlock.y;
         }
       } else {
         // If no blocks exist, start at left edge
@@ -345,7 +364,7 @@ function AdventurePage() {
           // Place new block directly to the right of the last block (touching, no gap)
           const proposedX = lastBlock.x + BLOCK_WIDTH;
           if (proposedX + BLOCK_WIDTH > workspaceWidth) {
-            // Wrap to new line
+            // Wrap to new line: start at left edge, directly below (touching)
             newX = 20;
             newY = lastBlock.y + BLOCK_HEIGHT;
           } else {
@@ -1571,7 +1590,8 @@ function AdventurePage() {
                                   minWidth: '100px',
                                   whiteSpace: 'nowrap',
                                   width: '100px', // Fixed width so blocks align perfectly
-                                  boxSizing: 'border-box' // Include padding in width
+                                  height: '40px', // Fixed height so blocks align vertically
+                                  boxSizing: 'border-box' // Include padding in width/height
                                 }}
                               >
                                 <span>{getBlockText()}</span>
