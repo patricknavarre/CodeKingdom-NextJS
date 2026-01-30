@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useCharacter } from '@/contexts/CharacterContext';
-import { useAuth } from '@/contexts/AuthContext';
 import { storyGameAPI } from '@/lib/api';
 import { SCENES } from '@/lib/storyGameConstants';
 import Navigation from '@/components/Navigation';
@@ -59,7 +58,6 @@ export default function StoryGamePage() {
     minHeight: '100vh',
     width: '100%'
   };
-  const { authState } = useAuth();
   
   // Get scene-specific default code
   const getDefaultCode = (scene: string) => {
