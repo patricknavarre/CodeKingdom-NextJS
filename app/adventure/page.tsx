@@ -1543,13 +1543,13 @@ function AdventurePage() {
                           // Find the block this one connects to (for drawing connector)
                           const connectsTo = connectedBlocks.find(b => b.id === block.connectedTo);
                           
-                          // Calculate block dimensions
+                          // Calculate block dimensions - need to match actual rendered size
                           const BLOCK_WIDTH = 120; // Approximate width including padding
                           const BLOCK_HEIGHT = 50; // Approximate height including gap
                           
                           return (
                             <React.Fragment key={block.id}>
-                              {/* Connector line to next block */}
+                              {/* Connector line to next block - render BEFORE block so it's behind */}
                               {connectsTo && (
                                 <>
                                   {/* Check if blocks are on same line or wrapped */}
@@ -1559,13 +1559,14 @@ function AdventurePage() {
                                       style={{
                                         position: 'absolute',
                                         left: `${block.x + BLOCK_WIDTH}px`,
-                                        top: `${block.y + BLOCK_HEIGHT / 2}px`,
+                                        top: `${block.y + BLOCK_HEIGHT / 2 - 2}px`, // Center vertically, offset for 4px height
                                         width: `${Math.max(0, connectsTo.x - block.x - BLOCK_WIDTH)}px`,
-                                        height: '4px',
-                                        backgroundColor: '#3498db',
-                                        zIndex: 1,
-                                        borderRadius: '2px',
-                                        boxShadow: '0 2px 4px rgba(52, 152, 219, 0.5)'
+                                        height: '5px',
+                                        backgroundColor: '#2980b9',
+                                        zIndex: 3, // Above workspace background, below blocks
+                                        borderRadius: '3px',
+                                        boxShadow: '0 0 4px rgba(52, 152, 219, 0.8)',
+                                        border: '1px solid #1f5f8b'
                                       }}
                                     />
                                   ) : (
@@ -1575,14 +1576,15 @@ function AdventurePage() {
                                       <div
                                         style={{
                                           position: 'absolute',
-                                          left: `${block.x + BLOCK_WIDTH / 2}px`,
+                                          left: `${block.x + BLOCK_WIDTH / 2 - 2}px`, // Center horizontally, offset for 4px width
                                           top: `${block.y + BLOCK_HEIGHT}px`,
-                                          width: '4px',
-                                          height: `${connectsTo.y - block.y - BLOCK_HEIGHT}px`,
-                                          backgroundColor: '#3498db',
-                                          zIndex: 1,
-                                          borderRadius: '2px',
-                                          boxShadow: '0 2px 4px rgba(52, 152, 219, 0.5)'
+                                          width: '5px',
+                                          height: `${Math.max(0, connectsTo.y - block.y - BLOCK_HEIGHT)}px`,
+                                          backgroundColor: '#2980b9',
+                                          zIndex: 3,
+                                          borderRadius: '3px',
+                                          boxShadow: '0 0 4px rgba(52, 152, 219, 0.8)',
+                                          border: '1px solid #1f5f8b'
                                         }}
                                       />
                                       {/* Horizontal line going right to next block */}
@@ -1590,13 +1592,14 @@ function AdventurePage() {
                                         style={{
                                           position: 'absolute',
                                           left: `${block.x + BLOCK_WIDTH / 2}px`,
-                                          top: `${connectsTo.y + BLOCK_HEIGHT / 2}px`,
-                                          width: `${connectsTo.x - block.x - BLOCK_WIDTH / 2}px`,
-                                          height: '4px',
-                                          backgroundColor: '#3498db',
-                                          zIndex: 1,
-                                          borderRadius: '2px',
-                                          boxShadow: '0 2px 4px rgba(52, 152, 219, 0.5)'
+                                          top: `${connectsTo.y + BLOCK_HEIGHT / 2 - 2}px`, // Center vertically
+                                          width: `${Math.max(0, connectsTo.x - block.x - BLOCK_WIDTH / 2)}px`,
+                                          height: '5px',
+                                          backgroundColor: '#2980b9',
+                                          zIndex: 3,
+                                          borderRadius: '3px',
+                                          boxShadow: '0 0 4px rgba(52, 152, 219, 0.8)',
+                                          border: '1px solid #1f5f8b'
                                         }}
                                       />
                                     </>
@@ -1621,7 +1624,7 @@ function AdventurePage() {
                                     : '0 3px 6px rgba(0,0,0,0.3)',
                                   transform: snapTarget === block.id ? 'scale(1.05)' : 'scale(1)',
                                   transition: 'all 0.2s ease',
-                                  zIndex: snapTarget === block.id ? 10 : 2,
+                                  zIndex: snapTarget === block.id ? 10 : 5, // Higher than connector lines
                                   display: 'flex',
                                   alignItems: 'center',
                                   gap: '8px',
@@ -1670,6 +1673,37 @@ function AdventurePage() {
                       Clear All Blocks
                     </button>
                   )}
+                  
+                  {/* Run My Code button - between drag section and command buttons */}
+                  <button 
+                    onClick={executeCommand}
+                    className="run-button"
+                    style={{ 
+                      backgroundColor: '#2ecc71', 
+                      color: 'white', 
+                      border: 'none', 
+                      padding: '10px 20px', 
+                      borderRadius: '8px', 
+                      fontSize: '1rem', 
+                      fontWeight: 'bold', 
+                      marginTop: '12px',
+                      marginBottom: '12px',
+                      width: '100%', 
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 8px rgba(46, 204, 113, 0.3)',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 12px rgba(46, 204, 113, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 4px 8px rgba(46, 204, 113, 0.3)';
+                    }}
+                  >
+                    Run My Code! 🚀
+                  </button>
                   
                   {/* Fallback text input */}
                   <div className="command-input">
@@ -1768,13 +1802,6 @@ function AdventurePage() {
                     <div className="command-tip" style={{ fontSize: '0.8rem', color: '#666', marginTop: '6px' }}>
                       Tip: You can **click the command buttons above** or **type your own commands** (separate multiple commands with commas, e.g. "turn right, move 2").
                     </div>
-                    <button 
-                      onClick={executeCommand}
-                      className="run-button"
-                      style={{ backgroundColor: '#2ecc71', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '5px', fontSize: '0.95rem', fontWeight: 'bold', marginTop: '8px', width: '100%', cursor: 'pointer' }}
-                    >
-                      Run My Code!
-                    </button>
                   </div>
                   
                   {/* Status and Log side by side */}
