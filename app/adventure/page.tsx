@@ -1543,28 +1543,65 @@ function AdventurePage() {
                           // Find the block this one connects to (for drawing connector)
                           const connectsTo = connectedBlocks.find(b => b.id === block.connectedTo);
                           
-                          // Calculate block width (minWidth 100px + padding 14px*2 = ~128px, but use actual rendered width)
+                          // Calculate block dimensions
                           const BLOCK_WIDTH = 120; // Approximate width including padding
-                          const BLOCK_HEIGHT = 40; // Approximate height
+                          const BLOCK_HEIGHT = 50; // Approximate height including gap
                           
                           return (
                             <React.Fragment key={block.id}>
                               {/* Connector line to next block */}
                               {connectsTo && (
-                                <div
-                                  style={{
-                                    position: 'absolute',
-                                    left: `${block.x + BLOCK_WIDTH}px`, // Right edge of current block
-                                    top: `${block.y + BLOCK_HEIGHT / 2}px`, // Middle of block vertically
-                                    width: `${Math.max(0, connectsTo.x - block.x - BLOCK_WIDTH)}px`, // Gap between blocks
-                                    height: '3px',
-                                    backgroundColor: '#3498db',
-                                    zIndex: 1,
-                                    opacity: 0.7,
-                                    borderRadius: '2px',
-                                    boxShadow: '0 1px 2px rgba(52, 152, 219, 0.3)'
-                                  }}
-                                />
+                                <>
+                                  {/* Check if blocks are on same line or wrapped */}
+                                  {connectsTo.y === block.y ? (
+                                    // Same line: horizontal connector
+                                    <div
+                                      style={{
+                                        position: 'absolute',
+                                        left: `${block.x + BLOCK_WIDTH}px`,
+                                        top: `${block.y + BLOCK_HEIGHT / 2}px`,
+                                        width: `${Math.max(0, connectsTo.x - block.x - BLOCK_WIDTH)}px`,
+                                        height: '4px',
+                                        backgroundColor: '#3498db',
+                                        zIndex: 1,
+                                        borderRadius: '2px',
+                                        boxShadow: '0 2px 4px rgba(52, 152, 219, 0.5)'
+                                      }}
+                                    />
+                                  ) : (
+                                    // Wrapped: L-shaped connector (down then right)
+                                    <>
+                                      {/* Vertical line going down from current block */}
+                                      <div
+                                        style={{
+                                          position: 'absolute',
+                                          left: `${block.x + BLOCK_WIDTH / 2}px`,
+                                          top: `${block.y + BLOCK_HEIGHT}px`,
+                                          width: '4px',
+                                          height: `${connectsTo.y - block.y - BLOCK_HEIGHT}px`,
+                                          backgroundColor: '#3498db',
+                                          zIndex: 1,
+                                          borderRadius: '2px',
+                                          boxShadow: '0 2px 4px rgba(52, 152, 219, 0.5)'
+                                        }}
+                                      />
+                                      {/* Horizontal line going right to next block */}
+                                      <div
+                                        style={{
+                                          position: 'absolute',
+                                          left: `${block.x + BLOCK_WIDTH / 2}px`,
+                                          top: `${connectsTo.y + BLOCK_HEIGHT / 2}px`,
+                                          width: `${connectsTo.x - block.x - BLOCK_WIDTH / 2}px`,
+                                          height: '4px',
+                                          backgroundColor: '#3498db',
+                                          zIndex: 1,
+                                          borderRadius: '2px',
+                                          boxShadow: '0 2px 4px rgba(52, 152, 219, 0.5)'
+                                        }}
+                                      />
+                                    </>
+                                  )}
+                                </>
                               )}
                               {/* Block */}
                               <div
