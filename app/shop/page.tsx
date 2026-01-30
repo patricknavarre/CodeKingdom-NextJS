@@ -37,32 +37,39 @@ interface ShopItem {
   backgroundType?: 'color' | 'gradient' | 'image';
   backgroundValue?: string; // CSS value
   thumbnail?: string;
-  // For items with variants (like axolotyl colors)
-  variants?: Array<{
-    id: string;
-    name: string;
-    image: string;
-  }>;
-  selectedVariant?: string; // Currently selected variant ID
 }
 
 // Shop items data
 const shopItems: ShopItem[] = [
   {
     id: 'axolotyl-pet',
-    name: 'Axolotyl Pet',
+    name: 'Pink Axolotyl Pet',
     type: 'pet',
     image: axolotylPet,
-    description: 'A cute axolotyl companion to join you on your coding adventures! Choose your favorite color!',
+    description: 'A cute pink axolotyl companion to join you on your coding adventures!',
     price: 100,
     rarity: 'rare',
-    category: 'pets',
-    variants: [
-      { id: 'default', name: 'Pink Axolotyl', image: axolotylPet },
-      { id: 'gold', name: 'Gold Axolotyl', image: axolotylGold },
-      { id: 'black', name: 'Black Axolotyl', image: axolotylBlack }
-    ],
-    selectedVariant: 'default'
+    category: 'pets'
+  },
+  {
+    id: 'axolotyl-gold-pet',
+    name: 'Gold Axolotyl Pet',
+    type: 'pet',
+    image: axolotylGold,
+    description: 'A rare golden axolotyl companion - a truly special find!',
+    price: 1000,
+    rarity: 'legendary',
+    category: 'pets'
+  },
+  {
+    id: 'axolotyl-black-pet',
+    name: 'Black Axolotyl Pet',
+    type: 'pet',
+    image: axolotylBlack,
+    description: 'A sleek black axolotyl companion with a mysterious charm!',
+    price: 500,
+    rarity: 'epic',
+    category: 'pets'
   },
   {
     id: 'frog-pet',
@@ -274,7 +281,6 @@ export default function ShopPage() {
   const { character, addAccessory, addCoins, setCharacter, setBackground } = useCharacter();
   const [selectedCategory, setSelectedCategory] = useState<'pets' | 'accessories' | 'backgrounds'>('pets');
   const [purchaseMessage, setPurchaseMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
-  const [itemVariants, setItemVariants] = useState<Record<string, string>>({}); // Track selected variants for items
 
   // Filter items by category
   const filteredItems = shopItems.filter(item => item.category === selectedCategory);
@@ -284,10 +290,6 @@ export default function ShopPage() {
     if (itemId.startsWith('bg-')) {
       // For backgrounds, check if it's already equipped
       return character.background?.id === itemId || false;
-    }
-    // For items with variants (like axolotyl), check if any variant is owned
-    if (itemId === 'axolotyl-pet') {
-      return character.accessories?.some(acc => acc.id?.startsWith('axolotyl-pet-')) || false;
     }
     return character.accessories?.some(acc => acc.id === itemId) || false;
   };
@@ -439,10 +441,6 @@ export default function ShopPage() {
                 {filteredItems.map((item) => {
                   const owned = ownsItem(item.id);
                   const canAfford = character.coins >= item.price;
-                  const selectedVariantId = itemVariants[item.id] || item.selectedVariant || 'default';
-                  const displayImage = item.variants 
-                    ? item.variants.find(v => v.id === selectedVariantId)?.image || item.image
-                    : item.image;
 
                   return (
                     <div key={item.id} className={`shop-item-card ${owned ? 'owned' : ''} ${!canAfford && !owned ? 'cannot-afford' : ''}`}>
@@ -463,10 +461,10 @@ export default function ShopPage() {
                           >
                             {item.image}
                           </div>
-                        ) : displayImage && (displayImage.includes('.png') || displayImage.includes('.jpg') || displayImage.startsWith('/') || displayImage.startsWith('http')) ? (
-                          <img src={displayImage} alt={item.name} className="item-image" />
+                        ) : item.image && (item.image.includes('.png') || item.image.includes('.jpg') || item.image.startsWith('/') || item.image.startsWith('http')) ? (
+                          <img src={item.image} alt={item.name} className="item-image" />
                         ) : (
-                          <div className="item-emoji">{displayImage}</div>
+                          <div className="item-emoji">{item.image}</div>
                         )}
                         {owned && (
                           <div className="owned-badge">OWNED</div>
@@ -475,49 +473,6 @@ export default function ShopPage() {
                           {item.rarity.toUpperCase()}
                         </div>
                       </div>
-                      
-                      {/* Color Variant Selector for Axolotyl */}
-                      {item.variants && item.variants.length > 0 && (
-                        <div className="variant-selector" style={{ 
-                          padding: '10px', 
-                          background: '#f5f5f5', 
-                          borderRadius: '8px',
-                          marginTop: '8px',
-                          display: 'flex',
-                          gap: '8px',
-                          flexWrap: 'wrap',
-                          justifyContent: 'center'
-                        }}>
-                          <div style={{ width: '100%', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '5px', textAlign: 'center' }}>
-                            Choose Color:
-                          </div>
-                          {item.variants.map((variant) => (
-                            <button
-                              key={variant.id}
-                              onClick={() => setItemVariants(prev => ({ ...prev, [item.id]: variant.id }))}
-                              style={{
-                                padding: '5px 10px',
-                                border: selectedVariantId === variant.id ? '2px solid #667eea' : '2px solid #ddd',
-                                borderRadius: '6px',
-                                background: selectedVariantId === variant.id ? '#e3f2fd' : 'white',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                gap: '4px',
-                                minWidth: '80px'
-                              }}
-                            >
-                              <img 
-                                src={variant.image} 
-                                alt={variant.name}
-                                style={{ width: '40px', height: '40px', objectFit: 'contain' }}
-                              />
-                              <span style={{ fontSize: '0.7rem' }}>{variant.name.replace(' Axolotyl', '')}</span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
                       
                       <div className="item-info">
                         <h3 className="item-name">{item.name}</h3>
