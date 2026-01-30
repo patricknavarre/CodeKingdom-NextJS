@@ -11,8 +11,13 @@ export default function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
   const isAuthenticated = authState.isAuthenticated;
   const username = authState.user?.username || 'User';
+  
+  // Check if we're on a game page
+  const gamePages = ['/adventure', '/story-game', '/web-dev-game', '/block-builder'];
+  const isGamePage = gamePages.includes(pathname);
 
   // Close menu when route changes
   useEffect(() => {
@@ -34,8 +39,13 @@ export default function Navigation() {
   };
 
   return (
-    <header className="navigation-header">
-      <div className="nav-container">
+    <div 
+      className={`navigation-wrapper ${isGamePage ? 'game-page' : ''}`}
+      onMouseEnter={() => isGamePage && setIsHovering(true)}
+      onMouseLeave={() => isGamePage && setIsHovering(false)}
+    >
+      <header className={`navigation-header ${isGamePage ? (isHovering ? 'show' : 'hide') : ''}`}>
+        <div className="nav-container">
         <Link href="/" className="nav-brand" onClick={closeMenu}>
           <span className="nav-brand-icon">👑</span>
           <span>CodeKingdom</span>
@@ -168,5 +178,6 @@ export default function Navigation() {
         )}
       </nav>
     </header>
+    </div>
   );
 }
