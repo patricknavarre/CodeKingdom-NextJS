@@ -280,12 +280,9 @@ export default function CharacterPage() {
                                   )
                                 }));
                               } else {
-                                // If backgroundData exists, use it; otherwise create it from the item
                                 let backgroundData = item.backgroundData;
                                 
-                                // If no backgroundData but it's a background item, create it
                                 if (!backgroundData && (item.id?.startsWith('bg-') || item.type === 'background')) {
-                                  // Look up the background definition by ID
                                   const bgDef = item.id ? BACKGROUND_DEFINITIONS[item.id] : null;
                                   
                                   if (bgDef) {
@@ -298,7 +295,6 @@ export default function CharacterPage() {
                                       rarity: item.rarity || 'common'
                                     };
                                   } else {
-                                    // Fallback: create a default gradient background
                                     backgroundData = {
                                       id: item.id,
                                       name: item.name,
@@ -314,12 +310,15 @@ export default function CharacterPage() {
                                   setBackground(backgroundData);
                                   setCharacter(prev => ({
                                     ...prev,
-                                    accessories: prev.accessories.map(acc => 
-                                      acc.id === item.id ? { ...acc, isEquipped: true, backgroundData } : 
-                                      acc.backgroundData || (acc.id?.startsWith('bg-') || acc.type === 'background') 
-                                        ? { ...acc, isEquipped: false } 
-                                        : acc
-                                    ))
+                                    accessories: prev.accessories.map(acc => {
+                                      if (acc.id === item.id) {
+                                        return { ...acc, isEquipped: true, backgroundData };
+                                      }
+                                      if (acc.backgroundData || (acc.id?.startsWith('bg-') || acc.type === 'background')) {
+                                        return { ...acc, isEquipped: false };
+                                      }
+                                      return acc;
+                                    })
                                   }));
                                 }
                               }
