@@ -1567,15 +1567,35 @@ function AdventurePage() {
                   </div>
                   
                   {/* Workspace for connected blocks */}
-                  <div style={{
-                    position: 'relative',
-                    minHeight: '200px',
-                    padding: '20px',
-                    backgroundColor: '#f8f9fa',
-                    borderRadius: '6px',
-                    border: '2px dashed #bdc3c7',
-                    marginBottom: '12px'
-                  }}>
+                  <div
+                    ref={workspaceRef}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      handleBlockDrag(e);
+                    }}
+                    onDrop={handleBlockDrop}
+                    onTouchMove={(e) => {
+                      if (draggedBlock) {
+                        handleBlockTouchMove(e);
+                      }
+                    }}
+                    onTouchEnd={(e) => {
+                      if (draggedBlock) {
+                        handleBlockTouchEnd(e);
+                      }
+                    }}
+                    style={{
+                      position: 'relative',
+                      minHeight: '200px',
+                      padding: '20px',
+                      backgroundColor: '#f8f9fa',
+                      borderRadius: '6px',
+                      border: '2px dashed #bdc3c7',
+                      marginBottom: '12px',
+                      touchAction: 'none',
+                      overflow: 'visible'
+                    }}
+                  >
                     {connectedBlocks.length === 0 ? (
                       <div style={{
                         textAlign: 'center',
