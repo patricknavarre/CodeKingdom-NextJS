@@ -1105,11 +1105,18 @@ function AdventurePage() {
       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
     };
 
+    const backgroundStyle = character.background ? {
+      background: character.background.value,
+      backgroundAttachment: 'fixed'
+    } : {
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+    };
+
     return (
       <ProtectedRoute>
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', margin: 0, padding: 0, overflow: 'hidden', ...(character.background ? { background: character.background.value, backgroundAttachment: 'fixed' } : { background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }) }}>
+        <div style={{ width: '100%', height: '100vh', margin: 0, padding: 0, ...backgroundStyle }}>
           <Navigation />
-          <div className="adventure-game" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'transparent', margin: 0, padding: '20px', boxSizing: 'border-box' }}>
+          <div className="adventure-game" style={{ height: '100vh', background: 'transparent' }}>
             <div style={{ marginBottom: '8px', flexShrink: 0 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
                 <div>
