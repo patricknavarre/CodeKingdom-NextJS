@@ -1096,8 +1096,7 @@ function AdventurePage() {
       margin: 0,
       padding: 0,
       background: character.background.value,
-      backgroundAttachment: 'fixed',
-      minHeight: '100vh'
+      backgroundAttachment: 'fixed'
     } : {
       width: '100%',
       height: '100vh',
@@ -1108,9 +1107,9 @@ function AdventurePage() {
 
     return (
       <ProtectedRoute>
-        <div style={{ ...containerStyle as React.CSSProperties, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ ...containerStyle as React.CSSProperties }}>
           <Navigation />
-          <div className="adventure-game" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
+          <div className="adventure-game" style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'transparent' }}>
             <div style={{ marginBottom: '8px', flexShrink: 0 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
                 <div>

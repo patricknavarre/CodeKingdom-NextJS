@@ -1,8 +1,7 @@
 .adventure-game {
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-height: 0;
+  height: 100vh;
   padding: 20px;
   font-family: 'Montserrat', sans-serif;
   background-color: #f0f8ff;
