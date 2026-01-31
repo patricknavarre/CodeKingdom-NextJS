@@ -28,22 +28,26 @@ function AdventurePage() {
   
   // Add debug logging
   console.log('AdventurePage: About to use character context');
-  
-  // Preload character images
-  const preloadImage = (src: string) => {
-    const img = new Image();
-    img.src = src;
-    console.log('Preloading image:', src);
-  };
-  
-  preloadImage(girlCharacter);
-  preloadImage(boyCharacter);
-  preloadImage(brownGirlCharacter);
-  preloadImage(brownBoyCharacter);
-  preloadImage(blondeGirlCharacter);
 
   // Hooks MUST be called at the top level
   const { character, addCoins, addExperience, addAccessory, addPoints } = useCharacter();
+  
+  // Preload character images on client side only
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const preloadImage = (src: string) => {
+        const img = new Image();
+        img.src = src;
+        console.log('Preloading image:', src);
+      };
+      
+      preloadImage(girlCharacter);
+      preloadImage(boyCharacter);
+      preloadImage(brownGirlCharacter);
+      preloadImage(brownBoyCharacter);
+      preloadImage(blondeGirlCharacter);
+    }
+  }, []);
   
   // Check if accessories are equipped
     const pinkHoodieEquipped = character?.accessories?.some(
