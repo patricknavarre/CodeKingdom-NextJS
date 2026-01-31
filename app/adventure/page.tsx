@@ -24,27 +24,26 @@ const girlHoodieSneakersCharacter = '/images/characters/Girl_Character_In_PinkHo
 function AdventurePage() {
   console.log('AdventurePage rendering');
   
-  // Basic error handling to prevent white screen
-  try {
-    // Add debug logging
-    console.log('AdventurePage: About to use character context');
-    
-    // Preload character images
-    const preloadImage = (src: string) => {
-      const img = new Image();
-      img.src = src;
-      console.log('Preloading image:', src);
-    };
-    
-    preloadImage(girlCharacter);
-    preloadImage(boyCharacter);
-    preloadImage(brownGirlCharacter);
-    preloadImage(brownBoyCharacter);
-    preloadImage(blondeGirlCharacter);
+  // Add debug logging
+  console.log('AdventurePage: About to use character context');
   
-    const { character, addCoins, addExperience, addAccessory, addPoints } = useCharacter();
-    
-    // Check if accessories are equipped
+  // Preload character images
+  const preloadImage = (src: string) => {
+    const img = new Image();
+    img.src = src;
+    console.log('Preloading image:', src);
+  };
+  
+  preloadImage(girlCharacter);
+  preloadImage(boyCharacter);
+  preloadImage(brownGirlCharacter);
+  preloadImage(brownBoyCharacter);
+  preloadImage(blondeGirlCharacter);
+
+  // Hooks MUST be called at the top level
+  const { character, addCoins, addExperience, addAccessory, addPoints } = useCharacter();
+  
+  // Check if accessories are equipped
     const pinkHoodieEquipped = character?.accessories?.some(
       acc => acc.name === 'Pink Hoodie' && acc.isEquipped
     ) || false;
@@ -1085,17 +1084,27 @@ function AdventurePage() {
       }, 500);
     };
     
-    const backgroundStyle = character.background ? {
+    const containerStyle = character.background ? {
+      width: '100%',
+      height: '100vh',
+      margin: 0,
+      padding: 0,
       background: character.background.value,
       backgroundAttachment: 'fixed',
       minHeight: '100vh'
-    } : {};
+    } : {
+      width: '100%',
+      height: '100vh',
+      margin: 0,
+      padding: 0,
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+    };
 
     return (
       <ProtectedRoute>
-        <div style={{ width: '100%', height: '100vh', margin: 0, padding: 0, ...backgroundStyle }}>
+        <div style={{ ...containerStyle as React.CSSProperties, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
           <Navigation />
-          <div className="adventure-game" style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <div className="adventure-game" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
             <div style={{ marginBottom: '8px', flexShrink: 0 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
                 <div>
@@ -1280,7 +1289,7 @@ function AdventurePage() {
                   flex: 1,
                   display: 'flex',
                   justifyContent: 'center',
-                  alignItems: 'flex-start',
+                  alignItems: 'center',
                   backgroundColor: '#ebf5fb',
                   borderRadius: '10px',
                   padding: '20px',
@@ -1381,8 +1390,9 @@ function AdventurePage() {
                   paddingBottom: '20px',
                   boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
                   borderLeft: '3px solid #3498db',
-                  flexShrink: 0,
-                  overflow: 'visible'
+                  flex: 1,
+                  overflow: 'auto',
+                  minHeight: 0
                 }}>
                   <h3>Drag & Connect Blocks</h3>
                   <div style={{ marginBottom: '12px', fontSize: '0.85rem', color: '#666' }}>
@@ -1560,43 +1570,23 @@ function AdventurePage() {
                   </div>
                   
                   {/* Workspace for connected blocks */}
-                  <div
-                    ref={workspaceRef}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      handleBlockDrag(e);
-                    }}
-                    onDrop={handleBlockDrop}
-                    onTouchMove={(e) => {
-                      if (draggedBlock) {
-                        handleBlockTouchMove(e);
-                      }
-                    }}
-                    onTouchEnd={(e) => {
-                      if (draggedBlock) {
-                        handleBlockTouchEnd(e);
-                      }
-                    }}
-                    style={{
-                      minHeight: '150px',
-                      backgroundColor: '#fff',
-                      border: '2px dashed #3498db',
-                      borderRadius: '8px',
-                      padding: '15px',
-                      marginBottom: '12px',
-                      position: 'relative',
-                      touchAction: 'none',
-                      overflow: 'visible' // Ensure connector lines are visible
-                    }}
-                  >
+                  <div style={{
+                    position: 'relative',
+                    minHeight: '200px',
+                    padding: '20px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '6px',
+                    border: '2px dashed #bdc3c7',
+                    marginBottom: '12px'
+                  }}>
                     {connectedBlocks.length === 0 ? (
-                      <div style={{ 
-                        textAlign: 'center', 
-                        color: '#999', 
-                        padding: '40px',
-                        fontSize: '0.9rem'
+                      <div style={{
+                        textAlign: 'center',
+                        color: '#999',
+                        fontSize: '0.9rem',
+                        padding: '40px 20px'
                       }}>
-                        Drag blocks here to build your program! 🧩
+                        Drag blocks here to build your program! 🍀
                       </div>
                     ) : (
                       <>
@@ -1704,9 +1694,9 @@ function AdventurePage() {
                                   gap: '8px',
                                   minWidth: '100px',
                                   whiteSpace: 'nowrap',
-                                  width: '100px', // Fixed width so blocks align perfectly
-                                  height: '40px', // Fixed height so blocks align vertically
-                                  boxSizing: 'border-box' // Include padding in width/height
+                                  width: '100px',
+                                  height: '40px',
+                                  boxSizing: 'border-box'
                                 }}
                               >
                                 <span>{getBlockText()}</span>
@@ -1814,7 +1804,7 @@ function AdventurePage() {
                           input.focus();
                         }}
                         className="command-quick-button"
-                        style={{ backgroundColor: '#3498db', color: 'white', border: 'none', padding: '3px 8px', borderRadius: '3px', fontSize: '0.8rem', cursor: 'pointer' }}
+                        style={{ backgroundColor: '#9b59b6', color: 'white', border: 'none', padding: '3px 8px', borderRadius: '3px', fontSize: '0.8rem', cursor: 'pointer' }}
                       >
                         turn right
                       </button>
@@ -1825,7 +1815,7 @@ function AdventurePage() {
                           input.focus();
                         }}
                         className="command-quick-button"
-                        style={{ backgroundColor: '#3498db', color: 'white', border: 'none', padding: '3px 8px', borderRadius: '3px', fontSize: '0.8rem', cursor: 'pointer' }}
+                        style={{ backgroundColor: '#9b59b6', color: 'white', border: 'none', padding: '3px 8px', borderRadius: '3px', fontSize: '0.8rem', cursor: 'pointer' }}
                       >
                         turn left
                       </button>
@@ -1836,7 +1826,7 @@ function AdventurePage() {
                           input.focus();
                         }}
                         className="command-quick-button"
-                        style={{ backgroundColor: '#3498db', color: 'white', border: 'none', padding: '3px 8px', borderRadius: '3px', fontSize: '0.8rem', cursor: 'pointer' }}
+                        style={{ backgroundColor: '#9b59b6', color: 'white', border: 'none', padding: '3px 8px', borderRadius: '3px', fontSize: '0.8rem', cursor: 'pointer' }}
                       >
                         turn up
                       </button>
@@ -1847,7 +1837,7 @@ function AdventurePage() {
                           input.focus();
                         }}
                         className="command-quick-button"
-                        style={{ backgroundColor: '#3498db', color: 'white', border: 'none', padding: '3px 8px', borderRadius: '3px', fontSize: '0.8rem', cursor: 'pointer' }}
+                        style={{ backgroundColor: '#9b59b6', color: 'white', border: 'none', padding: '3px 8px', borderRadius: '3px', fontSize: '0.8rem', cursor: 'pointer' }}
                       >
                         turn down
                       </button>
@@ -1922,7 +1912,6 @@ function AdventurePage() {
                             }}
                             onError={(e) => {
                               console.error('Image failed to load:', e);
-                              // Fallback to base character image
                               (e.target as HTMLImageElement).src = character.id === 'boy1' ? boyCharacter : girlCharacter;
                             }}
                           />
@@ -1964,7 +1953,6 @@ function AdventurePage() {
                           {(() => {
                             const equippedPet = character.accessories?.find(acc => acc.type === 'pet' && acc.isEquipped);
                             if (equippedPet) {
-                              // Show equipped pet image
                               if (equippedPet.image && (equippedPet.image.includes('.png') || equippedPet.image.includes('.jpg') || equippedPet.image.startsWith('/') || equippedPet.image.startsWith('http'))) {
                                 return (
                                   <img 
@@ -1986,7 +1974,6 @@ function AdventurePage() {
                                 return <span style={{ fontSize: '30px' }}>{equippedPet.image || '🐾'}</span>;
                               }
                             } else {
-                              // Show placeholder when no pet is equipped
                               return <span style={{ fontSize: '24px', opacity: 0.5 }}>🐾</span>;
                             }
                           })()}
@@ -2179,16 +2166,6 @@ function AdventurePage() {
         </div>
       </ProtectedRoute>
     );
-  } catch (error) {
-    console.error('Error rendering AdventurePage:', error);
-    return (
-      <div style={{ padding: '20px', textAlign: 'center' }}>
-        <h2>Something went wrong</h2>
-        <p>There was an error loading the adventure game.</p>
-        <button onClick={() => window.location.reload()}>Try Again</button>
-      </div>
-    );
-  }
 }
 
 export default AdventurePage;
