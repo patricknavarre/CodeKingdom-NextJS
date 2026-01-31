@@ -1090,21 +1090,6 @@ function AdventurePage() {
       }, 500);
     };
     
-    const containerStyle = character.background ? {
-      width: '100%',
-      height: '100vh',
-      margin: 0,
-      padding: 0,
-      background: character.background.value,
-      backgroundAttachment: 'fixed'
-    } : {
-      width: '100%',
-      height: '100vh',
-      margin: 0,
-      padding: 0,
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-    };
-
     const backgroundStyle = character.background ? {
       background: character.background.value,
       backgroundAttachment: 'fixed'
