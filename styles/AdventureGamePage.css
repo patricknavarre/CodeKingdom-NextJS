@@ -61,7 +61,7 @@
 
 .game-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   flex: 1;
   gap: 20px;
   height: 0;
@@ -69,6 +69,8 @@
   padding: 0;
   overflow: hidden;
   margin-top: 0;
+  width: 100%;
+  max-width: none;
 }
 
 /* Top panel - Instructions and Character */
