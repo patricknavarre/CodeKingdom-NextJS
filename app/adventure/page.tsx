@@ -1243,9 +1243,9 @@ function AdventurePage() {
             )}
             
             
-            <div className="game-container" style={{ flex: 1, display: 'flex', flexDirection: 'row', gap: '20px', overflow: 'hidden', minHeight: 0 }}>
+            <div className="game-container" style={{ flex: 1, display: 'flex', flexDirection: 'row', gap: '20px', overflow: 'hidden', minHeight: 0, width: '100%' }}>
               {/* Left Column - Instructions and Game Grid */}
-              <div style={{ flex: '0 0 50%', display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'hidden', minHeight: 0 }}>
+              <div style={{ flex: '1 1 45%', display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'hidden', minHeight: 0 }}>
                 {/* Instructions Panel - Collapsible */}
                 <div className="instructions-panel" style={{ 
                   padding: '15px 20px',
@@ -1387,7 +1387,7 @@ function AdventurePage() {
               </div>
               
               {/* Right Column - Commands, Character, Status, Log */}
-              <div style={{ flex: '0 0 50%', display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'auto', minHeight: 0 }}>
+              <div style={{ flex: '1 1 55%', display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'auto', minHeight: 0 }}>
                 {/* Commands Panel */}
                 <div className="command-panel" style={{
                   backgroundColor: 'white',
