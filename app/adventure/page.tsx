@@ -7,6 +7,8 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import { getLevelConfig, getMaxLevel, type LevelConfig } from './utils/levelConfigs';
 import '@/styles/AdventureGamePage.css';
 
+export const dynamic = 'force-dynamic';
+
 // Image paths for Next.js public folder
 const pinkHoodie = '/images/items/Pink_Hoodie.png';
 const whiteSneakers = '/images/items/WhiteSneakers.png';
