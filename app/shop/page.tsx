@@ -24,6 +24,7 @@ const sharkHockeyStick = '/images/items/SharkHockeyStick.png';
 const stanleyBlue = '/images/items/Accessory_Stanley_Blue.png';
 const owallaPink = '/images/items/Accessory_Owalla_Pink.png';
 const bagOfChips = '/images/items/Accessory_BagOfChips.png';
+const peachSchmapple = '/images/items/Accessory_PeachSchmapple.png';
 
 interface ShopItem {
   id: string;
