@@ -745,11 +745,22 @@ export default function WebDevGamePage() {
     if (req.css) {
       for (const prop of req.css) {
         const propLower = prop.toLowerCase();
-        // Check for the property name (with or without colon, with or without value)
-        // This handles "background-color", "background-color:", "background-color: magenta", etc.
-        const propPattern = new RegExp(propLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*[:{]', 'i');
-        if (!allCss.match(propPattern)) {
-          return false;
+        
+        // Special handling for class selector (just a dot)
+        if (prop === '.') {
+          // Look for a dot followed by a class name (letters, numbers, hyphens, underscores)
+          // and then either whitespace or opening brace
+          const classPattern = /\.[a-zA-Z0-9_-]+\s*[:\{]/;
+          if (!allCss.match(classPattern)) {
+            return false;
+          }
+        } else {
+          // Check for the property name (with or without colon, with or without value)
+          // This handles "background-color", "background-color:", "background-color: magenta", etc.
+          const propPattern = new RegExp(propLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*[:{]', 'i');
+          if (!allCss.match(propPattern)) {
+            return false;
+          }
         }
       }
     }
