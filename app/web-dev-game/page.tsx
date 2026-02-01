@@ -1180,7 +1180,18 @@ export default function WebDevGamePage() {
                         <li>Add at least 3 items!</li>
                       </ul>
                     )}
-                    {level.id > 6 && (
+                    {level.id === 7 && (
+                      <ul style={{ marginLeft: '20px', lineHeight: '1.6' }}>
+                        <li>Use the <code>&lt;a&gt;</code> tag (anchor tag) to create a link</li>
+                        <li>The <code>href</code> attribute tells the browser where to go when clicked</li>
+                        <li>Put the text you want to show inside the opening and closing tags</li>
+                        <li><strong>Example:</strong> <code>&lt;a href="https://www.google.com"&gt;Visit Google&lt;/a&gt;</code></li>
+                        <li>This creates a clickable link that says "Visit Google" and goes to Google's website</li>
+                        <li>Add it in the <code>&lt;body&gt;</code> section, after your existing content</li>
+                        <li><strong>Remember:</strong> Always include <code>https://</code> at the start of website URLs!</li>
+                      </ul>
+                    )}
+                    {level.id > 7 && (
                       <ul style={{ marginLeft: '20px', lineHeight: '1.6' }}>
                         <li>Read the challenge carefully</li>
                         <li>Check the requirements box to see what HTML tags or CSS properties you need</li>
