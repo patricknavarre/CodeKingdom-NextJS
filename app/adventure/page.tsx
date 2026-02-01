@@ -120,7 +120,7 @@ function AdventurePage() {
     const directionRef = useRef(initialConfig.startDirection);
     const [showReward, setShowReward] = useState(false);
     const [showDiamondCelebration, setShowDiamondCelebration] = useState(false);
-    const [diamondBonusInfo, setDiamondBonusInfo] = useState<{ coins: number; xp: number; points: number; isBonus: boolean; commandCount?: number } | null>(null);
+    const [diamondBonusInfo, setDiamondBonusInfo] = useState<{ coins: number; xp: number; points: number; isBonus: boolean; commandCount?: number; totalDiamonds: number } | null>(null);
     const [commandSequence, setCommandSequence] = useState<string[]>([]);
     const [diamondsCollectedThisSequence, setDiamondsCollectedThisSequence] = useState(0);
     
@@ -805,20 +805,23 @@ function AdventurePage() {
       setDiamondsCollectedThisSequence(prev => prev + 1);
       
       // Store bonus info for the celebration modal
+      const totalDiamonds = diamondPositions.length;
       if (isInCommandSequence) {
         setDiamondBonusInfo({
           coins: coinsEarned + bonusCoins,
           xp: xpEarned + bonusXP,
           points: pointsEarned + bonusPoints,
           isBonus: true,
-          commandCount: commandSequence.length
+          commandCount: commandSequence.length,
+          totalDiamonds: totalDiamonds
         });
       } else {
         setDiamondBonusInfo({
           coins: coinsEarned,
           xp: xpEarned,
           points: pointsEarned,
-          isBonus: false
+          isBonus: false,
+          totalDiamonds: totalDiamonds
         });
       }
       
@@ -1206,7 +1209,7 @@ function AdventurePage() {
                     </>
                   )}
                   <p style={{ fontSize: '0.9rem', color: '#7f8c8d', marginTop: '10px' }}>
-                    Diamonds collected: {diamonds + 1}/{diamondPositions.length}
+                    Diamonds collected: {diamonds + 1}/{diamondBonusInfo?.totalDiamonds || diamondPositions.length}
                   </p>
                 </div>
               </div>
