@@ -671,6 +671,20 @@ export default function WebDevGamePage() {
   const checkRequirements = (): boolean => {
     const req = level.requirements;
     const combinedCode = htmlCode + cssCode;
+    
+    // Extract CSS from HTML style tags for validation
+    const styleTagMatch = htmlCode.match(/<style[\s\S]*?>([\s\S]*?)<\/style>/gi);
+    let cssFromHtml = '';
+    if (styleTagMatch) {
+      styleTagMatch.forEach(match => {
+        const contentMatch = match.match(/<style[\s\S]*?>([\s\S]*?)<\/style>/i);
+        if (contentMatch && contentMatch[1]) {
+          cssFromHtml += contentMatch[1] + '\n';
+        }
+      });
+    }
+    // Combine CSS from editor and from HTML style tags
+    const allCss = (cssCode + '\n' + cssFromHtml).toLowerCase();
 
     // Check HTML requirements
     if (req.html) {
@@ -681,10 +695,14 @@ export default function WebDevGamePage() {
       }
     }
 
-    // Check CSS requirements
+    // Check CSS requirements - check both CSS editor and CSS in HTML style tags
     if (req.css) {
       for (const prop of req.css) {
-        if (!cssCode.toLowerCase().includes(prop.toLowerCase())) {
+        const propLower = prop.toLowerCase();
+        // Check for the property name (with or without colon, with or without value)
+        // This handles "background-color", "background-color:", "background-color: magenta", etc.
+        const propPattern = new RegExp(propLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*[:{]', 'i');
+        if (!allCss.match(propPattern)) {
           return false;
         }
       }
