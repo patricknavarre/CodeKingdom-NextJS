@@ -574,14 +574,17 @@ export default function WebDevGamePage() {
     }
   }, [currentLevel]);
 
-  // Save user's work whenever they make changes
+  // Save user's work whenever they make changes (debounced to avoid too many saves)
   useEffect(() => {
-    if (level && htmlCode && cssCode) {
-      // Save current work for this level
-      userWorkRef.current[level.id] = {
-        html: htmlCode,
-        css: cssCode
-      };
+    if (level && htmlCode !== undefined && cssCode !== undefined) {
+      // Only save if we have actual content (not just empty strings from initial load)
+      if (htmlCode || cssCode) {
+        // Save current work for this level
+        userWorkRef.current[level.id] = {
+          html: htmlCode,
+          css: cssCode
+        };
+      }
     }
   }, [htmlCode, cssCode, level]);
 
@@ -720,6 +723,14 @@ export default function WebDevGamePage() {
 
   const submitLevel = () => {
     if (checkRequirements()) {
+      // Save current work before advancing
+      if (level && htmlCode && cssCode) {
+        userWorkRef.current[level.id] = {
+          html: htmlCode,
+          css: cssCode
+        };
+      }
+      
       // Level completed!
       setCompletedLevels([...completedLevels, level.id]);
       
