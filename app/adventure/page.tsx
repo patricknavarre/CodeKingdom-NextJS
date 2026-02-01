@@ -122,6 +122,7 @@ function AdventurePage() {
     const [showDiamondCelebration, setShowDiamondCelebration] = useState(false);
     const [diamondBonusInfo, setDiamondBonusInfo] = useState<{ coins: number; xp: number; points: number; isBonus: boolean; commandCount?: number; totalDiamonds: number } | null>(null);
     const [commandSequence, setCommandSequence] = useState<string[]>([]);
+    const commandSequenceRef = useRef<string[]>([]); // Use ref for synchronous access
     const [diamondsCollectedThisSequence, setDiamondsCollectedThisSequence] = useState(0);
     
     // Block system state
@@ -764,7 +765,8 @@ function AdventurePage() {
       setDiamonds(newDiamondCount);
       
       // Check if this diamond was collected as part of a command sequence
-      const isInCommandSequence = commandSequence.length > 0;
+      // Use ref for synchronous access since state updates are async
+      const isInCommandSequence = commandSequenceRef.current.length > 0;
       let bonusCoins = 0;
       let bonusXP = 0;
       let bonusPoints = 0;
@@ -783,7 +785,7 @@ function AdventurePage() {
         bonusPoints = 30; // Extra points for efficiency
         
         // Additional bonus if using multiple commands
-        const commandCount = commandSequence.length;
+        const commandCount = commandSequenceRef.current.length;
         if (commandCount >= 3) {
           // Extra bonus for using 3+ commands efficiently
           bonusCoins += 5;
@@ -812,7 +814,7 @@ function AdventurePage() {
           xp: xpEarned + bonusXP,
           points: pointsEarned + bonusPoints,
           isBonus: true,
-          commandCount: commandSequence.length,
+          commandCount: commandSequenceRef.current.length,
           totalDiamonds: totalDiamonds
         });
       } else {
@@ -1114,6 +1116,7 @@ function AdventurePage() {
       
       // Track this command sequence for efficiency bonuses
       setCommandSequence(commands);
+      commandSequenceRef.current = commands; // Update ref synchronously
       setDiamondsCollectedThisSequence(0);
       
       // Execute commands sequentially with delays
@@ -1128,6 +1131,7 @@ function AdventurePage() {
       // Clear command sequence after execution (with small delay to allow diamond collection)
       setTimeout(() => {
         setCommandSequence([]);
+        commandSequenceRef.current = []; // Clear ref as well
         setDiamondsCollectedThisSequence(0);
       }, 500);
     };
