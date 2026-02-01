@@ -214,6 +214,16 @@ const shopItems: ShopItem[] = [
     rarity: 'uncommon',
     category: 'accessories'
   },
+  {
+    id: 'peach-schmapple',
+    name: 'Peach Schmapple',
+    type: 'tool',
+    image: peachSchmapple,
+    description: 'A refreshing peach schmapple drink to keep you energized while coding!',
+    price: 200,
+    rarity: 'uncommon',
+    category: 'accessories'
+  },
   // Background items
   {
     id: 'bg-sky-blue',
