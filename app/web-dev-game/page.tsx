@@ -1191,12 +1191,75 @@ export default function WebDevGamePage() {
                         <li><strong>Remember:</strong> Always include <code>https://</code> at the start of website URLs!</li>
                       </ul>
                     )}
-                    {level.id > 7 && (
+                    {level.id === 8 && (
                       <ul style={{ marginLeft: '20px', lineHeight: '1.6' }}>
-                        <li>Read the challenge carefully</li>
-                        <li>Check the requirements box to see what HTML tags or CSS properties you need</li>
-                        <li>Look at the example code in the template for guidance</li>
-                        <li>The Live Preview updates automatically - use it to see your changes!</li>
+                        <li>Add CSS properties to the <code>h1</code> selector in your <code>&lt;style&gt;</code> tag</li>
+                        <li>Use <code>border</code> to add a border around your heading</li>
+                        <li>Example border: <code>border: 2px solid black;</code> (thickness, style, color)</li>
+                        <li>Use <code>padding</code> to add space inside the border</li>
+                        <li>Example padding: <code>padding: 10px;</code> (adds space on all sides)</li>
+                        <li>You can combine them: <code>h1 &#123; border: 2px solid blue; padding: 15px; &#125;</code></li>
+                      </ul>
+                    )}
+                    {level.id === 9 && (
+                      <ul style={{ marginLeft: '20px', lineHeight: '1.6' }}>
+                        <li>Create a <code>&lt;div&gt;</code> element in your HTML</li>
+                        <li>Add a <code>class</code> attribute to the div, like <code>class="my-box"</code></li>
+                        <li>In CSS, use a dot (.) followed by the class name to style it</li>
+                        <li>Example: <code>&lt;div class="my-box"&gt;Content here&lt;/div&gt;</code></li>
+                        <li>Then style it: <code>.my-box &#123; background-color: yellow; padding: 20px; &#125;</code></li>
+                        <li>The dot (.) in CSS means you're selecting by class name</li>
+                      </ul>
+                    )}
+                    {level.id === 10 && (
+                      <ul style={{ marginLeft: '20px', lineHeight: '1.6' }}>
+                        <li>This level combines everything you've learned!</li>
+                        <li>Add: a heading (<code>&lt;h1&gt;</code>), paragraph (<code>&lt;p&gt;</code>), list (<code>&lt;ul&gt;</code> with <code>&lt;li&gt;</code>), link (<code>&lt;a&gt;</code>), and a styled div (<code>&lt;div&gt;</code> with a class)</li>
+                        <li>You can style any of these elements with CSS</li>
+                        <li>Build it step by step - add one element, check the preview, then add the next</li>
+                        <li>Remember: links need <code>href</code>, divs can have classes, and lists need list items!</li>
+                      </ul>
+                    )}
+                    {level.id === 11 && (
+                      <ul style={{ marginLeft: '20px', lineHeight: '1.6' }}>
+                        <li>Use the <code>&lt;nav&gt;</code> tag to create a navigation section</li>
+                        <li>Put multiple <code>&lt;a&gt;</code> links inside the nav</li>
+                        <li>To make them appear in a row, use <code>display: flex;</code> on the nav element</li>
+                        <li>Use <code>justify-content</code> to space them out (try <code>space-around</code> or <code>space-between</code>)</li>
+                        <li>Example CSS: <code>nav &#123; display: flex; justify-content: space-around; &#125;</code></li>
+                        <li>Flexbox makes elements arrange horizontally (in a row) instead of stacking vertically</li>
+                      </ul>
+                    )}
+                    {level.id === 12 && (
+                      <ul style={{ marginLeft: '20px', lineHeight: '1.6' }}>
+                        <li>Create a container <code>&lt;div&gt;</code> with a class (like <code>class="layout"</code>)</li>
+                        <li>Inside it, add two more divs: one for main content, one for sidebar</li>
+                        <li>Give them classes too (like <code>class="main"</code> and <code>class="sidebar"</code>)</li>
+                        <li>Use <code>display: flex;</code> on the layout container to make them sit side by side</li>
+                        <li>You can make the sidebar narrower with <code>width</code> or <code>flex</code> properties</li>
+                        <li>Example: <code>.layout &#123; display: flex; &#125; .sidebar &#123; width: 200px; &#125;</code></li>
+                      </ul>
+                    )}
+                    {level.id === 13 && (
+                      <ul style={{ marginLeft: '20px', lineHeight: '1.6' }}>
+                        <li>Create a <code>&lt;section&gt;</code> or <code>&lt;div&gt;</code> with a class like <code>class="hero"</code></li>
+                        <li>Add an <code>&lt;h1&gt;</code>, <code>&lt;p&gt;</code>, and <code>&lt;button&gt;</code> inside it</li>
+                        <li>Use <code>background-image</code> in CSS to add a background (you can use a URL or gradient)</li>
+                        <li>Add <code>padding</code> to give the hero section breathing room</li>
+                        <li>Use <code>text-align: center;</code> to center the text</li>
+                        <li>Example: <code>.hero &#123; background-image: url('https://example.com/image.jpg'); padding: 50px; text-align: center; &#125;</code></li>
+                        <li>Make it big and impressive - hero sections are usually the first thing visitors see!</li>
+                      </ul>
+                    )}
+                    {level.id === 14 && (
+                      <ul style={{ marginLeft: '20px', lineHeight: '1.6' }}>
+                        <li>Create a container <code>&lt;div&gt;</code> with a class like <code>class="gallery"</code></li>
+                        <li>Add at least 3 <code>&lt;img&gt;</code> tags inside the gallery div</li>
+                        <li>Use <code>display: flex;</code> on the gallery to make images appear in a row</li>
+                        <li>Add <code>gap: 10px;</code> (or more) to add space between images</li>
+                        <li>You can control image size with <code>width</code> or <code>height</code> on the <code>img</code> selector</li>
+                        <li>Example: <code>.gallery &#123; display: flex; gap: 15px; &#125; .gallery img &#123; width: 200px; &#125;</code></li>
+                        <li>Flexbox automatically arranges items in a row and wraps to the next line if needed!</li>
                       </ul>
                     )}
                   </div>
