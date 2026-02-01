@@ -484,6 +484,8 @@ export default function WebDevGamePage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(true); // Start expanded by default
   const previewRef = useRef<HTMLIFrameElement>(null);
+  // Store user's work across levels
+  const userWorkRef = useRef<{ [levelId: number]: { html: string; css: string } }>({});
 
   const level = levels[currentLevel];
 
@@ -555,14 +557,33 @@ export default function WebDevGamePage() {
     }
   }, [currentLevel]);
 
-  // Initialize code when level changes
+  // Initialize code when level changes - preserve user work
   useEffect(() => {
     if (level) {
-      setHtmlCode(level.htmlTemplate);
-      setCssCode(level.cssTemplate);
+      // Check if user has previous work for this level
+      if (userWorkRef.current[level.id]) {
+        // Restore user's previous work for this level
+        setHtmlCode(userWorkRef.current[level.id].html);
+        setCssCode(userWorkRef.current[level.id].css);
+      } else {
+        // First time on this level - use template
+        setHtmlCode(level.htmlTemplate);
+        setCssCode(level.cssTemplate);
+      }
       setShowSuccess(false);
     }
   }, [currentLevel]);
+
+  // Save user's work whenever they make changes
+  useEffect(() => {
+    if (level && htmlCode && cssCode) {
+      // Save current work for this level
+      userWorkRef.current[level.id] = {
+        html: htmlCode,
+        css: cssCode
+      };
+    }
+  }, [htmlCode, cssCode, level]);
 
   // Helper to combine HTML and CSS into a full document string
   const buildFullHtml = () => {
