@@ -1234,9 +1234,9 @@ function AdventurePage() {
             )}
             
             
-            <div className="game-container" style={{ flex: 1, display: 'flex', flexDirection: 'row', gap: '20px', overflow: 'hidden', minHeight: 0, width: '100%', maxWidth: 'none', justifyContent: 'center', padding: '0 40px' }}>
+            <div className="game-container" style={{ flex: 1, display: 'flex', flexDirection: 'row', gap: '20px', overflow: 'hidden', minHeight: 0, width: '100%', maxWidth: 'none', padding: '0 20px' }}>
               {/* Left Column - Instructions and Game Grid */}
-              <div style={{ flex: '0 1 600px', display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'hidden', minHeight: 0, minWidth: 0 }}>
+              <div style={{ flex: '0 0 500px', display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'hidden', minHeight: 0, minWidth: 0 }}>
                 {/* Instructions Panel - Collapsible */}
                 <div className="instructions-panel" style={{ 
                   padding: '15px 20px',
@@ -1378,7 +1378,7 @@ function AdventurePage() {
               </div>
               
               {/* Right Column - Commands, Character, Status, Log */}
-              <div style={{ flex: '0 1 600px', display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'auto', minHeight: 0, minWidth: 0 }}>
+              <div style={{ flex: '1 1 auto', display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'auto', minHeight: 0, minWidth: 0 }}>
                 {/* Commands Panel */}
                 <div className="command-panel" style={{
                   backgroundColor: 'white',
@@ -1586,14 +1586,15 @@ function AdventurePage() {
                     }}
                     style={{
                       position: 'relative',
-                      minHeight: '200px',
-                      padding: '20px',
+                      minHeight: '300px',
+                      padding: '30px',
                       backgroundColor: '#f8f9fa',
                       borderRadius: '6px',
                       border: '2px dashed #bdc3c7',
                       marginBottom: '12px',
                       touchAction: 'none',
-                      overflow: 'visible'
+                      overflow: 'visible',
+                      width: '100%'
                     }}
                   >
                     {connectedBlocks.length === 0 ? (
