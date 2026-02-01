@@ -248,10 +248,10 @@
   padding: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-left: 4px solid #3498db;
-  flex-shrink: 0;
+  flex-shrink: 1;
   overflow: visible;
-  width: 400px;
-  min-width: 400px;
+  width: 100%;
+  min-width: 0;
 }
 
 .command-panel h3 {
