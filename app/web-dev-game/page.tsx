@@ -1070,7 +1070,7 @@ export default function WebDevGamePage() {
               <strong>Requirements:</strong>
               <ul>
                 {level.requirements.html && (
-                  <li>HTML: Use {level.requirements.html.join(', ')}</li>
+                  <li>HTML: Use {level.requirements.html.map(tag => `<${tag}>`).join(', ')}</li>
                 )}
                 {level.requirements.css && (
                   <li>CSS: Use {level.requirements.css.join(', ')}</li>
