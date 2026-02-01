@@ -120,6 +120,7 @@ function AdventurePage() {
     const directionRef = useRef(initialConfig.startDirection);
     const [showReward, setShowReward] = useState(false);
     const [showDiamondCelebration, setShowDiamondCelebration] = useState(false);
+    const [diamondBonusInfo, setDiamondBonusInfo] = useState<{ coins: number; xp: number; points: number; isBonus: boolean; commandCount?: number } | null>(null);
     const [commandSequence, setCommandSequence] = useState<string[]>([]);
     const [diamondsCollectedThisSequence, setDiamondsCollectedThisSequence] = useState(0);
     
@@ -761,31 +762,70 @@ function AdventurePage() {
       setCollectedDiamonds(newCollectedDiamonds);
       const newDiamondCount = diamonds + 1;
       setDiamonds(newDiamondCount);
-      addToLog('You found a diamond! 💎');
       
-      // Calculate points based on efficiency
-      // Base points for collecting a diamond
+      // Check if this diamond was collected as part of a command sequence
+      const isInCommandSequence = commandSequence.length > 0;
+      let bonusCoins = 0;
+      let bonusXP = 0;
+      let bonusPoints = 0;
+      let bonusMessage = '';
+      
+      // Base rewards
+      let coinsEarned = 10;
+      let xpEarned = 15;
       let pointsEarned = 25;
       
       // Bonus for collecting diamond in one command sequence (efficiency bonus)
-      if (commandSequence.length > 0 && diamondsCollectedThisSequence === 0) {
-        // If this is the first diamond in this command sequence, give efficiency bonus
+      if (isInCommandSequence) {
+        // Give bonus for collecting as part of a command sequence
+        bonusCoins = 15; // Extra coins for efficiency
+        bonusXP = 10; // Extra XP for efficiency
+        bonusPoints = 30; // Extra points for efficiency
+        
+        // Additional bonus if using multiple commands
         const commandCount = commandSequence.length;
-        if (commandCount >= 2) {
-          // Bonus points for using multiple commands efficiently
-          const efficiencyBonus = Math.min(commandCount * 10, 50); // Max 50 bonus points
-          pointsEarned += efficiencyBonus;
-          addToLog(`⚡ Efficiency Bonus: +${efficiencyBonus} points for using ${commandCount} commands!`);
+        if (commandCount >= 3) {
+          // Extra bonus for using 3+ commands efficiently
+          bonusCoins += 5;
+          bonusXP += 5;
+          bonusPoints += 20;
+          bonusMessage = `🎯 Command Sequence Bonus! +${bonusCoins} coins, +${bonusXP} XP, +${bonusPoints} points for collecting with ${commandCount} commands!`;
+        } else {
+          bonusMessage = `⚡ Efficiency Bonus! +${bonusCoins} coins, +${bonusXP} XP, +${bonusPoints} points for collecting in a command sequence!`;
         }
+        
+        addToLog('You found a diamond! 💎');
+        addToLog(bonusMessage);
+      } else {
+        // Regular collection (not in a command sequence)
+        addToLog('You found a diamond! 💎');
       }
       
       // Track diamonds collected in this sequence
       setDiamondsCollectedThisSequence(prev => prev + 1);
       
-      // Add coins, experience, and points to character
-      addCoins(10);
-      addExperience(15);
-      addPoints(pointsEarned);
+      // Store bonus info for the celebration modal
+      if (isInCommandSequence) {
+        setDiamondBonusInfo({
+          coins: coinsEarned + bonusCoins,
+          xp: xpEarned + bonusXP,
+          points: pointsEarned + bonusPoints,
+          isBonus: true,
+          commandCount: commandSequence.length
+        });
+      } else {
+        setDiamondBonusInfo({
+          coins: coinsEarned,
+          xp: xpEarned,
+          points: pointsEarned,
+          isBonus: false
+        });
+      }
+      
+      // Add coins, experience, and points to character (base + bonus)
+      addCoins(coinsEarned + bonusCoins);
+      addExperience(xpEarned + bonusXP);
+      addPoints(pointsEarned + bonusPoints);
       
       // Show celebration modal
       setShowDiamondCelebration(true);
@@ -1142,11 +1182,31 @@ function AdventurePage() {
                   <div style={{ fontSize: '80px', marginBottom: '20px' }}>💎</div>
                   <h2 style={{ color: '#3498db', marginTop: '0', fontSize: '2rem' }}>Diamond Collected!</h2>
                   <p style={{ fontSize: '1.2rem', color: '#666' }}>Awesome work! You found a diamond!</p>
-                  <p style={{ fontSize: '1rem', color: '#27ae60', fontWeight: 'bold' }}>
-                    +10 Coins | +15 XP | +25 Points
-                  </p>
+                  {diamondBonusInfo && (
+                    <>
+                      {diamondBonusInfo.isBonus ? (
+                        <>
+                          <p style={{ fontSize: '1rem', color: '#f39c12', fontWeight: 'bold', marginTop: '10px' }}>
+                            ⚡ Command Sequence Bonus! ⚡
+                          </p>
+                          <p style={{ fontSize: '1rem', color: '#27ae60', fontWeight: 'bold' }}>
+                            +{diamondBonusInfo.coins} Coins | +{diamondBonusInfo.xp} XP | +{diamondBonusInfo.points} Points
+                          </p>
+                          {diamondBonusInfo.commandCount && diamondBonusInfo.commandCount >= 3 && (
+                            <p style={{ fontSize: '0.9rem', color: '#9b59b6', fontStyle: 'italic', marginTop: '5px' }}>
+                              Extra bonus for using {diamondBonusInfo.commandCount} commands!
+                            </p>
+                          )}
+                        </>
+                      ) : (
+                        <p style={{ fontSize: '1rem', color: '#27ae60', fontWeight: 'bold' }}>
+                          +{diamondBonusInfo.coins} Coins | +{diamondBonusInfo.xp} XP | +{diamondBonusInfo.points} Points
+                        </p>
+                      )}
+                    </>
+                  )}
                   <p style={{ fontSize: '0.9rem', color: '#7f8c8d', marginTop: '10px' }}>
-                    Diamonds collected: {diamonds}/3
+                    Diamonds collected: {diamonds + 1}/{diamondPositions.length}
                   </p>
                 </div>
               </div>
