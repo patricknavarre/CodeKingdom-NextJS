@@ -1101,7 +1101,7 @@ function AdventurePage() {
       <ProtectedRoute>
         <div style={{ width: '100%', height: '100vh', margin: 0, padding: 0, ...backgroundStyle }}>
           <Navigation />
-          <div className="adventure-game" style={{ height: '100vh', background: 'transparent' }}>
+          <div className="adventure-game" style={{ height: 'calc(100vh - 60px)', background: 'transparent' }}>
             <div style={{ marginBottom: '8px', flexShrink: 0 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
                 <div>
@@ -1234,9 +1234,9 @@ function AdventurePage() {
             )}
             
             
-            <div className="game-container" style={{ flex: 1, display: 'flex', flexDirection: 'row', gap: '20px', overflow: 'hidden', minHeight: 0, width: '100%', maxWidth: 'none', padding: '0 20px' }}>
+            <div className="game-container" style={{ flex: 1, display: 'flex', flexDirection: 'row', gap: '20px', overflow: 'hidden', minHeight: 0, width: '100%', maxWidth: '100%', flexShrink: 1 }}>
               {/* Left Column - Instructions and Game Grid */}
-              <div style={{ flex: '0 0 500px', display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'hidden', minHeight: 0, minWidth: 0 }}>
+              <div style={{ flex: '0 0 45%', display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'hidden', minHeight: 0, minWidth: 0 }}>
                 {/* Instructions Panel - Collapsible */}
                 <div className="instructions-panel" style={{ 
                   padding: '15px 20px',
@@ -1378,7 +1378,7 @@ function AdventurePage() {
               </div>
               
               {/* Right Column - Commands, Character, Status, Log */}
-              <div style={{ flex: '1 1 auto', display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'auto', minHeight: 0, minWidth: 0 }}>
+              <div style={{ flex: '1 1 55%', display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'auto', minHeight: 0, minWidth: 0 }}>
                 {/* Commands Panel */}
                 <div className="command-panel" style={{
                   backgroundColor: 'white',

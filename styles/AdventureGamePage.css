@@ -1,7 +1,7 @@
 .adventure-game {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: calc(100vh - 60px); /* Account for Navigation height */
   padding: 20px;
   font-family: 'Montserrat', sans-serif;
   background-color: transparent;
@@ -9,6 +9,7 @@
   overflow: hidden;
   box-sizing: border-box;
   width: 100%;
+  max-width: 100%;
   position: relative; /* For absolute positioning of character */
 }
 
