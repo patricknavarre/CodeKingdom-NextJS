@@ -478,7 +478,8 @@ const levels: Level[] = [
 
 export default function WebDevGamePage() {
   const { character, addExperience, addCoins, addPoints } = useCharacter();
-  const { user } = useAuth();
+  const { authState } = useAuth();
+  const user = authState.user;
   const [currentLevel, setCurrentLevel] = useState(0);
   const [htmlCode, setHtmlCode] = useState('');
   const [cssCode, setCssCode] = useState('');
@@ -491,7 +492,7 @@ export default function WebDevGamePage() {
   
   // Get user-specific storage key
   const getStorageKey = (key: string) => {
-    const userId = user?.email || user?._id || 'anonymous';
+    const userId = user?.email || (user as any)?._id || 'anonymous';
     return `${key}-${userId}`;
   };
 
