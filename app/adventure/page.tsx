@@ -839,7 +839,6 @@ function AdventurePage() {
       }, 2000);
       
       // If all diamonds are collected, prompt player to reach the flag instead of auto-completing
-      const totalDiamonds = diamondPositions.length;
       if (newDiamondCount === totalDiamonds) {
         addToLog(`Great job! You collected all ${totalDiamonds} diamonds. Now move to the finish flag (🏁) to complete the level.`);
       }
