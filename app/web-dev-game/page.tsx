@@ -594,9 +594,17 @@ export default function WebDevGamePage() {
         setHtmlCode(userWorkRef.current[level.id].html);
         setCssCode(userWorkRef.current[level.id].css);
       } else {
-        // First time on this level - use template
-        setHtmlCode(level.htmlTemplate);
-        setCssCode(level.cssTemplate);
+        // First time on this level - check if we have work from previous level
+        const previousLevelId = level.id - 1;
+        if (previousLevelId > 0 && userWorkRef.current[previousLevelId]) {
+          // Start with previous level's work instead of template
+          setHtmlCode(userWorkRef.current[previousLevelId].html);
+          setCssCode(userWorkRef.current[previousLevelId].css);
+        } else {
+          // No previous work - use template
+          setHtmlCode(level.htmlTemplate);
+          setCssCode(level.cssTemplate);
+        }
       }
       setShowSuccess(false);
     }
