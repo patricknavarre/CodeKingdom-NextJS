@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useCharacter } from '@/contexts/CharacterContext';
+import { useAuth } from '@/contexts/AuthContext';
 import Navigation from '@/components/Navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import '@/styles/WebDevGamePage.css';
@@ -477,6 +478,7 @@ const levels: Level[] = [
 
 export default function WebDevGamePage() {
   const { character, addExperience, addCoins, addPoints } = useCharacter();
+  const { user } = useAuth();
   const [currentLevel, setCurrentLevel] = useState(0);
   const [htmlCode, setHtmlCode] = useState('');
   const [cssCode, setCssCode] = useState('');
@@ -486,6 +488,12 @@ export default function WebDevGamePage() {
   const previewRef = useRef<HTMLIFrameElement>(null);
   // Store user's work across levels
   const userWorkRef = useRef<{ [levelId: number]: { html: string; css: string } }>({});
+  
+  // Get user-specific storage key
+  const getStorageKey = (key: string) => {
+    const userId = user?.email || user?._id || 'anonymous';
+    return `${key}-${userId}`;
+  };
 
   const level = levels[currentLevel];
 
@@ -532,11 +540,12 @@ export default function WebDevGamePage() {
   // 'html' = show only HTML editor bigger, 'css' = show only CSS editor bigger, null = show both
   const [expandedEditor, setExpandedEditor] = useState<'html' | 'css' | null>(null);
 
-  // Persist current level so players resume the Web Dev Game where they left off
+  // Persist current level so players resume the Web Dev Game where they left off (user-specific)
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !user) return;
     try {
-      const savedLevel = window.localStorage.getItem('webdev-current-level');
+      const storageKey = getStorageKey('webdev-current-level');
+      const savedLevel = window.localStorage.getItem(storageKey);
       if (savedLevel !== null) {
         const parsed = parseInt(savedLevel, 10);
         if (!isNaN(parsed) && parsed >= 0 && parsed < levels.length) {
@@ -546,16 +555,34 @@ export default function WebDevGamePage() {
     } catch (e) {
       console.warn('Unable to load saved Web Dev Game level:', e);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !user) return;
     try {
-      window.localStorage.setItem('webdev-current-level', String(currentLevel));
+      const storageKey = getStorageKey('webdev-current-level');
+      window.localStorage.setItem(storageKey, String(currentLevel));
     } catch (e) {
       console.warn('Unable to save Web Dev Game level:', e);
     }
-  }, [currentLevel]);
+  }, [currentLevel, user]);
+
+  // Load user's work from localStorage when user changes
+  useEffect(() => {
+    if (typeof window === 'undefined' || !user) return;
+    try {
+      const storageKey = getStorageKey('webdev-user-work');
+      const savedWork = window.localStorage.getItem(storageKey);
+      if (savedWork) {
+        userWorkRef.current = JSON.parse(savedWork);
+      } else {
+        userWorkRef.current = {};
+      }
+    } catch (e) {
+      console.warn('Unable to load saved user work:', e);
+      userWorkRef.current = {};
+    }
+  }, [user]);
 
   // Initialize code when level changes - preserve user work
   useEffect(() => {
@@ -576,7 +603,7 @@ export default function WebDevGamePage() {
 
   // Save user's work whenever they make changes (debounced to avoid too many saves)
   useEffect(() => {
-    if (level && htmlCode !== undefined && cssCode !== undefined) {
+    if (level && htmlCode !== undefined && cssCode !== undefined && user) {
       // Only save if we have actual content (not just empty strings from initial load)
       if (htmlCode || cssCode) {
         // Save current work for this level
@@ -584,9 +611,16 @@ export default function WebDevGamePage() {
           html: htmlCode,
           css: cssCode
         };
+        // Persist to localStorage
+        try {
+          const storageKey = getStorageKey('webdev-user-work');
+          window.localStorage.setItem(storageKey, JSON.stringify(userWorkRef.current));
+        } catch (e) {
+          console.warn('Unable to save user work:', e);
+        }
       }
     }
-  }, [htmlCode, cssCode, level]);
+  }, [htmlCode, cssCode, level, user]);
 
   // Helper to combine HTML and CSS into a full document string
   const buildFullHtml = () => {
@@ -724,11 +758,18 @@ export default function WebDevGamePage() {
   const submitLevel = () => {
     if (checkRequirements()) {
       // Save current work before advancing
-      if (level && htmlCode && cssCode) {
+      if (level && htmlCode && cssCode && user) {
         userWorkRef.current[level.id] = {
           html: htmlCode,
           css: cssCode
         };
+        // Persist to localStorage
+        try {
+          const storageKey = getStorageKey('webdev-user-work');
+          window.localStorage.setItem(storageKey, JSON.stringify(userWorkRef.current));
+        } catch (e) {
+          console.warn('Unable to save user work:', e);
+        }
       }
       
       // Level completed!
