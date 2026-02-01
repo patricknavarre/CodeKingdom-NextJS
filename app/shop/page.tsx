@@ -203,6 +203,16 @@ const shopItems: ShopItem[] = [
     rarity: 'rare',
     category: 'accessories'
   },
+  {
+    id: 'bag-of-chips',
+    name: 'Bag of Chips',
+    type: 'tool',
+    image: bagOfChips,
+    description: 'A delicious bag of chips to snack on while you code!',
+    price: 250,
+    rarity: 'uncommon',
+    category: 'accessories'
+  },
   // Background items
   {
     id: 'bg-sky-blue',
