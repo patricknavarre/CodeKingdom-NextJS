@@ -25,6 +25,9 @@ const stanleyBlue = '/images/items/Accessory_Stanley_Blue.png';
 const owallaPink = '/images/items/Accessory_Owalla_Pink.png';
 const bagOfChips = '/images/items/Accessory_BagOfChips.png';
 const peachSchmapple = '/images/items/Accessory_PeachSchmapple.png';
+const vdayLollipop = '/images/items/Accessory_VDay_Lollipop.png';
+const slimePet = '/images/items/Pet_Slime.png';
+const bobaTea = '/images/items/Accessory_BobaTea.png';
 
 interface ShopItem {
   id: string;
@@ -80,6 +83,16 @@ const shopItems: ShopItem[] = [
     image: frogPet,
     description: 'A friendly frog companion to hop along with you on your coding journey!',
     price: 120,
+    rarity: 'rare',
+    category: 'pets'
+  },
+  {
+    id: 'slime-pet',
+    name: 'Slime Pet',
+    type: 'pet',
+    image: slimePet,
+    description: 'A squishy, bouncy slime companion that loves to help with your coding adventures!',
+    price: 150,
     rarity: 'rare',
     category: 'pets'
   },
@@ -221,6 +234,26 @@ const shopItems: ShopItem[] = [
     image: peachSchmapple,
     description: 'A refreshing peach schmapple drink to keep you energized while coding!',
     price: 200,
+    rarity: 'uncommon',
+    category: 'accessories'
+  },
+  {
+    id: 'vday-lollipop',
+    name: 'Valentine\'s Day Lollipop',
+    type: 'tool',
+    image: vdayLollipop,
+    description: 'A sweet Valentine\'s Day lollipop to enjoy while you code!',
+    price: 200,
+    rarity: 'uncommon',
+    category: 'accessories'
+  },
+  {
+    id: 'boba-tea',
+    name: 'Boba Tea',
+    type: 'tool',
+    image: bobaTea,
+    description: 'A delicious boba tea with chewy tapioca pearls - perfect for coding breaks!',
+    price: 250,
     rarity: 'uncommon',
     category: 'accessories'
   },
