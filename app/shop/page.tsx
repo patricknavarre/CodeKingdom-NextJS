@@ -28,6 +28,8 @@ const peachSchmapple = '/images/items/Accessory_PeachSchmapple.png';
 const vdayLollipop = '/images/items/Accessory_VDay_Lollipop.png';
 const slimePet = '/images/items/Pet_Slime.png';
 const bobaTea = '/images/items/Accessory_BobaTea.png';
+const pencil = '/images/items/Accessory_Pencil.png';
+const sword = '/images/items/Accessory_Sword.png';
 
 interface ShopItem {
   id: string;
