@@ -259,6 +259,26 @@ const shopItems: ShopItem[] = [
     rarity: 'uncommon',
     category: 'accessories'
   },
+  {
+    id: 'pencil',
+    name: 'Pencil',
+    type: 'tool',
+    image: pencil,
+    description: 'A trusty pencil for sketching out your code ideas and taking notes!',
+    price: 200,
+    rarity: 'common',
+    category: 'accessories'
+  },
+  {
+    id: 'sword',
+    name: 'Sword',
+    type: 'tool',
+    image: sword,
+    description: 'A powerful sword to help you conquer coding challenges and defend your code!',
+    price: 500,
+    rarity: 'epic',
+    category: 'accessories'
+  },
   // Background items
   {
     id: 'bg-sky-blue',
