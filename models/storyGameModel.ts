@@ -29,6 +29,9 @@ export interface IStoryGame extends Document {
   }>;
   totalHintsPurchased: number;
   totalCoinsSpentOnHints: number;
+  isDead?: boolean;
+  deathCount?: number;
+  lastDeathLocation?: string;
   lastActive: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -103,6 +106,17 @@ const storyGameSchema = new Schema<IStoryGame>(
     totalCoinsSpentOnHints: {
       type: Number,
       default: 0,
+    },
+    isDead: {
+      type: Boolean,
+      default: false,
+    },
+    deathCount: {
+      type: Number,
+      default: 0,
+    },
+    lastDeathLocation: {
+      type: String,
     },
     lastActive: {
       type: Date,

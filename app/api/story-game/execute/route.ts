@@ -3,10 +3,20 @@ import connectDB from '@/lib/mongodb';
 import StoryGame from '@/models/storyGameModel';
 import User from '@/models/userModel';
 import { executePython, validatePythonCode } from '@/services/pythonExecutor';
-import { SCENES, DECISION_POINTS } from '@/lib/storyGameConstants';
+import { SCENES, DECISION_POINTS, DANGEROUS_LOCATIONS } from '@/lib/storyGameConstants';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_jwt_secret';
+
+// Helper function to reset player to scene start
+function resetToSceneStart(storyGame: any): { location: string; isDead: boolean } {
+  const scene = SCENES[storyGame.currentScene as keyof typeof SCENES];
+  const firstLocation = scene.locations[0];
+  return {
+    location: firstLocation,
+    isDead: false,
+  };
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -183,9 +193,54 @@ export async function POST(req: NextRequest) {
     } else if (result.action === 'move' && result.location) {
       const scene = SCENES[storyGame.currentScene as keyof typeof SCENES];
       if (scene.locations.includes(result.location)) {
-        updatedLocation = result.location;
-        message = `You moved to ${result.location.replace(/_/g, ' ')}.`;
-        coinsEarned = 5;
+        // Check if this is a dangerous location
+        const dangerousLocation = DANGEROUS_LOCATIONS[result.location];
+        if (dangerousLocation && dangerousLocation.scene === storyGame.currentScene) {
+          // Check if player has required item
+          const hasRequiredItem = storyGame.inventory.some(
+            (item: { name: string }) => item.name === dangerousLocation.requiredItem
+          );
+          
+          if (!hasRequiredItem) {
+            // Player dies - reset to scene start
+            const reset = resetToSceneStart(storyGame);
+            updatedLocation = reset.location;
+            storyGame.isDead = true;
+            storyGame.deathCount = (storyGame.deathCount || 0) + 1;
+            storyGame.lastDeathLocation = result.location;
+            
+            // Return death response
+            storyGame.currentLocation = updatedLocation;
+            storyGame.isDead = false; // Reset death flag after setting location
+            storyGame.lastActive = new Date();
+            await storyGame.save();
+            
+            return Response.json({
+              success: false,
+              action: 'death',
+              message: dangerousLocation.deathMessage,
+              deathMessage: dangerousLocation.deathMessage,
+              resetLocation: updatedLocation,
+              newLocation: updatedLocation,
+              newScene: storyGame.currentScene,
+              newInventory: storyGame.inventory.map((item: { name: string }) => item.name),
+              coinsEarned: 0,
+              experienceEarned: 0,
+              deathCount: storyGame.deathCount,
+            });
+          } else {
+            // Player has required item - safe passage
+            updatedLocation = result.location;
+            message = dangerousLocation.safeMessage;
+            coinsEarned = 10;
+            experienceEarned = 15;
+          }
+        } else {
+          // Normal location - safe to move
+          updatedLocation = result.location;
+          message = `You moved to ${result.location.replace(/_/g, ' ')}.`;
+          coinsEarned = 5;
+        }
       } else {
         message = 'Invalid location!';
         result.success = false;

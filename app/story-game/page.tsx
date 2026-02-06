@@ -138,6 +138,9 @@ export default function StoryGamePage() {
   const [collectedItem, setCollectedItem] = useState<string | null>(null);
   const [showCharacterCollectEffect, setShowCharacterCollectEffect] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(true); // Start expanded by default
+  const [showDeathModal, setShowDeathModal] = useState(false);
+  const [deathMessage, setDeathMessage] = useState('');
+  const [deathCount, setDeathCount] = useState(0);
 
   // Get character image
   const getCharacterImage = () => {
@@ -235,6 +238,27 @@ export default function StoryGamePage() {
       setCharacterPosition(prev => ({ x: prev.x + 20, y: prev.y }));
 
       const response = await storyGameAPI.executeCode(code);
+
+      // Check for death first
+      if (response.data.action === 'death') {
+        setDeathMessage(response.data.deathMessage || '💀 You have died!');
+        setDeathCount(response.data.deathCount || 0);
+        setShowDeathModal(true);
+        // Update progress to show reset location
+        if (response.data.newLocation) {
+          setStoryProgress(prev => prev ? {
+            ...prev,
+            currentLocation: response.data.newLocation,
+          } : null);
+        }
+        // Reload progress after a short delay
+        setTimeout(() => {
+          loadStoryProgress();
+        }, 100);
+        setExecuting(false);
+        setIsWalking(false);
+        return;
+      }
 
       // Update character context
       if (response.data.coinsEarned) {
@@ -1111,6 +1135,33 @@ export default function StoryGamePage() {
                   </div>
                 </div>
                 <p className="next-scene-text">Moving to next scene...</p>
+              </div>
+            </div>
+          )}
+
+          {/* Death Modal */}
+          {showDeathModal && (
+            <div className="death-modal-overlay" onClick={() => {
+              setShowDeathModal(false);
+              loadStoryProgress();
+            }}>
+              <div className="death-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="death-icon">💀</div>
+                <h2>You Have Died!</h2>
+                <p className="death-message">{deathMessage}</p>
+                {deathCount > 0 && (
+                  <p className="death-count">Deaths: {deathCount}</p>
+                )}
+                <p className="death-hint">You've been reset to the start of this scene. Your inventory has been preserved.</p>
+                <button 
+                  className="try-again-button"
+                  onClick={() => {
+                    setShowDeathModal(false);
+                    loadStoryProgress();
+                  }}
+                >
+                  Try Again
+                </button>
               </div>
             </div>
           )}

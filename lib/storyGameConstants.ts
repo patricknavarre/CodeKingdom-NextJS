@@ -1,5 +1,39 @@
 // Story scenes configuration - shared across story game API routes
 // Decision points: locations where players can make choices that affect the story
+
+// Dangerous locations: places where players can die if they don't have required items
+export const DANGEROUS_LOCATIONS: Record<string, {
+  requiredItem: string;
+  deathMessage: string;
+  safeMessage: string;
+  scene: string;
+}> = {
+  dragon_lair: {
+    requiredItem: 'sword',
+    deathMessage: "💀 The dragon's fire engulfs you! You should have brought a sword...",
+    safeMessage: "Your sword protects you! The dragon retreats.",
+    scene: 'castle'
+  },
+  dark_cave: {
+    requiredItem: 'torch',
+    deathMessage: "💀 You stumble in the darkness and fall into a deep pit! You needed a torch to see...",
+    safeMessage: "Your torch lights the way! You safely navigate the dark cave.",
+    scene: 'mountain'
+  },
+  ancient_temple: {
+    requiredItem: 'artifact',
+    deathMessage: "💀 The temple's ancient curse strikes you down! You needed an artifact to protect yourself...",
+    safeMessage: "The artifact protects you from the curse! You enter the temple safely.",
+    scene: 'desert'
+  },
+  deep_trench: {
+    requiredItem: 'pearl',
+    deathMessage: "💀 The crushing pressure of the deep ocean overwhelms you! You needed a pearl's magic to survive...",
+    safeMessage: "The pearl's magic protects you! You dive deep into the trench.",
+    scene: 'ocean'
+  },
+};
+
 export const DECISION_POINTS: Record<string, {
   location: string;
   choices: Array<{
@@ -138,28 +172,29 @@ export const SCENES = {
   },
   castle: {
     name: 'Ancient Castle',
-    locations: ['castle_gate', 'castle_courtyard', 'castle_hall', 'castle_tower'],
+    locations: ['castle_gate', 'castle_courtyard', 'castle_hall', 'castle_tower', 'dragon_lair'],
     items: ['sword', 'shield', 'crown'],
     locationItems: {
       'castle_gate': [],
       'castle_courtyard': ['sword'],
       'castle_hall': ['shield'],
       'castle_tower': ['crown'],
+      'dragon_lair': [],
     },
-    hints: {
+      hints: {
       1: { 
         cost: 10, 
-        text: 'You need to collect items to progress! Use if statements to check what you have.',
+        text: 'You need to collect items to progress! Some locations are dangerous - make sure you have the right equipment. Use if statements to check what you have.',
         example: 'if "sword" in inventory:'
       },
       2: { 
         cost: 20, 
-        text: 'Use collect_item("sword") when you find it, then check your inventory with if statements.',
+        text: 'Use collect_item("sword") when you find it, then check your inventory with if statements before entering dangerous areas.',
         example: 'if "sword" in inventory:\n    move_to("castle_hall")'
       },
       3: { 
         cost: 30, 
-        text: 'Collect the sword first, then use if/else to check your inventory before moving forward.',
+        text: 'Collect the sword first, then use if/else to check your inventory before moving forward. Some locations require specific items to survive!',
         example: 'if "sword" in inventory:\n    move_to("castle_hall")\nelse:\n    collect_item("sword")'
       },
     },
@@ -194,85 +229,88 @@ export const SCENES = {
   },
   ocean: {
     name: 'Mystical Ocean',
-    locations: ['beach_shore', 'tide_pool', 'cave_entrance', 'treasure_cove'],
+    locations: ['beach_shore', 'tide_pool', 'cave_entrance', 'treasure_cove', 'deep_trench'],
     items: ['shell', 'pearl', 'treasure_map'],
     locationItems: {
       'beach_shore': [],
       'tide_pool': ['shell'],
       'cave_entrance': ['pearl'],
       'treasure_cove': ['treasure_map'],
+      'deep_trench': [],
     },
-    hints: {
+      hints: {
       1: { 
         cost: 10, 
-        text: 'Use if statements to check if you have items before accessing treasure!',
+        text: 'Use if statements to check if you have items before accessing treasure! Deep ocean trenches are dangerous without protection!',
         example: 'if "treasure_map" in inventory:'
       },
       2: { 
         cost: 20, 
-        text: 'Collect the treasure map first, then use if to check before entering the treasure cove.',
+        text: 'Collect the treasure map first, then use if to check before entering the treasure cove. The deep trench requires a pearl\'s magic to survive!',
         example: 'if "treasure_map" in inventory:\n    move_to("treasure_cove")\nelse:\n    collect_item("treasure_map")'
       },
       3: { 
         cost: 30, 
-        text: 'You need the treasure map to access the cove. Use if/else to check your inventory and collect items in the right order.',
-        example: 'if "treasure_map" in inventory:\n    move_to("treasure_cove")\n    open_door()\nelse:\n    if "pearl" in inventory:\n        move_to("treasure_cove")\n        collect_item("treasure_map")\n    else:\n        collect_item("pearl")'
+        text: 'You need the treasure map to access the cove. Use if/else to check your inventory and collect items in the right order. Without a pearl, the deep trench will crush you!',
+        example: 'if "pearl" in inventory:\n    move_to("deep_trench")\nelse:\n    if "treasure_map" in inventory:\n        move_to("treasure_cove")\n        open_door()\n    else:\n        collect_item("pearl")'
       },
     },
   },
   mountain: {
     name: 'Mountain Peak',
-    locations: ['mountain_base', 'cliff_path', 'summit', 'cave'],
+    locations: ['mountain_base', 'cliff_path', 'summit', 'cave', 'dark_cave'],
     items: ['rope', 'torch', 'crystal'],
     locationItems: {
       'mountain_base': [],
       'cliff_path': ['rope'],
       'summit': ['torch'],
       'cave': ['crystal'],
+      'dark_cave': [],
     },
-    hints: {
+      hints: {
       1: { 
         cost: 10, 
-        text: 'Use if statements to check if you have the right equipment before climbing!',
+        text: 'Use if statements to check if you have the right equipment before climbing! Some locations are dangerous without proper gear.',
         example: 'if "rope" in inventory:'
       },
       2: { 
         cost: 20, 
-        text: 'You need a rope to safely climb. Use if/else to check your inventory before moving to dangerous locations.',
+        text: 'You need a rope to safely climb. Use if/else to check your inventory before moving to dangerous locations. Dark caves require a torch!',
         example: 'if "rope" in inventory:\n    move_to("cliff_path")\nelse:\n    collect_item("rope")'
       },
       3: { 
         cost: 30, 
-        text: 'Safety first! Use if/else to ensure you have the rope before climbing, and the torch before entering the cave.',
-        example: 'if "rope" in inventory:\n    if "torch" in inventory:\n        move_to("cave")\n    else:\n        move_to("summit")\n        collect_item("torch")\nelse:\n    move_to("cliff_path")\n    collect_item("rope")'
+        text: 'Safety first! Use if/else to ensure you have the rope before climbing, and the torch before entering dark caves. Without a torch, dark caves are deadly!',
+        example: 'if "rope" in inventory:\n    if "torch" in inventory:\n        move_to("dark_cave")\n    else:\n        move_to("summit")\n        collect_item("torch")\nelse:\n    move_to("cliff_path")\n    collect_item("rope")'
       },
     },
   },
   desert: {
     name: 'Ancient Desert',
-    locations: ['oasis', 'sand_dunes', 'ancient_ruins', 'temple'],
+    locations: ['oasis', 'sand_dunes', 'ancient_ruins', 'temple', 'ancient_temple'],
     items: ['water', 'artifact', 'scroll'],
     locationItems: {
       'oasis': [],
       'sand_dunes': ['water'],
       'ancient_ruins': ['artifact'],
       'temple': ['scroll'],
+      'ancient_temple': [],
     },
-    hints: {
+      hints: {
       1: { 
         cost: 10, 
-        text: 'Survival in the desert requires water! Use if statements to check your resources.',
+        text: 'Survival in the desert requires water! Use if statements to check your resources. Some ancient places require protection!',
         example: 'if "water" in inventory:'
       },
       2: { 
         cost: 20, 
-        text: 'Collect water first, then use if/else to manage your resources before exploring dangerous areas.',
+        text: 'Collect water first, then use if/else to manage your resources before exploring dangerous areas. Ancient temples are deadly without an artifact!',
         example: 'if "water" in inventory:\n    move_to("ancient_ruins")\nelse:\n    move_to("sand_dunes")\n    collect_item("water")'
       },
       3: { 
         cost: 30, 
-        text: 'Resource management is key! Use nested if/else to check for water before exploring, and artifacts before entering the temple.',
-        example: 'if "water" in inventory:\n    if "artifact" in inventory:\n        move_to("temple")\n        collect_item("scroll")\n    else:\n        move_to("ancient_ruins")\n        collect_item("artifact")\nelse:\n    move_to("sand_dunes")\n    collect_item("water")'
+        text: 'Resource management is key! Use nested if/else to check for water before exploring, and artifacts before entering ancient temples. Without an artifact, the temple curse will strike!',
+        example: 'if "water" in inventory:\n    if "artifact" in inventory:\n        move_to("ancient_temple")\n    else:\n        move_to("ancient_ruins")\n        collect_item("artifact")\nelse:\n    move_to("sand_dunes")\n    collect_item("water")'
       },
     },
   },
