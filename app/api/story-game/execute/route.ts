@@ -86,17 +86,49 @@ export async function POST(req: NextRequest) {
           coinsEarned = 20;
           experienceEarned = 25;
         } else {
-          // Scene completed - check if there's a decision point here
+          // Scene completed - opening door at last location advances to next scene
+          const unlockedScenes = storyGame.unlockedScenes || [];
           const decisionPoint = DECISION_POINTS[storyGame.currentLocation];
+          
+          // If there's a decision point, try to auto-choose the first available choice
           if (decisionPoint && decisionPoint.choices.length > 0) {
-            // There are choices available - don't auto-advance, let player choose
-            message = 'You\'ve reached a decision point! Use choose_path("choice_id") to make your choice.';
-            coinsEarned = 20;
-            experienceEarned = 25;
-          } else {
-            // No decision point, check unlocked scenes or default progression
-            const unlockedScenes = storyGame.unlockedScenes || [];
+            // Find the first available choice (one that doesn't require an item, or player has the item)
+            const availableChoice = decisionPoint.choices.find(choice => {
+              if (!choice.requiredItem) return true;
+              return storyGame.inventory.some(item => item.name === choice.requiredItem);
+            });
             
+            if (availableChoice) {
+              // Auto-choose the first available path
+              if (availableChoice.nextScene) {
+                storyGame.currentScene = availableChoice.nextScene as any;
+                updatedLocation = availableChoice.nextLocation || (SCENES[availableChoice.nextScene as keyof typeof SCENES]?.locations[0] || storyGame.currentLocation);
+                message = availableChoice.message || `You chose: ${availableChoice.description}`;
+                coinsEarned = 30;
+                experienceEarned = 30;
+                
+                // Unlock scene if specified
+                if (availableChoice.unlocksScene && !storyGame.unlockedScenes.includes(availableChoice.unlocksScene)) {
+                  storyGame.unlockedScenes.push(availableChoice.unlocksScene);
+                }
+              } else if (availableChoice.nextLocation) {
+                updatedLocation = availableChoice.nextLocation;
+                message = availableChoice.message || `You chose: ${availableChoice.description}`;
+                coinsEarned = 15;
+                experienceEarned = 15;
+              } else {
+                message = availableChoice.message || `You chose: ${availableChoice.description}`;
+                coinsEarned = 10;
+                experienceEarned = 10;
+              }
+            } else {
+              // No available choice, fall through to default progression
+              // Continue to default progression logic below
+            }
+          }
+          
+          // If no decision point or no available choice, use default progression
+          if (!decisionPoint || !decisionPoint.choices.find(c => !c.requiredItem || storyGame.inventory.some(item => item.name === c.requiredItem))) {
             // Try to go to an unlocked scene first, otherwise default progression
             if (unlockedScenes.length > 0 && !unlockedScenes.includes(storyGame.currentScene)) {
               // Move to first unlocked scene not yet visited
@@ -113,15 +145,9 @@ export async function POST(req: NextRequest) {
               // Default linear progression (fallback)
               if (storyGame.currentScene === 'forest') {
                 // Forest can branch to castle or town
-                if (unlockedScenes.includes('town')) {
-                  storyGame.currentScene = 'town';
-                  updatedLocation = 'town_gate';
-                  message = 'Forest completed! You head to the town.';
-                } else {
-                  storyGame.currentScene = 'castle';
-                  updatedLocation = 'castle_gate';
-                  message = 'Forest completed! You enter the castle.';
-                }
+                storyGame.currentScene = 'castle';
+                updatedLocation = 'castle_gate';
+                message = 'Forest completed! You enter the castle.';
                 coinsEarned = 50;
                 experienceEarned = 50;
               } else if (storyGame.currentScene === 'castle') {
