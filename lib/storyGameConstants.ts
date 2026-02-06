@@ -47,6 +47,28 @@ export const DECISION_POINTS: Record<string, {
     message?: string; // Custom message when this choice is made
   }>;
 }> = {
+  forest_clearing: {
+    location: 'forest_clearing',
+    choices: [
+      {
+        id: 'explore_deep',
+        description: 'Explore deeper into the forest',
+        nextLocation: 'forest_exit',
+        message: 'You discover a hidden path leading out of the forest!',
+      },
+      {
+        id: 'rest_clearing',
+        description: 'Rest in the peaceful clearing',
+        nextLocation: 'forest_clearing',
+        message: 'You take a moment to rest and gather your strength.',
+      },
+      {
+        id: 'back_to_path',
+        description: 'Return to the forest path',
+        nextLocation: 'forest_path',
+      },
+    ],
+  },
   forest_exit: {
     location: 'forest_exit',
     choices: [
@@ -62,6 +84,71 @@ export const DECISION_POINTS: Record<string, {
         nextScene: 'town',
         nextLocation: 'town_gate',
       },
+      {
+        id: 'path_mountain',
+        description: 'Follow the winding path to the mountains (requires map)',
+        requiredItem: 'map',
+        unlocksScene: 'mountain',
+        nextScene: 'mountain',
+        nextLocation: 'mountain_base',
+        message: 'Your map shows a secret path to the mountains!',
+      },
+      {
+        id: 'stay_forest',
+        description: 'Stay in the forest and explore more',
+        nextLocation: 'forest_clearing',
+        message: 'You decide to explore the forest a bit more before leaving.',
+      },
+    ],
+  },
+  castle_courtyard: {
+    location: 'castle_courtyard',
+    choices: [
+      {
+        id: 'enter_hall',
+        description: 'Enter the castle hall',
+        nextLocation: 'castle_hall',
+      },
+      {
+        id: 'climb_tower',
+        description: 'Climb the tower (requires shield for safety)',
+        requiredItem: 'shield',
+        nextLocation: 'castle_tower',
+        message: 'Your shield protects you from falling debris!',
+      },
+      {
+        id: 'explore_dragon',
+        description: 'Investigate the mysterious lair (WARNING: Dangerous!)',
+        nextLocation: 'dragon_lair',
+        message: 'You hear ominous sounds from the lair...',
+      },
+      {
+        id: 'leave_castle',
+        description: 'Leave the castle',
+        nextScene: 'town',
+        nextLocation: 'town_gate',
+      },
+    ],
+  },
+  castle_hall: {
+    location: 'castle_hall',
+    choices: [
+      {
+        id: 'ascend_tower',
+        description: 'Ascend to the tower',
+        nextLocation: 'castle_tower',
+      },
+      {
+        id: 'explore_courtyard',
+        description: 'Return to the courtyard',
+        nextLocation: 'castle_courtyard',
+      },
+      {
+        id: 'search_hall',
+        description: 'Search the hall for secrets',
+        nextLocation: 'castle_hall',
+        message: 'You find ancient writings on the walls, but nothing else.',
+      },
     ],
   },
   castle_tower: {
@@ -69,17 +156,50 @@ export const DECISION_POINTS: Record<string, {
     choices: [
       {
         id: 'explore_ocean',
-        description: 'Use the telescope to spot the ocean',
+        description: 'Use the telescope to spot the ocean (requires crown)',
         requiredItem: 'crown',
         unlocksScene: 'ocean',
         nextScene: 'ocean',
         nextLocation: 'beach_shore',
+        message: 'The crown\'s magic reveals a path to the mystical ocean!',
       },
       {
         id: 'continue_town',
         description: 'Leave the castle and go to town',
         nextScene: 'town',
         nextLocation: 'town_gate',
+      },
+      {
+        id: 'search_tower',
+        description: 'Search the tower for hidden treasures',
+        nextLocation: 'castle_tower',
+        message: 'You find some old coins but nothing of great value.',
+      },
+      {
+        id: 'return_hall',
+        description: 'Return to the castle hall',
+        nextLocation: 'castle_hall',
+      },
+    ],
+  },
+  town_square: {
+    location: 'town_square',
+    choices: [
+      {
+        id: 'visit_market',
+        description: 'Visit the bustling market',
+        nextLocation: 'town_market',
+      },
+      {
+        id: 'explore_gate',
+        description: 'Head to the town gate',
+        nextLocation: 'town_gate',
+      },
+      {
+        id: 'rest_square',
+        description: 'Rest in the town square',
+        nextLocation: 'town_square',
+        message: 'You take a moment to observe the town life.',
       },
     ],
   },
@@ -94,9 +214,94 @@ export const DECISION_POINTS: Record<string, {
         message: 'The merchant rewards you with a map to the ocean!',
       },
       {
+        id: 'buy_potion',
+        description: 'Buy a healing potion (requires coin)',
+        requiredItem: 'coin',
+        nextLocation: 'town_market',
+        message: 'You purchase a healing potion from the market!',
+      },
+      {
         id: 'ignore_merchant',
         description: 'Continue exploring the town',
-        // No special unlock, just continue
+        nextLocation: 'town_square',
+      },
+      {
+        id: 'leave_town',
+        description: 'Leave the town',
+        nextLocation: 'town_exit',
+      },
+    ],
+  },
+  town_exit: {
+    location: 'town_exit',
+    choices: [
+      {
+        id: 'return_castle',
+        description: 'Return to the castle',
+        nextScene: 'castle',
+        nextLocation: 'castle_gate',
+      },
+      {
+        id: 'path_forest',
+        description: 'Take the path back to the forest',
+        nextScene: 'forest',
+        nextLocation: 'forest_entrance',
+      },
+      {
+        id: 'explore_ocean',
+        description: 'Follow the map to the ocean (requires map from merchant)',
+        requiredItem: 'bread', // If they helped merchant, they got the map
+        unlocksScene: 'ocean',
+        nextScene: 'ocean',
+        nextLocation: 'beach_shore',
+        message: 'You follow the merchant\'s map to the ocean!',
+      },
+    ],
+  },
+  beach_shore: {
+    location: 'beach_shore',
+    choices: [
+      {
+        id: 'explore_tide_pool',
+        description: 'Explore the tide pools',
+        nextLocation: 'tide_pool',
+      },
+      {
+        id: 'enter_cave',
+        description: 'Enter the mysterious cave',
+        nextLocation: 'cave_entrance',
+      },
+      {
+        id: 'search_treasure',
+        description: 'Search for treasure along the shore',
+        nextLocation: 'treasure_cove',
+      },
+      {
+        id: 'dive_deep',
+        description: 'Dive into the deep ocean (WARNING: Requires pearl!)',
+        nextLocation: 'deep_trench',
+        message: 'The ocean depths call to you...',
+      },
+    ],
+  },
+  tide_pool: {
+    location: 'tide_pool',
+    choices: [
+      {
+        id: 'continue_shore',
+        description: 'Return to the beach shore',
+        nextLocation: 'beach_shore',
+      },
+      {
+        id: 'explore_cave',
+        description: 'Follow the path to the cave entrance',
+        nextLocation: 'cave_entrance',
+      },
+      {
+        id: 'search_pool',
+        description: 'Search the tide pool for treasures',
+        nextLocation: 'tide_pool',
+        message: 'You find interesting shells but nothing magical.',
       },
     ],
   },
@@ -105,19 +310,83 @@ export const DECISION_POINTS: Record<string, {
     choices: [
       {
         id: 'path_mountain',
-        description: 'Follow the map to the mountains',
+        description: 'Follow the map to the mountains (requires treasure_map)',
         requiredItem: 'treasure_map',
         unlocksScene: 'mountain',
         nextScene: 'mountain',
         nextLocation: 'mountain_base',
+        message: 'The treasure map reveals a path to the mountains!',
       },
       {
         id: 'path_desert',
-        description: 'Take the ancient scroll to the desert',
+        description: 'Take the ancient scroll to the desert (requires scroll)',
         requiredItem: 'scroll',
         unlocksScene: 'desert',
         nextScene: 'desert',
         nextLocation: 'oasis',
+        message: 'The ancient scroll guides you to the desert!',
+      },
+      {
+        id: 'stay_ocean',
+        description: 'Continue exploring the ocean',
+        nextLocation: 'beach_shore',
+      },
+      {
+        id: 'search_more',
+        description: 'Search for more treasures',
+        nextLocation: 'treasure_cove',
+        message: 'You search thoroughly but find nothing else.',
+      },
+    ],
+  },
+  mountain_base: {
+    location: 'mountain_base',
+    choices: [
+      {
+        id: 'climb_cliff',
+        description: 'Climb the cliff path (requires rope)',
+        requiredItem: 'rope',
+        nextLocation: 'cliff_path',
+        message: 'Your rope helps you safely climb the cliff!',
+      },
+      {
+        id: 'explore_base',
+        description: 'Explore the mountain base',
+        nextLocation: 'mountain_base',
+        message: 'You find some useful supplies at the base.',
+      },
+      {
+        id: 'return_previous',
+        description: 'Return to previous area',
+        nextScene: 'ocean',
+        nextLocation: 'beach_shore',
+      },
+    ],
+  },
+  summit: {
+    location: 'summit',
+    choices: [
+      {
+        id: 'enter_cave',
+        description: 'Enter the crystal cave',
+        nextLocation: 'cave',
+      },
+      {
+        id: 'enter_dark_cave',
+        description: 'Enter the dark cave (WARNING: Requires torch!)',
+        nextLocation: 'dark_cave',
+        message: 'The dark cave looks ominous...',
+      },
+      {
+        id: 'descend_cliff',
+        description: 'Descend back to the cliff path',
+        nextLocation: 'cliff_path',
+      },
+      {
+        id: 'rest_summit',
+        description: 'Rest at the summit and enjoy the view',
+        nextLocation: 'summit',
+        message: 'The view from the summit is breathtaking!',
       },
     ],
   },
@@ -126,16 +395,102 @@ export const DECISION_POINTS: Record<string, {
     choices: [
       {
         id: 'path_desert',
-        description: 'Use the crystal to find the desert path',
+        description: 'Use the crystal to find the desert path (requires crystal)',
         requiredItem: 'crystal',
         unlocksScene: 'desert',
         nextScene: 'desert',
         nextLocation: 'oasis',
+        message: 'The crystal glows and reveals a path to the desert!',
+      },
+      {
+        id: 'return_summit',
+        description: 'Return to the summit',
+        nextLocation: 'summit',
       },
       {
         id: 'return_base',
         description: 'Return to the mountain base',
         nextLocation: 'mountain_base',
+      },
+      {
+        id: 'explore_cave',
+        description: 'Explore the cave deeper',
+        nextLocation: 'cave',
+        message: 'You find some interesting rock formations but nothing else.',
+      },
+    ],
+  },
+  oasis: {
+    location: 'oasis',
+    choices: [
+      {
+        id: 'explore_dunes',
+        description: 'Explore the sand dunes',
+        nextLocation: 'sand_dunes',
+      },
+      {
+        id: 'search_ruins',
+        description: 'Search for ancient ruins',
+        nextLocation: 'ancient_ruins',
+      },
+      {
+        id: 'rest_oasis',
+        description: 'Rest at the oasis',
+        nextLocation: 'oasis',
+        message: 'The oasis provides much-needed rest and water.',
+      },
+      {
+        id: 'find_temple',
+        description: 'Look for the ancient temple',
+        nextLocation: 'temple',
+      },
+    ],
+  },
+  sand_dunes: {
+    location: 'sand_dunes',
+    choices: [
+      {
+        id: 'continue_ruins',
+        description: 'Continue to the ancient ruins',
+        nextLocation: 'ancient_ruins',
+      },
+      {
+        id: 'return_oasis',
+        description: 'Return to the oasis',
+        nextLocation: 'oasis',
+      },
+      {
+        id: 'explore_dunes',
+        description: 'Explore the sand dunes more',
+        nextLocation: 'sand_dunes',
+        message: 'You find some interesting patterns in the sand.',
+      },
+    ],
+  },
+  ancient_ruins: {
+    location: 'ancient_ruins',
+    choices: [
+      {
+        id: 'enter_temple',
+        description: 'Enter the ancient temple (WARNING: Requires artifact!)',
+        nextLocation: 'ancient_temple',
+        message: 'The ancient temple radiates powerful energy...',
+      },
+      {
+        id: 'visit_temple',
+        description: 'Visit the regular temple',
+        nextLocation: 'temple',
+      },
+      {
+        id: 'return_oasis',
+        description: 'Return to the oasis',
+        nextLocation: 'oasis',
+      },
+      {
+        id: 'search_ruins',
+        description: 'Search the ruins for artifacts',
+        nextLocation: 'ancient_ruins',
+        message: 'You carefully search the ruins for anything valuable.',
       },
     ],
   },
