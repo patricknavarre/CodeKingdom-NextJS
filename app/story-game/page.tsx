@@ -664,7 +664,7 @@ export default function StoryGamePage() {
                         boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
                       }}>
                         <strong>🔀 Decision Point!</strong>
-                        <p style={{ marginTop: '10px', marginBottom: '10px' }}>You've reached a choice! Use <code style={{ background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: '4px' }}>choose_path("choice_id")</code> to make your decision:</p>
+                        <p style={{ marginTop: '10px', marginBottom: '10px' }}>You've reached a choice! Use <code style={{ background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: '4px', color: 'white' }}>choose_path("choice_id")</code> to make your decision:</p>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                           {availableChoices.map((choice) => (
                             <div key={choice.id} style={{
@@ -692,7 +692,8 @@ export default function StoryGamePage() {
                                 fontSize: '0.8rem',
                                 background: 'rgba(0,0,0,0.3)',
                                 padding: '4px 8px',
-                                borderRadius: '4px'
+                                borderRadius: '4px',
+                                color: 'white'
                               }}>
                                 choose_path("{choice.id}")
                               </code>
