@@ -1024,6 +1024,12 @@ export default function StoryGamePage() {
                           <div className="item-glow"></div>
                         </div>
                       )}
+                      {availableItems.includes('shield') && !storyProgress?.inventory.includes('shield') && (
+                        <div className={`scene-element collectible-item item-shield ${collectedItem === 'shield' ? 'collected' : ''}`}>
+                          🛡️
+                          <div className="item-glow"></div>
+                        </div>
+                      )}
                     </>
                   )}
                   {storyProgress?.currentScene === 'ocean' && (
@@ -1074,6 +1080,12 @@ export default function StoryGamePage() {
                       {availableItems.includes('crystal') && !storyProgress?.inventory.includes('crystal') && (
                         <div className={`scene-element collectible-item item-crystal ${collectedItem === 'crystal' ? 'collected' : ''}`}>
                           💠
+                          <div className="item-glow"></div>
+                        </div>
+                      )}
+                      {availableItems.includes('sword') && !storyProgress?.inventory.includes('sword') && (
+                        <div className={`scene-element collectible-item item-sword ${collectedItem === 'sword' ? 'collected' : ''}`}>
+                          ⚔️
                           <div className="item-glow"></div>
                         </div>
                       )}

@@ -222,12 +222,15 @@ export async function POST(req: NextRequest) {
         // Check if this is a dangerous location
         const dangerousLocation = DANGEROUS_LOCATIONS[result.location];
         if (dangerousLocation && dangerousLocation.scene === storyGame.currentScene) {
-          // Check if player has required item
-          const hasRequiredItem = storyGame.inventory.some(
-            (item: { name: string }) => item.name === dangerousLocation.requiredItem
-          );
+          // Check if player has required item(s): support multiple requiredItems or single requiredItem
+          const inventoryNames = storyGame.inventory.map((item: { name: string }) => item.name);
+          const hasRequiredItems = dangerousLocation.requiredItems
+            ? dangerousLocation.requiredItems.every((itemName: string) => inventoryNames.includes(itemName))
+            : dangerousLocation.requiredItem
+              ? inventoryNames.includes(dangerousLocation.requiredItem)
+              : true;
           
-          if (!hasRequiredItem) {
+          if (!hasRequiredItems) {
             // Player dies - reset to scene start
             const reset = resetToSceneStart(storyGame);
             updatedLocation = reset.location;

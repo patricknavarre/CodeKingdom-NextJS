@@ -3,15 +3,16 @@
 
 // Dangerous locations: places where players can die if they don't have required items
 export const DANGEROUS_LOCATIONS: Record<string, {
-  requiredItem: string;
+  requiredItem?: string;
+  requiredItems?: string[];
   deathMessage: string;
   safeMessage: string;
   scene: string;
 }> = {
   dragon_lair: {
-    requiredItem: 'sword',
-    deathMessage: "💀 The dragon's fire engulfs you! You should have brought a sword...",
-    safeMessage: "Your sword protects you! The dragon retreats.",
+    requiredItems: ['sword', 'shield'],
+    deathMessage: "💀 The dragon's fire engulfs you! You needed a sword and shield to face the dragon...",
+    safeMessage: "Your sword and shield protect you! The dragon retreats.",
     scene: 'castle'
   },
   dark_cave: {
@@ -528,40 +529,40 @@ export const SCENES = {
   castle: {
     name: 'Ancient Castle',
     locations: ['castle_gate', 'castle_courtyard', 'castle_hall', 'castle_tower', 'dragon_lair'],
-    items: ['sword', 'shield', 'crown'],
+    items: ['crown'],
     locationItems: {
       'castle_gate': [],
-      'castle_courtyard': ['sword'],
-      'castle_hall': ['shield'],
+      'castle_courtyard': [],
+      'castle_hall': [],
       'castle_tower': ['crown'],
       'dragon_lair': [],
     },
       hints: {
       1: { 
         cost: 10, 
-        text: 'You need to collect items to progress! Some locations are dangerous - make sure you have the right equipment. Use if statements to check what you have.',
-        example: 'if "sword" in inventory:'
+        text: 'Collect a sword and shield before coming to the castle! Get the sword at the mountain base and the shield in the town market.',
+        example: 'if "sword" in inventory and "shield" in inventory:'
       },
       2: { 
         cost: 20, 
-        text: 'Use collect_item("sword") when you find it, then check your inventory with if statements before entering dangerous areas.',
-        example: 'if "sword" in inventory:\n    move_to("castle_hall")'
+        text: 'You need both sword and shield to face the dragon. Get the sword from the mountain base and the shield from the town market, then come to the castle.',
+        example: 'if "sword" in inventory:\n    if "shield" in inventory:\n        move_to("dragon_lair")'
       },
       3: { 
         cost: 30, 
-        text: 'Collect the sword first, then use if/else to check your inventory before moving forward. Some locations require specific items to survive!',
-        example: 'if "sword" in inventory:\n    move_to("castle_hall")\nelse:\n    collect_item("sword")'
+        text: 'Prepare before the castle: collect the sword at mountain_base and the shield at town_market. Use if/else to check you have both before entering the dragon lair!',
+        example: 'if "sword" in inventory and "shield" in inventory:\n    move_to("dragon_lair")\nelse:\n    print("You need sword and shield!")'
       },
     },
   },
   town: {
     name: 'Medieval Town',
     locations: ['town_gate', 'town_square', 'town_market', 'town_exit'],
-    items: ['coin', 'bread', 'potion'],
+    items: ['coin', 'bread', 'potion', 'shield'],
     locationItems: {
       'town_gate': [],
       'town_square': ['coin'],
-      'town_market': ['bread', 'potion'],
+      'town_market': ['bread', 'potion', 'shield'],
       'town_exit': [],
     },
     hints: {
@@ -614,9 +615,9 @@ export const SCENES = {
   mountain: {
     name: 'Mountain Peak',
     locations: ['mountain_base', 'cliff_path', 'summit', 'cave', 'dark_cave'],
-    items: ['rope', 'torch', 'crystal'],
+    items: ['rope', 'torch', 'crystal', 'sword'],
     locationItems: {
-      'mountain_base': [],
+      'mountain_base': ['sword'],
       'cliff_path': ['rope'],
       'summit': ['torch'],
       'cave': ['crystal'],
