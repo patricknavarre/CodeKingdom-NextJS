@@ -914,7 +914,7 @@ export default function StoryGamePage() {
                     }
                     return SCENE_BACKGROUNDS[scene] || SCENE_BACKGROUNDS.forest;
                   })(),
-                  backgroundSize: 'cover',
+                  backgroundSize: 'contain',
                   backgroundPosition: 'center',
                   backgroundRepeat: 'no-repeat'
                 }}
