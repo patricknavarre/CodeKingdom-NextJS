@@ -357,6 +357,13 @@ export const DECISION_POINTS: Record<string, {
         message: 'You explore the base but don\'t find anything new. Try climbing the cliff path or looking for items to collect!',
       },
       {
+        id: 'travel_to_town',
+        description: 'Travel to the town to find a shield',
+        nextScene: 'town',
+        nextLocation: 'town_gate',
+        message: 'You head down the mountain toward the town. Once there, use move_to("town_market") to find the shield!',
+      },
+      {
         id: 'return_previous',
         description: 'Return to previous area',
         nextScene: 'ocean',

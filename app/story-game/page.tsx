@@ -607,7 +607,7 @@ export default function StoryGamePage() {
                         return (
                           <div className="quest-hint" style={{ marginTop: '12px', borderLeft: '4px solid #ff9800', background: 'rgba(255, 152, 0, 0.08)' }}>
                             <strong>➡️ Next step:</strong>
-                            <p style={{ margin: '6px 0 0 0' }}>You have the sword! Get the <strong>shield</strong> at the town market next. Go to the forest exit and choose the path to town, then <code>move_to(&quot;town_market&quot;)</code> and <code>collect_item(&quot;shield&quot;)</code>.</p>
+                            <p style={{ margin: '6px 0 0 0' }}>You have the sword! Get the <strong>shield</strong> at the town market next. From the mountain base, use <code>choose_path(&quot;travel_to_town&quot;)</code> to go to the town. Then <code>move_to(&quot;town_market&quot;)</code> and <code>collect_item(&quot;shield&quot;)</code>.</p>
                           </div>
                         );
                       }
