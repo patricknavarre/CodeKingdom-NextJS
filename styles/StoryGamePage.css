@@ -660,6 +660,11 @@
 .item-bread { top: 40%; right: 30%; }
 .item-potion { top: 50%; left: 50%; transform: translateX(-50%); }
 
+/* Item positions for mountain */
+.item-rope { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.item-torch { top: 30%; right: 30%; }
+.item-crystal { bottom: 30%; left: 40%; }
+
 /* Available items hint */
 .available-items-hint {
   margin-top: 15px;
