@@ -623,7 +623,7 @@ export default function StoryGamePage() {
                         return (
                           <div className="quest-hint" style={{ marginTop: '12px', borderLeft: '4px solid #4caf50', background: 'rgba(76, 175, 80, 0.08)' }}>
                             <strong>➡️ Ready for the dragon!</strong>
-                            <p style={{ margin: '6px 0 0 0' }}>You have both sword and shield. Go to the castle (from forest exit), then <code>if &quot;sword&quot; in inventory and &quot;shield&quot; in inventory: move_to(&quot;dragon_lair&quot;)</code> to face the dragon!</p>
+                            <p style={{ margin: '6px 0 0 0' }}>You have both sword and shield. <strong>move_to</strong> only works in your current scene. From the town market, first use <code>choose_path(&quot;travel_to_castle&quot;)</code> to go to the castle. Then run <code>move_to(&quot;castle_courtyard&quot;)</code> and <code>move_to(&quot;dragon_lair&quot;)</code> to face the dragon!</p>
                           </div>
                         );
                       }

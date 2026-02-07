@@ -208,6 +208,13 @@ export const DECISION_POINTS: Record<string, {
     location: 'town_market',
     choices: [
       {
+        id: 'travel_to_castle',
+        description: 'Travel to the castle to face the dragon',
+        nextScene: 'castle',
+        nextLocation: 'castle_gate',
+        message: 'You head to the castle! Once there, use move_to("castle_courtyard") then move_to("dragon_lair") to face the dragon. Make sure you have both sword and shield!',
+      },
+      {
         id: 'help_merchant',
         description: 'Help the merchant (requires bread)',
         requiredItem: 'bread',
