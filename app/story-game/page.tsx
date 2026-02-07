@@ -40,7 +40,7 @@ const SCENE_BACKGROUNDS: Record<string, string> = {
   castle: 'url(/images/backgrounds/Background_Castle.png)',
   town: 'url(/images/backgrounds/Background_Village_Square.png)',
   ocean: 'linear-gradient(135deg, #1e3a5f 0%, #0a1f3d 50%, #006994 100%)',
-  mountain: 'linear-gradient(135deg, #8b7355 0%, #5a4a3a 50%, #3d2f1f 100%)',
+  mountain: 'url(/images/backgrounds/Background_Mountain.png)',
   desert: 'linear-gradient(135deg, #d4a574 0%, #c19a6b 50%, #8b6914 100%)',
 };
 
