@@ -36,9 +36,9 @@ interface StoryProgress {
 
 // Scene backgrounds for visual display
 const SCENE_BACKGROUNDS: Record<string, string> = {
-  forest: 'linear-gradient(135deg, #2d5016 0%, #1a3009 100%)',
-  castle: 'linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%)',
-  town: 'linear-gradient(135deg, #8b6f47 0%, #5a4a3a 100%)',
+  forest: 'url(/images/backgrounds/Background_Forest.png)',
+  castle: 'url(/images/backgrounds/Background_Castle.png)',
+  town: 'url(/images/backgrounds/Background_Village_Square.png)',
   ocean: 'linear-gradient(135deg, #1e3a5f 0%, #0a1f3d 50%, #006994 100%)',
   mountain: 'linear-gradient(135deg, #8b7355 0%, #5a4a3a 50%, #3d2f1f 100%)',
   desert: 'linear-gradient(135deg, #d4a574 0%, #c19a6b 50%, #8b6914 100%)',
