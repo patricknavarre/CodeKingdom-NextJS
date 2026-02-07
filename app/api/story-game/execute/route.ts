@@ -308,7 +308,12 @@ export async function POST(req: NextRequest) {
       const decisionPoint = DECISION_POINTS[storyGame.currentLocation];
       if (decisionPoint) {
         const choice = decisionPoint.choices.find(c => c.id === result.choiceId);
-        if (choice) {
+        if (!choice) {
+          // Choice doesn't exist at this location
+          const availableChoiceIds = decisionPoint.choices.map(c => c.id).join(', ');
+          message = `Invalid choice! Available choices at this location are: ${availableChoiceIds}. Use choose_path("choice_id") with one of these.`;
+          result.success = false;
+        } else if (choice) {
           // Check if choice requires an item
           if (choice.requiredItem) {
             const hasItem = storyGame.inventory.some(item => item.name === choice.requiredItem);
@@ -333,16 +338,21 @@ export async function POST(req: NextRequest) {
               if (choice.nextScene) {
                 storyGame.currentScene = choice.nextScene as any;
                 updatedLocation = choice.nextLocation || (SCENES[choice.nextScene as keyof typeof SCENES]?.locations[0] || storyGame.currentLocation);
-                message = choice.message || `You chose: ${choice.description}`;
+                const baseMessage = choice.message || `You chose: ${choice.description}`;
+                message = `${baseMessage} You arrive at the ${SCENES[choice.nextScene as keyof typeof SCENES]?.name || choice.nextScene}. Explore the area with move_to() or look for items to collect!`;
                 coinsEarned = 30;
                 experienceEarned = 30;
               } else if (choice.nextLocation) {
                 updatedLocation = choice.nextLocation;
-                message = choice.message || `You chose: ${choice.description}`;
+                const baseMessage = choice.message || `You chose: ${choice.description}`;
+                const nextScene = SCENES[storyGame.currentScene as keyof typeof SCENES];
+                const nextLocationName = choice.nextLocation.replace(/_/g, ' ');
+                message = `${baseMessage} You're now at ${nextLocationName}. Try exploring with move_to() or look for items to collect!`;
                 coinsEarned = 15;
                 experienceEarned = 15;
               } else {
-                message = choice.message || `You chose: ${choice.description}`;
+                const baseMessage = choice.message || `You chose: ${choice.description}`;
+                message = `${baseMessage} Continue exploring this area or look for new paths!`;
                 coinsEarned = 10;
                 experienceEarned = 10;
               }
@@ -361,28 +371,40 @@ export async function POST(req: NextRequest) {
             }
             
             if (choice.nextScene) {
-              storyGame.currentScene = choice.nextScene as any;
-              updatedLocation = choice.nextLocation || (SCENES[choice.nextScene as keyof typeof SCENES]?.locations[0] || storyGame.currentLocation);
-              message = choice.message || `You chose: ${choice.description}`;
-              coinsEarned = 30;
-              experienceEarned = 30;
-            } else if (choice.nextLocation) {
-              updatedLocation = choice.nextLocation;
-              message = choice.message || `You chose: ${choice.description}`;
-              coinsEarned = 15;
-              experienceEarned = 15;
-            } else {
-              message = choice.message || `You chose: ${choice.description}`;
-              coinsEarned = 10;
-              experienceEarned = 10;
-            }
+                storyGame.currentScene = choice.nextScene as any;
+                updatedLocation = choice.nextLocation || (SCENES[choice.nextScene as keyof typeof SCENES]?.locations[0] || storyGame.currentLocation);
+                const baseMessage = choice.message || `You chose: ${choice.description}`;
+                message = `${baseMessage} You arrive at the ${SCENES[choice.nextScene as keyof typeof SCENES]?.name || choice.nextScene}. Explore the area with move_to() or look for items to collect!`;
+                coinsEarned = 30;
+                experienceEarned = 30;
+              } else if (choice.nextLocation) {
+                updatedLocation = choice.nextLocation;
+                const baseMessage = choice.message || `You chose: ${choice.description}`;
+                const nextLocationName = choice.nextLocation.replace(/_/g, ' ');
+                message = `${baseMessage} You're now at ${nextLocationName}. Try exploring with move_to() or look for items to collect!`;
+                coinsEarned = 15;
+                experienceEarned = 15;
+              } else {
+                const baseMessage = choice.message || `You chose: ${choice.description}`;
+                message = `${baseMessage} Continue exploring this area or look for new paths!`;
+                coinsEarned = 10;
+                experienceEarned = 10;
+              }
           }
         } else {
+          // This shouldn't happen now due to the check above, but keep as fallback
           message = 'Invalid choice! Check available choices at this location.';
           result.success = false;
         }
       } else {
-        message = 'No decision point available at this location.';
+        // No decision point at this location - provide helpful message
+        const scene = SCENES[storyGame.currentScene as keyof typeof SCENES];
+        const currentIndex = scene.locations.indexOf(storyGame.currentLocation);
+        if (currentIndex < scene.locations.length - 1) {
+          message = 'No decision point here. Try using move_to() to explore other locations, or use open_door() if you have a key!';
+        } else {
+          message = 'You\'re at the end of this scene! Try using open_door() to advance to the next scene, or explore other locations with move_to().';
+        }
         result.success = false;
       }
     } else if (result.action === 'message' && result.text) {
