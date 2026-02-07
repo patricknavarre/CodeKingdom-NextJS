@@ -560,18 +560,18 @@ export default function StoryGamePage() {
                       )}
                       {storyProgress?.currentScene === 'castle' && (
                         <>
-                          <p>Collect the sword and shield to progress through the castle. Use <strong>if/else statements</strong> to check your inventory!</p>
-                          <p><strong>Step 1:</strong> Move to different locations to find items: <code>move_to("castle_courtyard")</code></p>
-                          <p><strong>Step 2:</strong> Collect items when you find them: <code>collect_item("sword")</code></p>
-                          <p><strong>Step 3:</strong> Use if statements to check before moving: <code>if "sword" in inventory: move_to("castle_hall")</code></p>
+                          <p>To face the dragon you need <strong>both the sword and the shield</strong>—get the sword at the <strong>mountain base</strong> and the shield at the <strong>town market</strong> before coming here!</p>
+                          <p><strong>Step 1:</strong> If you have both: <code>if &quot;sword&quot; in inventory and &quot;shield&quot; in inventory: move_to(&quot;dragon_lair&quot;)</code></p>
+                          <p><strong>Step 2:</strong> Explore the castle: <code>move_to(&quot;castle_courtyard&quot;)</code>, <code>move_to(&quot;castle_tower&quot;)</code> to find the crown.</p>
+                          <p><strong>Step 3:</strong> Don&apos;t enter the dragon lair without both items—you won&apos;t survive!</p>
                         </>
                       )}
                       {storyProgress?.currentScene === 'town' && (
                         <>
-                          <p>Explore the town market to find useful items. Use <strong>if statements to check your location</strong>!</p>
-                          <p><strong>Step 1:</strong> Move to the market: <code>move_to("town_market")</code></p>
-                          <p><strong>Step 2:</strong> Check your location with if: <code>if current_location == "town_market": collect_item("bread")</code></p>
-                          <p><strong>Step 3:</strong> Use if/else to handle different locations!</p>
+                          <p>Explore the town market. Get the <strong>shield</strong> here—you&apos;ll need it <strong>with the sword</strong> (from the mountain base) to face the dragon in the castle!</p>
+                          <p><strong>Step 1:</strong> Move to the market: <code>move_to(&quot;town_market&quot;)</code></p>
+                          <p><strong>Step 2:</strong> Collect the shield: <code>collect_item(&quot;shield&quot;)</code></p>
+                          <p><strong>Step 3:</strong> If you already have the sword, go to the castle. If not, head to the mountain base to get the sword first!</p>
                         </>
                       )}
                       {storyProgress?.currentScene === 'ocean' && (
@@ -584,10 +584,10 @@ export default function StoryGamePage() {
                       )}
                       {storyProgress?.currentScene === 'mountain' && (
                         <>
-                          <p>Safety first! Collect the rope and torch before climbing. Use <strong>if/else to check your equipment</strong>!</p>
-                          <p><strong>Step 1:</strong> Collect the rope first: <code>move_to("cliff_path")</code> then <code>collect_item("rope")</code></p>
-                          <p><strong>Step 2:</strong> Check before climbing: <code>if "rope" in inventory: move_to("summit")</code></p>
-                          <p><strong>Step 3:</strong> Get the torch before the cave: <code>if "torch" in inventory: move_to("cave")</code></p>
+                          <p>Safety first! Collect the rope and torch before climbing. Also get the <strong>sword</strong> here at the mountain base—you&apos;ll need it <strong>with the shield</strong> (from the town market) to face the dragon in the castle!</p>
+                          <p><strong>Step 1:</strong> Get the sword here: <code>collect_item(&quot;sword&quot;)</code> (you&apos;re at mountain base).</p>
+                          <p><strong>Step 2:</strong> For climbing: <code>move_to(&quot;cliff_path&quot;)</code> then <code>collect_item(&quot;rope&quot;)</code>; then <code>if &quot;rope&quot; in inventory: move_to(&quot;summit&quot;)</code> for the torch.</p>
+                          <p><strong>Step 3:</strong> Before the dragon: get the shield at the town market if you don&apos;t have it yet!</p>
                         </>
                       )}
                       {storyProgress?.currentScene === 'desert' && (
@@ -599,6 +599,36 @@ export default function StoryGamePage() {
                         </>
                       )}
                     </div>
+                    {storyProgress?.inventory && (() => {
+                      const inv = storyProgress.inventory;
+                      const hasSword = inv.includes('sword');
+                      const hasShield = inv.includes('shield');
+                      if (hasSword && !hasShield) {
+                        return (
+                          <div className="quest-hint" style={{ marginTop: '12px', borderLeft: '4px solid #ff9800', background: 'rgba(255, 152, 0, 0.08)' }}>
+                            <strong>➡️ Next step:</strong>
+                            <p style={{ margin: '6px 0 0 0' }}>You have the sword! Get the <strong>shield</strong> at the town market next. Go to the forest exit and choose the path to town, then <code>move_to(&quot;town_market&quot;)</code> and <code>collect_item(&quot;shield&quot;)</code>.</p>
+                          </div>
+                        );
+                      }
+                      if (hasShield && !hasSword) {
+                        return (
+                          <div className="quest-hint" style={{ marginTop: '12px', borderLeft: '4px solid #ff9800', background: 'rgba(255, 152, 0, 0.08)' }}>
+                            <strong>➡️ Next step:</strong>
+                            <p style={{ margin: '6px 0 0 0' }}>You have the shield! Get the <strong>sword</strong> at the mountain base next. Go to the mountain (from forest exit with a map, or from ocean), then <code>move_to(&quot;mountain_base&quot;)</code> and <code>collect_item(&quot;sword&quot;)</code>.</p>
+                          </div>
+                        );
+                      }
+                      if (hasSword && hasShield) {
+                        return (
+                          <div className="quest-hint" style={{ marginTop: '12px', borderLeft: '4px solid #4caf50', background: 'rgba(76, 175, 80, 0.08)' }}>
+                            <strong>➡️ Ready for the dragon!</strong>
+                            <p style={{ margin: '6px 0 0 0' }}>You have both sword and shield. Go to the castle (from forest exit), then <code>if &quot;sword&quot; in inventory and &quot;shield&quot; in inventory: move_to(&quot;dragon_lair&quot;)</code> to face the dragon!</p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
                     {storyProgress?.currentScene && (
                       <div className="location-guide" style={{
                         background: 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)',
