@@ -42,6 +42,7 @@ const SCENE_BACKGROUNDS: Record<string, string> = {
   ocean: 'linear-gradient(135deg, #1e3a5f 0%, #0a1f3d 50%, #006994 100%)',
   mountain: 'url(/images/backgrounds/Background_Mountain.png)',
   cave: 'url(/images/backgrounds/Background_Cave.png)',
+  dragonLair: 'url(/images/backgrounds/Background_Dragon_Lair.png)',
   desert: 'url(/images/backgrounds/Background_Desert.png)',
 };
 
@@ -876,6 +877,10 @@ export default function StoryGamePage() {
                     // Use cave background when in cave or dark_cave (mountain scene)
                     if (scene === 'mountain' && (location === 'cave' || location === 'dark_cave')) {
                       return SCENE_BACKGROUNDS.cave || SCENE_BACKGROUNDS.mountain;
+                    }
+                    // Use dragon lair background when at dragon_lair (castle scene)
+                    if (scene === 'castle' && location === 'dragon_lair') {
+                      return SCENE_BACKGROUNDS.dragonLair || SCENE_BACKGROUNDS.castle;
                     }
                     return SCENE_BACKGROUNDS[scene] || SCENE_BACKGROUNDS.forest;
                   })(),
