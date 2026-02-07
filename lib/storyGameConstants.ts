@@ -658,12 +658,12 @@ export const SCENES = {
   desert: {
     name: 'Ancient Desert',
     locations: ['oasis', 'sand_dunes', 'ancient_ruins', 'temple', 'ancient_temple'],
-    items: ['water', 'artifact', 'scroll'],
+    items: ['water', 'artifact', 'scroll', 'magic_gem'],
     locationItems: {
       'oasis': [],
       'sand_dunes': ['water'],
       'ancient_ruins': ['artifact'],
-      'temple': ['scroll'],
+      'temple': ['scroll', 'magic_gem'],
       'ancient_temple': [],
     },
       hints: {

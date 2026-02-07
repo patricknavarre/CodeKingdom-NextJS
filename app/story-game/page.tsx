@@ -262,6 +262,34 @@ export default function StoryGamePage() {
         return;
       }
 
+      // Dragon defeated: show victory modal and rewards
+      if (response.data.dragonDefeated === true) {
+        const newLocation = response.data.newLocation || storyProgress?.currentLocation;
+        const newScene = response.data.newScene || storyProgress?.currentScene;
+        setStoryProgress(prev => ({
+          ...prev!,
+          currentLocation: newLocation,
+          currentScene: newScene,
+          inventory: response.data.newInventory ?? prev?.inventory,
+          storyProgress: response.data.storyProgress ?? prev?.storyProgress ?? 0,
+        }));
+        if (response.data.coinsEarned) addCoins(response.data.coinsEarned);
+        if (response.data.experienceEarned) addExperience(response.data.experienceEarned);
+        setLevelCompleteData({
+          message: response.data.message,
+          coinsEarned: response.data.coinsEarned ?? 0,
+          experienceEarned: response.data.experienceEarned ?? 0,
+        });
+        setShowLevelComplete(true);
+        setMessage(response.data.message || 'You defeat the dragon!');
+        setTimeout(() => {
+          setShowLevelComplete(false);
+        }, 4000);
+        setExecuting(false);
+        setIsWalking(false);
+        return;
+      }
+
       // Update character context
       if (response.data.coinsEarned) {
         addCoins(response.data.coinsEarned);
@@ -560,10 +588,10 @@ export default function StoryGamePage() {
                       )}
                       {storyProgress?.currentScene === 'castle' && (
                         <>
-                          <p>To face the dragon you need <strong>both the sword and the shield</strong>—get the sword at the <strong>mountain base</strong> and the shield at the <strong>town market</strong> before coming here!</p>
-                          <p><strong>Step 1:</strong> If you have both: <code>if &quot;sword&quot; in inventory and &quot;shield&quot; in inventory: move_to(&quot;dragon_lair&quot;)</code></p>
-                          <p><strong>Step 2:</strong> Explore the castle: <code>move_to(&quot;castle_courtyard&quot;)</code>, <code>move_to(&quot;castle_tower&quot;)</code> to find the crown.</p>
-                          <p><strong>Step 3:</strong> Don&apos;t enter the dragon lair without both items—you won&apos;t survive!</p>
+                          <p>To beat the dragon you need <strong>sword</strong> (mountain base), <strong>shield</strong> (town market), <strong>crown</strong> (castle tower), and <strong>magic gem</strong> (desert temple).</p>
+                          <p><strong>Step 1:</strong> Get the crown here: <code>move_to(&quot;castle_tower&quot;)</code> then <code>collect_item(&quot;crown&quot;)</code>. Get the magic gem from the desert temple first if you don&apos;t have it.</p>
+                          <p><strong>Step 2:</strong> At the lair: <code>move_to(&quot;dragon_lair&quot;)</code>. Then use <code>hypnotize_dragon()</code> (uses the magic gem), then <code>fight_dragon()</code> (needs sword, shield, crown, and dragon hypnotized).</p>
+                          <p><strong>Step 3:</strong> Don&apos;t enter the dragon lair without sword and shield—you won&apos;t survive!</p>
                         </>
                       )}
                       {storyProgress?.currentScene === 'town' && (
@@ -592,10 +620,10 @@ export default function StoryGamePage() {
                       )}
                       {storyProgress?.currentScene === 'desert' && (
                         <>
-                          <p>Survival in the desert! Collect water and manage your resources. Use <strong>if/else for resource management</strong>!</p>
+                          <p>Survival in the desert! Collect water and the <strong>magic gem</strong> at the temple (with the scroll)—you need it to hypnotize the dragon!</p>
                           <p><strong>Step 1:</strong> Get water first: <code>move_to("sand_dunes")</code> then <code>collect_item("water")</code></p>
                           <p><strong>Step 2:</strong> Check resources before exploring: <code>if "water" in inventory: move_to("ancient_ruins")</code></p>
-                          <p><strong>Step 3:</strong> Collect artifact before temple: <code>if "artifact" in inventory: move_to("temple")</code></p>
+                          <p><strong>Step 3:</strong> At the temple: <code>if "artifact" in inventory: move_to("temple")</code> then <code>collect_item("scroll")</code> and <code>collect_item("magic_gem")</code></p>
                         </>
                       )}
                     </div>
@@ -619,11 +647,21 @@ export default function StoryGamePage() {
                           </div>
                         );
                       }
-                      if (hasSword && hasShield) {
+                      const hasCrown = inv.includes('crown');
+                      const hasMagicGem = inv.includes('magic_gem');
+                      if (hasSword && hasShield && hasCrown && hasMagicGem) {
                         return (
                           <div className="quest-hint" style={{ marginTop: '12px', borderLeft: '4px solid #4caf50', background: 'rgba(76, 175, 80, 0.08)' }}>
                             <strong>➡️ Ready for the dragon!</strong>
-                            <p style={{ margin: '6px 0 0 0' }}>You have both sword and shield. <strong>move_to</strong> only works in your current scene. From the town market, first use <code>choose_path(&quot;travel_to_castle&quot;)</code> to go to the castle. Then run <code>move_to(&quot;castle_courtyard&quot;)</code> and <code>move_to(&quot;dragon_lair&quot;)</code> to face the dragon!</p>
+                            <p style={{ margin: '6px 0 0 0' }}>You have sword, shield, crown, and magic gem. Go to the castle, then <code>move_to(&quot;dragon_lair&quot;)</code>. At the lair run <code>hypnotize_dragon()</code> first, then <code>fight_dragon()</code>!</p>
+                          </div>
+                        );
+                      }
+                      if (hasSword && hasShield) {
+                        return (
+                          <div className="quest-hint" style={{ marginTop: '12px', borderLeft: '4px solid #ff9800', background: 'rgba(255, 152, 0, 0.08)' }}>
+                            <strong>➡️ Almost ready for the dragon!</strong>
+                            <p style={{ margin: '6px 0 0 0' }}>Get the <strong>crown</strong> at the castle tower (<code>move_to(&quot;castle_tower&quot;)</code>, <code>collect_item(&quot;crown&quot;)</code>) and the <strong>magic gem</strong> at the desert temple. Then go to <code>dragon_lair</code> and use <code>hypnotize_dragon()</code> then <code>fight_dragon()</code>.</p>
                           </div>
                         );
                       }
@@ -683,6 +721,11 @@ export default function StoryGamePage() {
                         }}>
                           💡 Tip: Each location might have different items or secrets to discover!
                         </p>
+                        {storyProgress?.currentLocation === 'dragon_lair' && (
+                          <p style={{ marginTop: '10px', fontSize: '0.9rem', fontWeight: 600, color: '#c62828' }}>
+                            🐉 At the dragon lair: use <code>hypnotize_dragon()</code> first, then <code>fight_dragon()</code> when you have sword, shield, crown, and the dragon is hypnotized.
+                          </p>
+                        )}
                       </div>
                     )}
                     {availableChoices.length > 0 && (
@@ -886,6 +929,7 @@ export default function StoryGamePage() {
                         {item === 'water' && '💧'}
                         {item === 'artifact' && '🏺'}
                         {item === 'scroll' && '📜'}
+                        {item === 'magic_gem' && '💎'}
                         <span>{item}</span>
                       </div>
                     ))
@@ -1143,6 +1187,12 @@ export default function StoryGamePage() {
                       {availableItems.includes('scroll') && !storyProgress?.inventory.includes('scroll') && (
                         <div className={`scene-element collectible-item item-scroll ${collectedItem === 'scroll' ? 'collected' : ''}`}>
                           📜
+                          <div className="item-glow"></div>
+                        </div>
+                      )}
+                      {availableItems.includes('magic_gem') && !storyProgress?.inventory.includes('magic_gem') && (
+                        <div className={`scene-element collectible-item item-magic-gem ${collectedItem === 'magic_gem' ? 'collected' : ''}`}>
+                          💎
                           <div className="item-glow"></div>
                         </div>
                       )}

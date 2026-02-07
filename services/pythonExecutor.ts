@@ -74,6 +74,8 @@ const executeCodeBlock = (
   const openDoorRegex = /open_door\(\s*\)/;
   const messageRegex = /show_message\(\s*["']([^"']+)["']\s*\)/;
   const choosePathRegex = /choose_path\(\s*["']([\w_]+)["']\s*\)/;
+  const hypnotizeDragonRegex = /hypnotize_dragon\(\s*\)/;
+  const fightDragonRegex = /fight_dragon\(\s*\)/;
   
   let result: any = { action: 'continue', success: true };
   let i = startIndex;
@@ -102,8 +104,14 @@ const executeCodeBlock = (
       result = { action: 'collect', item: match[1], success: true };
     } else if (openDoorRegex.test(trimmed)) {
       result = { action: 'open_door', success: true, message: 'The door opens!' };
+    } else if (hypnotizeDragonRegex.test(trimmed)) {
+      result = { action: 'hypnotize_dragon', success: true };
+    } else if (fightDragonRegex.test(trimmed)) {
+      result = { action: 'fight_dragon', success: true };
     } else if ((match = trimmed.match(messageRegex))) {
       result = { action: 'message', text: match[1], success: true };
+    } else if ((match = trimmed.match(choosePathRegex))) {
+      result = { action: 'choose_path', choiceId: match[1], success: true };
     }
     
     i++;
@@ -134,6 +142,8 @@ export const executePython = (code: string, context: Record<string, any> = {}): 
       const openDoorRegex = /open_door\(\s*\)/;
       const messageRegex = /show_message\(\s*["']([^"']+)["']\s*\)/;
       const choosePathRegex = /choose_path\(\s*["']([\w_]+)["']\s*\)/;
+      const hypnotizeDragonRegex = /hypnotize_dragon\(\s*\)/;
+      const fightDragonRegex = /fight_dragon\(\s*\)/;
 
       let i = 0;
       while (i < lines.length) {
@@ -166,6 +176,10 @@ export const executePython = (code: string, context: Record<string, any> = {}): 
                 result = { action: 'collect', item: match[1], success: true };
               } else if (openDoorRegex.test(sameLineTrimmed)) {
                 result = { action: 'open_door', success: true, message: 'The door opens!' };
+              } else if (hypnotizeDragonRegex.test(sameLineTrimmed)) {
+                result = { action: 'hypnotize_dragon', success: true };
+              } else if (fightDragonRegex.test(sameLineTrimmed)) {
+                result = { action: 'fight_dragon', success: true };
               } else if ((match = sameLineTrimmed.match(messageRegex))) {
                 result = { action: 'message', text: match[1], success: true };
               } else if ((match = sameLineTrimmed.match(choosePathRegex))) {
@@ -227,6 +241,10 @@ export const executePython = (code: string, context: Record<string, any> = {}): 
           result = { action: 'collect', item: match[1], success: true };
         } else if (openDoorRegex.test(trimmed)) {
           result = { action: 'open_door', success: true, message: 'The door opens!' };
+        } else if (hypnotizeDragonRegex.test(trimmed)) {
+          result = { action: 'hypnotize_dragon', success: true };
+        } else if (fightDragonRegex.test(trimmed)) {
+          result = { action: 'fight_dragon', success: true };
         } else if ((match = trimmed.match(messageRegex))) {
           result = { action: 'message', text: match[1], success: true };
         } else if ((match = trimmed.match(choosePathRegex))) {

@@ -679,6 +679,11 @@
 .item-crystal { bottom: 30%; left: 40%; }
 .item-sword { bottom: 40%; left: 20%; }
 
+/* Item positions for desert (temple) */
+.item-magic-gem { top: 35%; right: 35%; }
+.item-scroll { top: 35%; left: 35%; }
+.item-artifact { bottom: 35%; left: 50%; transform: translateX(-50%); }
+
 /* Available items hint */
 .available-items-hint {
   margin-top: 15px;

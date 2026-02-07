@@ -33,6 +33,8 @@ export interface IStoryGame extends Document {
   isDead?: boolean;
   deathCount?: number;
   lastDeathLocation?: string;
+  dragonHypnotized?: boolean;
+  dragonDefeated?: boolean;
   lastActive: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -121,6 +123,14 @@ const storyGameSchema = new Schema<IStoryGame>(
     },
     lastDeathLocation: {
       type: String,
+    },
+    dragonHypnotized: {
+      type: Boolean,
+      default: false,
+    },
+    dragonDefeated: {
+      type: Boolean,
+      default: false,
     },
     lastActive: {
       type: Date,

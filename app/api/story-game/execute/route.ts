@@ -412,6 +412,86 @@ export async function POST(req: NextRequest) {
       }
     } else if (result.action === 'message' && result.text) {
       message = result.text;
+    } else if (result.action === 'hypnotize_dragon' && result.success) {
+      const atDragonLair = storyGame.currentScene === 'castle' && storyGame.currentLocation === 'dragon_lair';
+      const hasMagicGem = updatedInventory.some((item: { name: string }) => item.name === 'magic_gem');
+      if (!atDragonLair) {
+        message = 'You need to be at the dragon lair to hypnotize the dragon! Use move_to("dragon_lair") first.';
+        result.success = false;
+      } else if (!hasMagicGem) {
+        message = "You need the magic gem from the desert temple to hypnotize the dragon!";
+        result.success = false;
+      } else {
+        storyGame.dragonHypnotized = true;
+        message = 'You use the magic gem and the dragon falls into a trance!';
+        coinsEarned = 15;
+        experienceEarned = 15;
+      }
+    } else if (result.action === 'fight_dragon' && result.success) {
+      const atDragonLair = storyGame.currentScene === 'castle' && storyGame.currentLocation === 'dragon_lair';
+      const invNames = updatedInventory.map((item: { name: string }) => item.name);
+      const hasSword = invNames.includes('sword');
+      const hasShield = invNames.includes('shield');
+      const hasCrown = invNames.includes('crown');
+      const dragonHypnotized = !!storyGame.dragonHypnotized;
+      const alreadyDefeated = !!storyGame.dragonDefeated;
+
+      if (alreadyDefeated) {
+        message = "You've already defeated the dragon!";
+        result.success = false;
+      } else if (!atDragonLair) {
+        message = 'You can only fight the dragon from the dragon lair! Use move_to("dragon_lair") first.';
+        result.success = false;
+      } else if (!dragonHypnotized) {
+        message = 'Hypnotize the dragon with the magic gem first! Use hypnotize_dragon().';
+        result.success = false;
+      } else if (!hasSword || !hasShield || !hasCrown) {
+        const missing = [];
+        if (!hasSword) missing.push('sword');
+        if (!hasShield) missing.push('shield');
+        if (!hasCrown) missing.push('crown (from the castle tower)');
+        message = `You need ${missing.join(', ')} to fight the dragon!`;
+        result.success = false;
+      } else {
+        storyGame.dragonDefeated = true;
+        message = "With the dragon hypnotized, you strike with your sword and shield! The crown's power seals the victory! You defeat the dragon!";
+        coinsEarned = 100;
+        experienceEarned = 50;
+        storyGame.lastActive = new Date();
+        await storyGame.save();
+        const user = await User.findById(userId);
+        if (!user) {
+          return Response.json({ message: 'User not found' }, { status: 404 });
+        }
+        user.coins += coinsEarned;
+        user.experience += experienceEarned;
+        if (user.experience >= user.level * 100) {
+          user.level += 1;
+          user.coins += 50;
+        }
+        await user.save();
+        const scene = SCENES[storyGame.currentScene as keyof typeof SCENES];
+        const locationItems: string[] = (scene.locationItems as Record<string, string[]>)[storyGame.currentLocation] || [];
+        const finalAvailableItems = locationItems.filter(
+          (itemName: string) => !storyGame.inventory.some((i: { name: string }) => i.name === itemName)
+        );
+        return Response.json({
+          success: true,
+          message,
+          action: 'fight_dragon',
+          dragonDefeated: true,
+          newLocation: storyGame.currentLocation,
+          newScene: storyGame.currentScene,
+          newInventory: storyGame.inventory.map((i: { name: string }) => i.name),
+          availableItems: finalAvailableItems,
+          coinsEarned,
+          experienceEarned,
+          userCoins: user.coins,
+          userExperience: user.experience,
+          userLevel: user.level,
+          storyProgress: storyGame.storyProgress,
+        });
+      }
     } else if (result.action === 'continue') {
       message = result.output || 'Code executed successfully!';
     }
