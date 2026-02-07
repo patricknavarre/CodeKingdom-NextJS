@@ -277,6 +277,16 @@ export const validatePythonCode = (code: string) => {
     }
   }
   
+  // Check for spaces in location/item names (should use underscores)
+  // Check move_to("location with spaces") or collect_item("item with spaces")
+  const spaceInQuotesPattern = /(move_to|collect_item|choose_path)\(["']([^"']*\s[^"']*)["']\)/;
+  if (spaceInQuotesPattern.test(code)) {
+    return {
+      valid: false,
+      error: 'Location and item names should use underscores instead of spaces. For example: use "forest_clearing" instead of "forest clearing". This follows Python naming conventions!',
+    };
+  }
+  
   // Check for required patterns (if/else statements)
   if (!code.includes('if') && !code.includes('else')) {
     return {
