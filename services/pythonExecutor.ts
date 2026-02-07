@@ -147,17 +147,37 @@ export const executePython = (code: string, context: Record<string, any> = {}): 
         }
         
         // Check for if statement
-        const ifMatch = trimmed.match(/if\s+(.+):/);
+        const ifMatch = trimmed.match(/if\s+(.+?):\s*(.*)/);
         if (ifMatch) {
           const condition = ifMatch[1];
+          const sameLineCode = ifMatch[2] || ''; // Code on the same line after the colon
           const conditionResult = evaluateCondition(condition, context);
           const baseIndent = getIndent(line);
           
           if (conditionResult) {
-            // Execute if block
-            const blockResult = executeCodeBlock(lines, i + 1, baseIndent, context);
-            result = blockResult.result;
-            i = blockResult.nextIndex;
+            // Check if there's code on the same line
+            if (sameLineCode.trim()) {
+              // Execute the code on the same line
+              const sameLineTrimmed = sameLineCode.trim();
+              let match;
+              if ((match = sameLineTrimmed.match(moveRegex))) {
+                result = { action: 'move', location: match[1], success: true };
+              } else if ((match = sameLineTrimmed.match(collectRegex))) {
+                result = { action: 'collect', item: match[1], success: true };
+              } else if (openDoorRegex.test(sameLineTrimmed)) {
+                result = { action: 'open_door', success: true, message: 'The door opens!' };
+              } else if ((match = sameLineTrimmed.match(messageRegex))) {
+                result = { action: 'message', text: match[1], success: true };
+              } else if ((match = sameLineTrimmed.match(choosePathRegex))) {
+                result = { action: 'choose_path', choiceId: match[1], success: true };
+              }
+              i++; // Move to next line
+            } else {
+              // Execute if block from next line
+              const blockResult = executeCodeBlock(lines, i + 1, baseIndent, context);
+              result = blockResult.result;
+              i = blockResult.nextIndex;
+            }
             
             // Check for else on same indent level
             if (i < lines.length) {
