@@ -41,7 +41,7 @@ const SCENE_BACKGROUNDS: Record<string, string> = {
   town: 'url(/images/backgrounds/Background_Village_Square.png)',
   ocean: 'linear-gradient(135deg, #1e3a5f 0%, #0a1f3d 50%, #006994 100%)',
   mountain: 'url(/images/backgrounds/Background_Mountain.png)',
-  desert: 'linear-gradient(135deg, #d4a574 0%, #c19a6b 50%, #8b6914 100%)',
+  desert: 'url(/images/backgrounds/Background_Desert.png)',
 };
 
 export default function StoryGamePage() {
