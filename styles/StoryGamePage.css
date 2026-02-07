@@ -602,7 +602,7 @@
 .collectible-item {
   font-size: 3rem;
   cursor: pointer;
-  position: relative;
+  position: absolute;
   animation: itemPulse 2s ease-in-out infinite;
   filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
   z-index: 5;
