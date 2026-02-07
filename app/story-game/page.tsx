@@ -868,7 +868,12 @@ export default function StoryGamePage() {
             <div className="story-game-scene-panel">
               <div
                 className="scene-background"
-                style={{ background: SCENE_BACKGROUNDS[storyProgress?.currentScene || 'forest'] || SCENE_BACKGROUNDS.forest }}
+                style={{ 
+                  background: SCENE_BACKGROUNDS[storyProgress?.currentScene || 'forest'] || SCENE_BACKGROUNDS.forest,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat'
+                }}
               >
                 {/* Character */}
                 <div
