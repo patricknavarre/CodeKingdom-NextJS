@@ -676,8 +676,11 @@ export default function StoryGamePage() {
                         border: '2px solid #90caf9'
                       }}>
                         <strong>🗺️ Where Can I Go?</strong>
-                        <p style={{ marginTop: '8px', marginBottom: '10px', fontSize: '0.9rem' }}>
-                          This scene has several locations to explore. Try using <code>move_to("location_name")</code> to visit them:
+                        <p style={{ marginTop: '8px', marginBottom: '6px', fontSize: '0.9rem' }}>
+                          <strong>In this scene</strong> (below): use <code>move_to("location_name")</code> to visit these locations.
+                        </p>
+                        <p style={{ marginTop: '4px', marginBottom: '10px', fontSize: '0.85rem', color: '#555' }}>
+                          To go to a <strong>different scene</strong> (e.g. desert, ocean, town), you need to reach a decision point and use <code>choose_path("choice_id")</code> when that choice appears.
                         </p>
                         <div style={{ 
                           display: 'grid', 
@@ -719,7 +722,7 @@ export default function StoryGamePage() {
                           fontStyle: 'italic',
                           color: '#555'
                         }}>
-                          💡 Tip: Each location might have different items or secrets to discover!
+                          💡 Tip: <code>move_to()</code> only works for locations in your current scene. Use <code>choose_path()</code> at decision points to change scenes (e.g. to the desert or ocean).
                         </p>
                         {storyProgress?.currentLocation === 'dragon_lair' && (
                           <p style={{ marginTop: '10px', fontSize: '0.9rem', fontWeight: 600, color: '#c62828' }}>
