@@ -41,6 +41,7 @@ const SCENE_BACKGROUNDS: Record<string, string> = {
   town: 'url(/images/backgrounds/Background_Village_Square.png)',
   ocean: 'linear-gradient(135deg, #1e3a5f 0%, #0a1f3d 50%, #006994 100%)',
   mountain: 'url(/images/backgrounds/Background_Mountain.png)',
+  cave: 'url(/images/backgrounds/Background_Cave.png)',
   desert: 'url(/images/backgrounds/Background_Desert.png)',
 };
 
@@ -869,7 +870,15 @@ export default function StoryGamePage() {
               <div
                 className="scene-background"
                 style={{ 
-                  background: SCENE_BACKGROUNDS[storyProgress?.currentScene || 'forest'] || SCENE_BACKGROUNDS.forest,
+                  background: (() => {
+                    const scene = storyProgress?.currentScene || 'forest';
+                    const location = storyProgress?.currentLocation || '';
+                    // Use cave background when in cave or dark_cave (mountain scene)
+                    if (scene === 'mountain' && (location === 'cave' || location === 'dark_cave')) {
+                      return SCENE_BACKGROUNDS.cave || SCENE_BACKGROUNDS.mountain;
+                    }
+                    return SCENE_BACKGROUNDS[scene] || SCENE_BACKGROUNDS.forest;
+                  })(),
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   backgroundRepeat: 'no-repeat'
