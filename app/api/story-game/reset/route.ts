@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
       storyGame.currentLocation = 'forest_entrance';
       storyGame.inventory = [];
       storyGame.completedScenes = [];
+      storyGame.visitedLocations = ['forest_entrance'];
       storyGame.storyProgress = 0;
       await storyGame.save();
     }

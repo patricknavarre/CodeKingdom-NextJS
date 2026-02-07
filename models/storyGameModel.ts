@@ -21,6 +21,7 @@ export interface IStoryGame extends Document {
     chosenAt: Date;
   }>;
   unlockedScenes: string[]; // Scenes unlocked through choices
+  visitedLocations: string[]; // All locations the player has ever been to (for progress %)
   hintsUsed: Array<{
     scene: string;
     hintLevel: number; // 1, 2, or 3
@@ -88,6 +89,9 @@ const storyGameSchema = new Schema<IStoryGame>(
       },
     }],
     unlockedScenes: [{
+      type: String,
+    }],
+    visitedLocations: [{
       type: String,
     }],
     hintsUsed: [{

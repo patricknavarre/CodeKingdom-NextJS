@@ -424,11 +424,24 @@ export async function POST(req: NextRequest) {
     if (!storyGame.unlockedScenes) {
       storyGame.unlockedScenes = [];
     }
+    if (!Array.isArray(storyGame.visitedLocations)) {
+      storyGame.visitedLocations = [];
+    }
+    // Backfill for existing saves: ensure current location is in visited
+    if (storyGame.visitedLocations.length === 0 && storyGame.currentLocation) {
+      storyGame.visitedLocations = [storyGame.currentLocation];
+    }
+    // Record this location as visited (and any new location we're moving to)
+    if (!storyGame.visitedLocations.includes(updatedLocation)) {
+      storyGame.visitedLocations.push(updatedLocation);
+    }
     
-    // Update story progress percentage
+    // Update story progress percentage from unique locations visited
     const totalLocations = Object.values(SCENES).reduce((sum, scene) => sum + scene.locations.length, 0);
-    const completedLocations = storyGame.completedScenes.length * 4; // Approximate
-    storyGame.storyProgress = Math.min(100, Math.round((completedLocations / totalLocations) * 100));
+    const uniqueVisited = storyGame.visitedLocations.filter((loc: string) =>
+      Object.values(SCENES).some(scene => scene.locations.includes(loc))
+    );
+    storyGame.storyProgress = Math.min(100, Math.round((uniqueVisited.length / totalLocations) * 100));
     
     storyGame.lastActive = new Date();
     await storyGame.save();

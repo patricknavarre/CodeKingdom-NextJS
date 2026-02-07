@@ -30,7 +30,15 @@ export async function GET(req: NextRequest) {
         currentLocation: 'forest_entrance',
         inventory: [],
         storyProgress: 0,
+        visitedLocations: ['forest_entrance'],
       });
+    }
+    
+    // Backfill visitedLocations for existing saves so progress % is accurate
+    if (!Array.isArray(storyGame.visitedLocations) || storyGame.visitedLocations.length === 0) {
+      storyGame.visitedLocations = [storyGame.currentLocation];
+      storyGame.markModified('visitedLocations');
+      await storyGame.save();
     }
     
     // Get available items at current location
@@ -54,6 +62,16 @@ export async function GET(req: NextRequest) {
       available: !choice.requiredItem || storyGame.inventory.some(item => item.name === choice.requiredItem),
     })) : [];
     
+    // Compute progress from visited locations (accurate); fallback to stored value for old saves
+    const totalLocations = Object.values(SCENES).reduce((sum, s) => sum + s.locations.length, 0);
+    const visitedLocations = Array.isArray(storyGame.visitedLocations) ? storyGame.visitedLocations : [];
+    const uniqueVisited = visitedLocations.filter((loc: string) =>
+      Object.values(SCENES).some(scene => scene.locations.includes(loc))
+    );
+    const storyProgress = visitedLocations.length > 0
+      ? Math.min(100, Math.round((uniqueVisited.length / totalLocations) * 100))
+      : (storyGame.storyProgress ?? 0);
+    
     return Response.json({
       currentScene: storyGame.currentScene,
       currentLocation: storyGame.currentLocation,
@@ -61,7 +79,7 @@ export async function GET(req: NextRequest) {
       availableItems,
       availableChoices,
       unlockedScenes: storyGame.unlockedScenes || [],
-      storyProgress: storyGame.storyProgress,
+      storyProgress,
       completedScenes: storyGame.completedScenes,
       hintsUsed: storyGame.hintsUsed,
     });
