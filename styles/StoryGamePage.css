@@ -481,6 +481,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0; /* allow flex child to fill */
   background: white;
   border-radius: 10px;
   overflow: hidden;
@@ -492,10 +493,14 @@
   position: relative;
   overflow: hidden;
   width: 100%;
+  min-width: 0;
   aspect-ratio: 16 / 9;
   min-height: 320px;
   max-height: min(65vh, 560px);
   flex-shrink: 0;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
 }
 
 .character-sprite {
