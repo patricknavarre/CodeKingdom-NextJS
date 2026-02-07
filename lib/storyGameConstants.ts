@@ -353,7 +353,7 @@ export const DECISION_POINTS: Record<string, {
         id: 'explore_base',
         description: 'Explore the mountain base',
         nextLocation: 'mountain_base',
-        message: 'You find some useful supplies at the base.',
+        message: 'You explore the base but don\'t find anything new. Try climbing the cliff path or looking for items to collect!',
       },
       {
         id: 'return_previous',
