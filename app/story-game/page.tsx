@@ -44,6 +44,7 @@ const SCENE_BACKGROUNDS: Record<string, string> = {
   cave: 'url(/images/backgrounds/Background_Cave.png)',
   dragonLair: 'url(/images/backgrounds/Background_Dragon_Lair.png)',
   castleHall: 'url(/images/backgrounds/Background_Castle_Hall.png)',
+  castleCourtyard: 'url(/images/backgrounds/Background_Castle_Courtyard.png)',
   desert: 'url(/images/backgrounds/Background_Desert.png)',
 };
 
@@ -978,6 +979,10 @@ export default function StoryGamePage() {
                     // Use castle hall background when at castle_hall (castle scene)
                     if (scene === 'castle' && location === 'castle_hall') {
                       return SCENE_BACKGROUNDS.castleHall || SCENE_BACKGROUNDS.castle;
+                    }
+                    // Use castle courtyard background when at castle_courtyard (castle scene)
+                    if (scene === 'castle' && location === 'castle_courtyard') {
+                      return SCENE_BACKGROUNDS.castleCourtyard || SCENE_BACKGROUNDS.castle;
                     }
                     return SCENE_BACKGROUNDS[scene] || SCENE_BACKGROUNDS.forest;
                   })(),
