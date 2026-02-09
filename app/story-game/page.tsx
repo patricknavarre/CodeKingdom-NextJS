@@ -422,7 +422,7 @@ export default function StoryGamePage() {
         chapterOverlayTimeoutRef.current = setTimeout(() => {
           setShowChapterOverlay(false);
           chapterOverlayTimeoutRef.current = null;
-        }, 2500);
+        }, 5000);
       }
 
       // Update available items from response
