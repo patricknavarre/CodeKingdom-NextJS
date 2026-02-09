@@ -41,6 +41,9 @@ const SCENE_BACKGROUNDS: Record<string, string> = {
   town: 'url(/images/backgrounds/Background_Village_Square.png)',
   ocean: 'linear-gradient(135deg, #1e3a5f 0%, #0a1f3d 50%, #006994 100%)',
   mountain: 'url(/images/backgrounds/Background_Mountain.png)',
+  cave: 'url(/images/backgrounds/Background_Cave.png)',
+  dragonLair: 'url(/images/backgrounds/Background_Dragon_Lair.png)',
+  castleHall: 'url(/images/backgrounds/Background_Castle_Hall.png)',
   desert: 'url(/images/backgrounds/Background_Desert.png)',
 };
 
@@ -255,6 +258,34 @@ export default function StoryGamePage() {
         setTimeout(() => {
           loadStoryProgress();
         }, 100);
+        setExecuting(false);
+        setIsWalking(false);
+        return;
+      }
+
+      // Dragon defeated: show victory modal and rewards
+      if (response.data.dragonDefeated === true) {
+        const newLocation = response.data.newLocation || storyProgress?.currentLocation;
+        const newScene = response.data.newScene || storyProgress?.currentScene;
+        setStoryProgress(prev => ({
+          ...prev!,
+          currentLocation: newLocation,
+          currentScene: newScene,
+          inventory: response.data.newInventory ?? prev?.inventory,
+          storyProgress: response.data.storyProgress ?? prev?.storyProgress ?? 0,
+        }));
+        if (response.data.coinsEarned) addCoins(response.data.coinsEarned);
+        if (response.data.experienceEarned) addExperience(response.data.experienceEarned);
+        setLevelCompleteData({
+          message: response.data.message,
+          coinsEarned: response.data.coinsEarned ?? 0,
+          experienceEarned: response.data.experienceEarned ?? 0,
+        });
+        setShowLevelComplete(true);
+        setMessage(response.data.message || 'You defeat the dragon!');
+        setTimeout(() => {
+          setShowLevelComplete(false);
+        }, 4000);
         setExecuting(false);
         setIsWalking(false);
         return;
@@ -558,18 +589,18 @@ export default function StoryGamePage() {
                       )}
                       {storyProgress?.currentScene === 'castle' && (
                         <>
-                          <p>Collect the sword and shield to progress through the castle. Use <strong>if/else statements</strong> to check your inventory!</p>
-                          <p><strong>Step 1:</strong> Move to different locations to find items: <code>move_to("castle_courtyard")</code></p>
-                          <p><strong>Step 2:</strong> Collect items when you find them: <code>collect_item("sword")</code></p>
-                          <p><strong>Step 3:</strong> Use if statements to check before moving: <code>if "sword" in inventory: move_to("castle_hall")</code></p>
+                          <p>To beat the dragon you need <strong>sword</strong> (mountain base), <strong>shield</strong> (town market), <strong>crown</strong> (castle tower), and <strong>magic gem</strong> (desert temple).</p>
+                          <p><strong>Step 1:</strong> Get the crown here: <code>move_to(&quot;castle_tower&quot;)</code> then <code>collect_item(&quot;crown&quot;)</code>. Get the magic gem from the desert temple first if you don&apos;t have it.</p>
+                          <p><strong>Step 2:</strong> At the lair: <code>move_to(&quot;dragon_lair&quot;)</code>. Then use <code>hypnotize_dragon()</code> (uses the magic gem), then <code>fight_dragon()</code> (needs sword, shield, crown, and dragon hypnotized).</p>
+                          <p><strong>Step 3:</strong> Don&apos;t enter the dragon lair without sword and shield—you won&apos;t survive!</p>
                         </>
                       )}
                       {storyProgress?.currentScene === 'town' && (
                         <>
-                          <p>Explore the town market to find useful items. Use <strong>if statements to check your location</strong>!</p>
-                          <p><strong>Step 1:</strong> Move to the market: <code>move_to("town_market")</code></p>
-                          <p><strong>Step 2:</strong> Check your location with if: <code>if current_location == "town_market": collect_item("bread")</code></p>
-                          <p><strong>Step 3:</strong> Use if/else to handle different locations!</p>
+                          <p>Explore the town market. Get the <strong>shield</strong> here—you&apos;ll need it <strong>with the sword</strong> (from the mountain base) to face the dragon in the castle!</p>
+                          <p><strong>Step 1:</strong> Move to the market: <code>move_to(&quot;town_market&quot;)</code></p>
+                          <p><strong>Step 2:</strong> Collect the shield: <code>collect_item(&quot;shield&quot;)</code></p>
+                          <p><strong>Step 3:</strong> If you already have the sword, go to the castle. If not, head to the mountain base to get the sword first!</p>
                         </>
                       )}
                       {storyProgress?.currentScene === 'ocean' && (
@@ -582,21 +613,111 @@ export default function StoryGamePage() {
                       )}
                       {storyProgress?.currentScene === 'mountain' && (
                         <>
-                          <p>Safety first! Collect the rope and torch before climbing. Use <strong>if/else to check your equipment</strong>!</p>
-                          <p><strong>Step 1:</strong> Collect the rope first: <code>move_to("cliff_path")</code> then <code>collect_item("rope")</code></p>
-                          <p><strong>Step 2:</strong> Check before climbing: <code>if "rope" in inventory: move_to("summit")</code></p>
-                          <p><strong>Step 3:</strong> Get the torch before the cave: <code>if "torch" in inventory: move_to("cave")</code></p>
+                          <p>Safety first! Collect the rope and torch before climbing. Also get the <strong>sword</strong> here at the mountain base—you&apos;ll need it <strong>with the shield</strong> (from the town market) to face the dragon in the castle!</p>
+                          <p><strong>Step 1:</strong> Get the sword here: <code>collect_item(&quot;sword&quot;)</code> (you&apos;re at mountain base).</p>
+                          <p><strong>Step 2:</strong> For climbing: <code>move_to(&quot;cliff_path&quot;)</code> then <code>collect_item(&quot;rope&quot;)</code>; then <code>if &quot;rope&quot; in inventory: move_to(&quot;summit&quot;)</code> for the torch.</p>
+                          <p><strong>Step 3:</strong> Before the dragon: get the shield at the town market if you don&apos;t have it yet!</p>
                         </>
                       )}
                       {storyProgress?.currentScene === 'desert' && (
                         <>
-                          <p>Survival in the desert! Collect water and manage your resources. Use <strong>if/else for resource management</strong>!</p>
+                          <p>Survival in the desert! Collect water and the <strong>magic gem</strong> at the temple (with the scroll)—you need it to hypnotize the dragon!</p>
                           <p><strong>Step 1:</strong> Get water first: <code>move_to("sand_dunes")</code> then <code>collect_item("water")</code></p>
                           <p><strong>Step 2:</strong> Check resources before exploring: <code>if "water" in inventory: move_to("ancient_ruins")</code></p>
-                          <p><strong>Step 3:</strong> Collect artifact before temple: <code>if "artifact" in inventory: move_to("temple")</code></p>
+                          <p><strong>Step 3:</strong> At the temple: <code>if "artifact" in inventory: move_to("temple")</code> then <code>collect_item("scroll")</code> and <code>collect_item("magic_gem")</code></p>
                         </>
                       )}
                     </div>
+                    {storyProgress?.inventory && (() => {
+                      const inv = storyProgress.inventory;
+                      const hasSword = inv.includes('sword');
+                      const hasShield = inv.includes('shield');
+                      if (hasSword && !hasShield) {
+                        return (
+                          <div className="quest-hint" style={{ marginTop: '12px', borderLeft: '4px solid #ff9800', background: 'rgba(255, 152, 0, 0.08)' }}>
+                            <strong>➡️ Next step:</strong>
+                            <p style={{ margin: '6px 0 0 0' }}>You have the sword! Get the <strong>shield</strong> at the town market next. From the mountain base, use <code>choose_path(&quot;travel_to_town&quot;)</code> to go to the town. Then <code>move_to(&quot;town_market&quot;)</code> and <code>collect_item(&quot;shield&quot;)</code>.</p>
+                          </div>
+                        );
+                      }
+                      if (hasShield && !hasSword) {
+                        return (
+                          <div className="quest-hint" style={{ marginTop: '12px', borderLeft: '4px solid #ff9800', background: 'rgba(255, 152, 0, 0.08)' }}>
+                            <strong>➡️ Next step:</strong>
+                            <p style={{ margin: '6px 0 0 0' }}>You have the shield! Get the <strong>sword</strong> at the mountain base next. Go to the mountain (from forest exit with a map, or from ocean), then <code>move_to(&quot;mountain_base&quot;)</code> and <code>collect_item(&quot;sword&quot;)</code>.</p>
+                          </div>
+                        );
+                      }
+                      const hasCrown = inv.includes('crown');
+                      const hasMagicGem = inv.includes('magic_gem');
+                      if (hasSword && hasShield && hasCrown && hasMagicGem) {
+                        return (
+                          <div className="quest-hint" style={{ marginTop: '12px', borderLeft: '4px solid #4caf50', background: 'rgba(76, 175, 80, 0.08)' }}>
+                            <strong>➡️ Ready for the dragon!</strong>
+                            <p style={{ margin: '6px 0 0 0' }}>You have sword, shield, crown, and magic gem. Go to the castle, then <code>move_to(&quot;dragon_lair&quot;)</code>. At the lair run <code>hypnotize_dragon()</code> first, then <code>fight_dragon()</code>!</p>
+                          </div>
+                        );
+                      }
+                      if (hasSword && hasShield) {
+                        return (
+                          <div className="quest-hint" style={{ marginTop: '12px', borderLeft: '4px solid #ff9800', background: 'rgba(255, 152, 0, 0.08)' }}>
+                            <strong>➡️ Almost ready for the dragon!</strong>
+                            <p style={{ margin: '6px 0 0 0' }}>Get the <strong>crown</strong> at the castle tower (<code>move_to(&quot;castle_tower&quot;)</code>, <code>collect_item(&quot;crown&quot;)</code>) and the <strong>magic gem</strong> at the desert temple. Then go to <code>dragon_lair</code> and use <code>hypnotize_dragon()</code> then <code>fight_dragon()</code>.</p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
+                    {availableChoices.length > 0 && (
+                      <div className="decision-point-hint" style={{ 
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        padding: '15px',
+                        borderRadius: '10px',
+                        marginTop: '15px',
+                        marginBottom: '15px',
+                        color: 'white',
+                        border: '2px solid #fff',
+                        boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
+                      }}>
+                        <strong>🔀 Decision Point!</strong>
+                        <p style={{ marginTop: '10px', marginBottom: '10px' }}>You&apos;re at a choice. Use <code style={{ background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: '4px', color: 'white' }}>choose_path("choice_id")</code> with one of the IDs below. Some choices take you to another scene (e.g. town, ocean, desert).</p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          {availableChoices.map((choice) => (
+                            <div key={choice.id} style={{
+                              background: choice.available ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.3)',
+                              padding: '10px',
+                              borderRadius: '6px',
+                              border: `2px solid ${choice.available ? '#fff' : '#999'}`,
+                              opacity: choice.available ? 1 : 0.6
+                            }}>
+                              <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+                                {choice.available ? '✅' : '🔒'} {choice.description}
+                              </div>
+                              {choice.requiredItem && (
+                                <div style={{ fontSize: '0.85rem', marginTop: '4px' }}>
+                                  {choice.available ? (
+                                    <span>✓ You have: {choice.requiredItem}</span>
+                                  ) : (
+                                    <span>⚠️ Requires: {choice.requiredItem}</span>
+                                  )}
+                                </div>
+                              )}
+                              <code style={{ 
+                                display: 'block', 
+                                marginTop: '6px', 
+                                fontSize: '0.8rem',
+                                background: 'rgba(0,0,0,0.3)',
+                                padding: '4px 8px',
+                                borderRadius: '4px',
+                                color: 'white'
+                              }}>
+                                choose_path("{choice.id}")
+                              </code>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                     {storyProgress?.currentScene && (
                       <div className="location-guide" style={{
                         background: 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)',
@@ -606,9 +727,26 @@ export default function StoryGamePage() {
                         border: '2px solid #90caf9'
                       }}>
                         <strong>🗺️ Where Can I Go?</strong>
-                        <p style={{ marginTop: '8px', marginBottom: '10px', fontSize: '0.9rem' }}>
-                          This scene has several locations to explore. Try using <code>move_to("location_name")</code> to visit them:
-                        </p>
+                        {availableChoices.length > 0 && (
+                          <p style={{ marginTop: '8px', marginBottom: '6px', fontSize: '0.9rem', fontWeight: 600, color: '#333' }}>
+                            You&apos;re at a decision point. Use the choices above with <code>choose_path("choice_id")</code> to move or change scenes. Or use <code>move_to("location_name")</code> for locations in this scene (below).
+                          </p>
+                        )}
+                        {availableChoices.length === 0 && (
+                          <>
+                            <p style={{ marginTop: '8px', marginBottom: '6px', fontSize: '0.9rem' }}>
+                              <strong>In this scene</strong> (below): use <code>move_to("location_name")</code> to visit these locations.
+                            </p>
+                            <p style={{ marginTop: '4px', marginBottom: '10px', fontSize: '0.85rem', color: '#555' }}>
+                              To go to a <strong>different scene</strong> (e.g. desert, ocean, town), go to a decision point and use <code>choose_path("choice_id")</code> when that choice appears.
+                            </p>
+                          </>
+                        )}
+                        {availableChoices.length > 0 && (
+                          <p style={{ marginTop: '4px', marginBottom: '10px', fontSize: '0.85rem', color: '#555' }}>
+                            <strong>In this scene</strong> (below): use <code>move_to("location_name")</code> to visit these locations.
+                          </p>
+                        )}
                         <div style={{ 
                           display: 'grid', 
                           gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
@@ -649,57 +787,13 @@ export default function StoryGamePage() {
                           fontStyle: 'italic',
                           color: '#555'
                         }}>
-                          💡 Tip: Each location might have different items or secrets to discover!
+                          💡 Tip: <code>move_to()</code> only works for locations in your current scene. Use <code>choose_path()</code> at decision points to change scenes (e.g. to the desert or ocean).
                         </p>
-                      </div>
-                    )}
-                    {availableChoices.length > 0 && (
-                      <div className="decision-point-hint" style={{ 
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        padding: '15px',
-                        borderRadius: '10px',
-                        marginBottom: '15px',
-                        color: 'white',
-                        border: '2px solid #fff',
-                        boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
-                      }}>
-                        <strong>🔀 Decision Point!</strong>
-                        <p style={{ marginTop: '10px', marginBottom: '10px' }}>You've reached a choice! Use <code style={{ background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: '4px', color: 'white' }}>choose_path("choice_id")</code> to make your decision:</p>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                          {availableChoices.map((choice) => (
-                            <div key={choice.id} style={{
-                              background: choice.available ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.3)',
-                              padding: '10px',
-                              borderRadius: '6px',
-                              border: `2px solid ${choice.available ? '#fff' : '#999'}`,
-                              opacity: choice.available ? 1 : 0.6
-                            }}>
-                              <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
-                                {choice.available ? '✅' : '🔒'} {choice.description}
-                              </div>
-                              {choice.requiredItem && (
-                                <div style={{ fontSize: '0.85rem', marginTop: '4px' }}>
-                                  {choice.available ? (
-                                    <span>✓ You have: {choice.requiredItem}</span>
-                                  ) : (
-                                    <span>⚠️ Requires: {choice.requiredItem}</span>
-                                  )}
-                                </div>
-                              )}
-                              <code style={{ 
-                                display: 'block', 
-                                marginTop: '6px', 
-                                fontSize: '0.8rem',
-                                background: 'rgba(0,0,0,0.3)',
-                                padding: '4px 8px',
-                                borderRadius: '4px',
-                                color: 'white'
-                              }}>
-                                choose_path("{choice.id}")
-                              </code>
-                            </div>
-                          ))}
-                        </div>
+                        {storyProgress?.currentLocation === 'dragon_lair' && (
+                          <p style={{ marginTop: '10px', fontSize: '0.9rem', fontWeight: 600, color: '#c62828' }}>
+                            🐉 At the dragon lair: use <code>hypnotize_dragon()</code> first, then <code>fight_dragon()</code> when you have sword, shield, crown, and the dragon is hypnotized.
+                          </p>
+                        )}
                       </div>
                     )}
                     {availableItems.length > 0 && (
@@ -854,6 +948,7 @@ export default function StoryGamePage() {
                         {item === 'water' && '💧'}
                         {item === 'artifact' && '🏺'}
                         {item === 'scroll' && '📜'}
+                        {item === 'magic_gem' && '💎'}
                         <span>{item}</span>
                       </div>
                     ))
@@ -869,8 +964,24 @@ export default function StoryGamePage() {
               <div
                 className="scene-background"
                 style={{ 
-                  background: SCENE_BACKGROUNDS[storyProgress?.currentScene || 'forest'] || SCENE_BACKGROUNDS.forest,
-                  backgroundSize: 'cover',
+                  background: (() => {
+                    const scene = storyProgress?.currentScene || 'forest';
+                    const location = storyProgress?.currentLocation || '';
+                    // Use cave background when in cave or dark_cave (mountain scene)
+                    if (scene === 'mountain' && (location === 'cave' || location === 'dark_cave')) {
+                      return SCENE_BACKGROUNDS.cave || SCENE_BACKGROUNDS.mountain;
+                    }
+                    // Use dragon lair background when at dragon_lair (castle scene)
+                    if (scene === 'castle' && location === 'dragon_lair') {
+                      return SCENE_BACKGROUNDS.dragonLair || SCENE_BACKGROUNDS.castle;
+                    }
+                    // Use castle hall background when at castle_hall (castle scene)
+                    if (scene === 'castle' && location === 'castle_hall') {
+                      return SCENE_BACKGROUNDS.castleHall || SCENE_BACKGROUNDS.castle;
+                    }
+                    return SCENE_BACKGROUNDS[scene] || SCENE_BACKGROUNDS.forest;
+                  })(),
+                  backgroundSize: 'contain',
                   backgroundPosition: 'center',
                   backgroundRepeat: 'no-repeat'
                 }}
@@ -1010,6 +1121,12 @@ export default function StoryGamePage() {
                           <div className="item-glow"></div>
                         </div>
                       )}
+                      {availableItems.includes('shield') && !storyProgress?.inventory.includes('shield') && (
+                        <div className={`scene-element collectible-item item-shield ${collectedItem === 'shield' ? 'collected' : ''}`}>
+                          🛡️
+                          <div className="item-glow"></div>
+                        </div>
+                      )}
                     </>
                   )}
                   {storyProgress?.currentScene === 'ocean' && (
@@ -1063,6 +1180,12 @@ export default function StoryGamePage() {
                           <div className="item-glow"></div>
                         </div>
                       )}
+                      {availableItems.includes('sword') && !storyProgress?.inventory.includes('sword') && (
+                        <div className={`scene-element collectible-item item-sword ${collectedItem === 'sword' ? 'collected' : ''}`}>
+                          ⚔️
+                          <div className="item-glow"></div>
+                        </div>
+                      )}
                     </>
                   )}
                   {storyProgress?.currentScene === 'desert' && (
@@ -1087,6 +1210,12 @@ export default function StoryGamePage() {
                       {availableItems.includes('scroll') && !storyProgress?.inventory.includes('scroll') && (
                         <div className={`scene-element collectible-item item-scroll ${collectedItem === 'scroll' ? 'collected' : ''}`}>
                           📜
+                          <div className="item-glow"></div>
+                        </div>
+                      )}
+                      {availableItems.includes('magic_gem') && !storyProgress?.inventory.includes('magic_gem') && (
+                        <div className={`scene-element collectible-item item-magic-gem ${collectedItem === 'magic_gem' ? 'collected' : ''}`}>
+                          💎
                           <div className="item-glow"></div>
                         </div>
                       )}

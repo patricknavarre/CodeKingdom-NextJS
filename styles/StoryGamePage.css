@@ -481,17 +481,26 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0; /* allow flex child to fill */
   background: white;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  min-height: 0;
 }
 
 .scene-background {
-  flex: 1;
   position: relative;
   overflow: hidden;
-  min-height: 500px;
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 16 / 9;
+  min-height: 320px;
+  max-height: min(65vh, 560px);
+  flex-shrink: 0;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
 }
 
 .character-sprite {
@@ -661,19 +670,24 @@
 .item-compass { bottom: 30%; left: 50%; }
 
 /* Item positions for castle */
-.item-sword { top: 50%; left: 20%; }
-.item-shield { top: 30%; right: 25%; }
 .item-crown { top: 15%; left: 50%; transform: translateX(-50%); }
 
 /* Item positions for town */
 .item-coin { bottom: 30%; left: 40%; }
 .item-bread { top: 40%; right: 30%; }
 .item-potion { top: 50%; left: 50%; transform: translateX(-50%); }
+.item-shield { top: 30%; right: 25%; }
 
 /* Item positions for mountain */
 .item-rope { top: 50%; left: 50%; transform: translate(-50%, -50%); }
 .item-torch { top: 30%; right: 30%; }
 .item-crystal { bottom: 30%; left: 40%; }
+.item-sword { bottom: 40%; left: 20%; }
+
+/* Item positions for desert (temple) */
+.item-magic-gem { top: 35%; right: 35%; }
+.item-scroll { top: 35%; left: 35%; }
+.item-artifact { bottom: 35%; left: 50%; transform: translateX(-50%); }
 
 /* Available items hint */
 .available-items-hint {

@@ -21,6 +21,7 @@ export interface IStoryGame extends Document {
     chosenAt: Date;
   }>;
   unlockedScenes: string[]; // Scenes unlocked through choices
+  visitedLocations: string[]; // All locations the player has ever been to (for progress %)
   hintsUsed: Array<{
     scene: string;
     hintLevel: number; // 1, 2, or 3
@@ -32,6 +33,8 @@ export interface IStoryGame extends Document {
   isDead?: boolean;
   deathCount?: number;
   lastDeathLocation?: string;
+  dragonHypnotized?: boolean;
+  dragonDefeated?: boolean;
   lastActive: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -90,6 +93,9 @@ const storyGameSchema = new Schema<IStoryGame>(
     unlockedScenes: [{
       type: String,
     }],
+    visitedLocations: [{
+      type: String,
+    }],
     hintsUsed: [{
       scene: String,
       hintLevel: Number, // 1, 2, or 3 (progressive detail)
@@ -117,6 +123,14 @@ const storyGameSchema = new Schema<IStoryGame>(
     },
     lastDeathLocation: {
       type: String,
+    },
+    dragonHypnotized: {
+      type: Boolean,
+      default: false,
+    },
+    dragonDefeated: {
+      type: Boolean,
+      default: false,
     },
     lastActive: {
       type: Date,
