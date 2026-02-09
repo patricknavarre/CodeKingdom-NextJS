@@ -744,3 +744,50 @@ export const ENDINGS: Record<string, { id: string; title: string; message: strin
     message: 'You brokered peace with the dragon using the magic gem. The kingdom is safe without bloodshed.',
   },
 };
+
+// Book-like narrative for each location. Value can be a string or { default, helped_merchant? }.
+export const LOCATION_NARRATIVE: Record<string, string | { default: string; helped_merchant?: string }> = {
+  forest_entrance: 'Tall trees loom on either side of the path. Somewhere in this forest lies a key—and a door that needs opening.',
+  forest_path: 'The path winds deeper into the woods. Birds call from the canopy; something glints between the ferns ahead.',
+  forest_clearing: 'Sun breaks through the leaves into a peaceful clearing. A good place to rest—or to press on toward the forest exit.',
+  forest_exit: 'The trees thin. Before you: paths to the castle, the town, or the mountains. Your choice will shape the journey.',
+  castle_gate: 'The ancient castle rises before you, stone worn by years. The gate stands open. Inside, a courtyard and the promise of danger—or glory.',
+  castle_courtyard: 'Stone walls enclose the courtyard. Ivy climbs the walls; somewhere above, a tower. To one side, the great hall. To the other, the way out.',
+  castle_hall: 'Torchlight flickers in the hall. Tapestries tell of kings and dragons. Stairs lead to the tower; the courtyard lies behind you.',
+  castle_tower: 'From the tower window you see the whole kingdom. A telescope points to distant shores. Here, among maps and old books, a crown waits.',
+  dragon_lair: 'The lair is hot and reeks of smoke. The dragon watches. With the right tools—and courage—you might end this threat for good.',
+  town_gate: 'The town gate bustles with travelers. Beyond it: the square, the market, and the chance to gather what you need for the road ahead.',
+  town_square: 'The heart of the town. Merchants call out; the market is nearby. Rest here, or seek the gate to other lands.',
+  town_market: 'Stalls overflow with bread, potions, and gear. A merchant catches your eye. Helping them might open doors—or maps—later.',
+  town_exit: 'The edge of town. From here you can return to the castle, the forest, or follow a map to the ocean—if you earned one.',
+  beach_shore: {
+    default: 'Waves roll onto the sand. Tide pools and a cave entrance dot the shore. Somewhere, treasure and deeper waters call.',
+    helped_merchant: "The merchant's map led you true. The ocean stretches before you—tide pools, a cave, and the promise of treasure.",
+  },
+  tide_pool: 'Shells and shallow water. You could search here, head for the cave, or return to the main shore.',
+  cave_entrance: 'The cave mouth is dark. Deeper in, something glows. You will need light—or magic—to go farther.',
+  treasure_cove: 'Hidden among the rocks, the cove holds more than shells. Maps and scrolls point to the mountains and the desert.',
+  deep_trench: 'The water presses in. Only a pearl\'s magic could see you through—and perhaps to what lies in the depths.',
+  mountain_base: 'The mountain rises ahead. A sword is said to rest here for the worthy. The cliff path and the summit wait above.',
+  cliff_path: 'The path is steep. A rope would make the climb safe. Above: the summit and a torch that could light the way.',
+  summit: 'You have reached the summit. The world spreads below. A cave holds a crystal; a darker cave demands a torch.',
+  cave: 'Crystals gleam in the walls. One might show the path to the desert. The summit and the base are still within reach.',
+  dark_cave: 'Darkness swallows the way. Without a torch, this place is death. With one, who knows what you might find.',
+  oasis: 'Palms and water in the endless sand. Travelers rest here before the dunes and the ancient ruins.',
+  sand_dunes: 'Dunes roll to the horizon. Water is life here. The ruins—and the temple—lie ahead for those who prepare.',
+  ancient_ruins: 'Broken stones and old magic. An artifact here might protect you in the temple. The oasis is behind; the temples, ahead.',
+  temple: 'A place of scrolls and quiet power. The magic gem waits for those who come prepared. The ancient temple is another step.',
+  ancient_temple: 'The heart of the desert\'s mystery. Only the protected may enter. The gem within could change the fate of the kingdom.',
+};
+
+const DEFAULT_NARRATIVE = 'You take in your surroundings. The next step is yours.';
+
+/** Returns 1–3 sentence narrative for a location; uses flag variant (e.g. helped_merchant) when present. */
+export function getNarrative(location: string, storyFlags?: string[]): string {
+  const entry = LOCATION_NARRATIVE[location];
+  if (!entry) return DEFAULT_NARRATIVE;
+  if (typeof entry === 'string') return entry;
+  const flags = storyFlags || [];
+  if (flags.includes('helped_merchant') && entry.helped_merchant) return entry.helped_merchant;
+  return entry.default;
+}

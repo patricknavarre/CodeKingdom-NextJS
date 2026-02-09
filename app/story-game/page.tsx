@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useCharacter } from '@/contexts/CharacterContext';
 import { storyGameAPI } from '@/lib/api';
-import { SCENES, ENDINGS } from '@/lib/storyGameConstants';
+import { SCENES, ENDINGS, getNarrative } from '@/lib/storyGameConstants';
 import Navigation from '@/components/Navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import '@/styles/StoryGamePage.css';
@@ -62,68 +62,91 @@ export default function StoryGamePage() {
     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
   };
   
-  // Get scene-specific default code
-  const getDefaultCode = (scene: string) => {
+  // Story-guided default code: location-specific hints, then scene fallback
+  const DEFAULT_CODE_BY_LOCATION: Record<string, string> = {
+    forest_entrance: `# Explore the forest to find the key.
+# move_to("forest_path") or move_to("forest_clearing")
+`,
+    forest_path: `# Keep exploring. Try move_to("forest_clearing") or move_to("forest_exit")
+`,
+    forest_clearing: `# move_to("forest_exit") to reach the paths out, or rest here
+`,
+    forest_exit: `# Choose your path: choose_path("path_castle"), choose_path("path_town"), or stay
+`,
+    castle_gate: `# Enter the courtyard: move_to("castle_courtyard")
+`,
+    castle_courtyard: `# To leave: choose_path("leave_castle")
+# To explore: move_to("castle_hall") or move_to("castle_tower")
+`,
+    castle_hall: `# move_to("castle_tower") or move_to("castle_courtyard")
+`,
+    castle_tower: `# Get the crown: collect_item("crown")
+# Then choose_path("explore_ocean") or choose_path("continue_town")
+`,
+    dragon_lair: `# First: hypnotize_dragon()   Then: fight_dragon()
+# Or choose_path("peaceful_ending") to make peace
+`,
+    town_gate: `# move_to("town_square") or move_to("town_market")
+`,
+    town_square: `# move_to("town_market") to find items, or move_to("town_exit") to leave
+`,
+    town_market: `# collect_item("shield"), collect_item("bread"), or choose_path("travel_to_castle") when ready
+`,
+    town_exit: `# choose_path("return_castle"), choose_path("path_forest"), or choose_path("ask_merchant_ocean") if you helped them
+`,
+    beach_shore: `# move_to("tide_pool"), move_to("cave_entrance"), or move_to("treasure_cove")
+`,
+    tide_pool: `# move_to("beach_shore"), move_to("cave_entrance"), or search here
+`,
+    cave_entrance: `# collect_item("pearl") if you see it; move_to("treasure_cove") or move_to("beach_shore")
+`,
+    treasure_cove: `# collect_item("treasure_map"); then choose_path("path_mountain") or choose_path("path_desert")
+`,
+    mountain_base: `# collect_item("sword"); move_to("cliff_path") or choose_path("travel_to_town")
+`,
+    cliff_path: `# collect_item("rope"); then move_to("summit") or move_to("mountain_base")
+`,
+    summit: `# collect_item("torch"); move_to("cave") or move_to("dark_cave") (need torch!)
+`,
+    cave: `# collect_item("crystal"); choose_path("path_desert") or move_to("summit")
+`,
+    oasis: `# move_to("sand_dunes"), move_to("ancient_ruins"), or move_to("temple")
+`,
+    sand_dunes: `# collect_item("water"); move_to("ancient_ruins") or move_to("oasis")
+`,
+    ancient_ruins: `# collect_item("artifact"); move_to("temple") or move_to("ancient_temple")
+`,
+    temple: `# collect_item("scroll") and collect_item("magic_gem"); then move_to("ancient_temple") if ready
+`,
+  };
+
+  const getDefaultCode = (scene: string, location?: string): string => {
+    if (location && DEFAULT_CODE_BY_LOCATION[location]) return DEFAULT_CODE_BY_LOCATION[location];
     switch (scene) {
       case 'forest':
-        return `# Write Python code to make decisions!
-# Example:
-# if "key" in inventory:
-#     open_door()
-# else:
-#     print("You need a key!")
+        return `# Explore with move_to("location_name"). Find the key, then open_door()
 `;
       case 'castle':
-        return `# Use if/else to check your inventory!
-# Example:
-# if "sword" in inventory:
-#     move_to("castle_hall")
-# else:
-#     collect_item("sword")
+        return `# move_to("castle_hall"), move_to("castle_tower"), or choose_path("leave_castle")
 `;
       case 'town':
-        return `# Check your location with if statements!
-# Example:
-# if current_location == "town_market":
-#     collect_item("bread")
-# else:
-#     move_to("town_market")
+        return `# move_to("town_market") to find items; use choose_path() at decision points
 `;
       case 'ocean':
-        return `# Use if/else to check items before accessing treasure!
-# Example:
-# if "treasure_map" in inventory:
-#     move_to("treasure_cove")
-# else:
-#     collect_item("treasure_map")
+        return `# move_to("tide_pool"), move_to("cave_entrance"), or move_to("treasure_cove")
 `;
       case 'mountain':
-        return `# Safety first! Check equipment with if/else!
-# Example:
-# if "rope" in inventory:
-#     move_to("cliff_path")
-# else:
-#     collect_item("rope")
+        return `# move_to("cliff_path"), move_to("summit"), or move_to("cave"). Get rope and torch first
 `;
       case 'desert':
-        return `# Manage your resources with if/else!
-# Example:
-# if "water" in inventory:
-#     move_to("ancient_ruins")
-# else:
-#     collect_item("water")
+        return `# move_to("sand_dunes"), move_to("ancient_ruins"), or move_to("temple")
 `;
       default:
-        return `# Write Python code to make decisions!
-# Example:
-# if "key" in inventory:
-#     open_door()
-# else:
-#     print("You need a key!")
+        return `# Explore with move_to("location_name") or choose_path("choice_id") at decision points
 `;
     }
   };
-  
+
   const [code, setCode] = useState(getDefaultCode('forest'));
   const [storyProgress, setStoryProgress] = useState<StoryProgress | null>(null);
   const [loading, setLoading] = useState(true);
@@ -224,9 +247,9 @@ export default function StoryGamePage() {
       } else {
         setEndingModal(null);
       }
-      // Set default code based on current scene
+      // Set default code based on current scene and location (story-guided hints)
       if (response.data.currentScene) {
-        setCode(getDefaultCode(response.data.currentScene));
+        setCode(getDefaultCode(response.data.currentScene, response.data.currentLocation));
       }
       setLoading(false);
     } catch (error: any) {
@@ -372,9 +395,9 @@ export default function StoryGamePage() {
         storyProgress: response.data.storyProgress || prev?.storyProgress || 0,
       }));
       
-      // Update default code when scene changes
-      if (newScene !== prevScene) {
-        setCode(getDefaultCode(newScene));
+      // Update default code when scene or location changes (story-guided hints)
+      if (newScene !== prevScene || newLocation !== storyProgress?.currentLocation) {
+        setCode(getDefaultCode(newScene, newLocation));
       }
 
       // Update available items from response
@@ -600,6 +623,13 @@ export default function StoryGamePage() {
                   </button>
                 </div>
               </div>
+
+              {/* Story narrative - book-like description for current location */}
+              {storyProgress?.currentLocation && (
+                <div className="story-narrative">
+                  <p>{getNarrative(storyProgress.currentLocation, storyProgress.storyFlags)}</p>
+                </div>
+              )}
               
               {/* How to Play Instructions - Collapsible */}
               <div className="how-to-play-panel" style={{ display: 'block' }}>

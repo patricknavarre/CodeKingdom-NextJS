@@ -90,6 +90,22 @@
   font-size: 1.5rem;
 }
 
+.story-narrative {
+  margin-bottom: 15px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #faf8f5 0%, #f5f0e8 100%);
+  border: 1px solid #e8e0d4;
+  border-radius: 8px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #3d3829;
+}
+
+.story-narrative p {
+  margin: 0;
+}
+
 .hint-buttons {
   display: flex;
   gap: 10px;
