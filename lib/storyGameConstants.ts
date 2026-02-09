@@ -39,6 +39,8 @@ export const DANGEROUS_LOCATIONS: Record<string, {
 export type DecisionChoice = {
   id: string;
   description: string;
+  /** CYOA-style hint shown in UI: e.g. "If you enter the hall, run choose_path('enter_hall')." */
+  codeHint?: string;
   requiredItem?: string;
   unlocksScene?: string;
   unlocksLocation?: string;
@@ -60,18 +62,21 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'explore_deep',
         description: 'Explore deeper into the forest',
+        codeHint: 'If you venture deeper, run choose_path("explore_deep").',
         nextLocation: 'forest_exit',
         message: 'You discover a hidden path leading out of the forest!',
       },
       {
         id: 'rest_clearing',
         description: 'Rest in the peaceful clearing',
+        codeHint: 'If you rest here, run choose_path("rest_clearing").',
         nextLocation: 'forest_clearing',
         message: 'You take a moment to rest and gather your strength.',
       },
       {
         id: 'back_to_path',
         description: 'Return to the forest path',
+        codeHint: 'If you turn back, run choose_path("back_to_path").',
         nextLocation: 'forest_path',
       },
     ],
@@ -82,18 +87,21 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'path_castle',
         description: 'Take the path to the ancient castle',
+        codeHint: 'If you go to the castle, run choose_path("path_castle").',
         nextScene: 'castle',
         nextLocation: 'castle_gate',
       },
       {
         id: 'path_town',
         description: 'Head towards the medieval town',
+        codeHint: 'If you head to the town, run choose_path("path_town").',
         nextScene: 'town',
         nextLocation: 'town_gate',
       },
       {
         id: 'path_mountain',
         description: 'Follow the winding path to the mountains (requires map)',
+        codeHint: 'If you have the map and go to the mountains, run choose_path("path_mountain").',
         requiredItem: 'map',
         unlocksScene: 'mountain',
         nextScene: 'mountain',
@@ -103,6 +111,7 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'stay_forest',
         description: 'Stay in the forest and explore more',
+        codeHint: 'If you stay in the forest, run choose_path("stay_forest").',
         nextLocation: 'forest_clearing',
         message: 'You decide to explore the forest a bit more before leaving.',
       },
@@ -114,11 +123,13 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'enter_hall',
         description: 'Enter the castle hall',
+        codeHint: 'If you enter the hall, run choose_path("enter_hall").',
         nextLocation: 'castle_hall',
       },
       {
         id: 'climb_tower',
         description: 'Climb the tower (requires shield for safety)',
+        codeHint: 'If you have a shield and climb the tower, run choose_path("climb_tower").',
         requiredItem: 'shield',
         nextLocation: 'castle_tower',
         message: 'Your shield protects you from falling debris!',
@@ -126,12 +137,14 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'explore_dragon',
         description: 'Investigate the mysterious lair (WARNING: Dangerous!)',
+        codeHint: 'If you dare enter the lair, run choose_path("explore_dragon"). You will need sword and shield to survive.',
         nextLocation: 'dragon_lair',
         message: 'You hear ominous sounds from the lair...',
       },
       {
         id: 'leave_castle',
         description: 'Leave the castle',
+        codeHint: 'If you leave the castle, run choose_path("leave_castle").',
         nextScene: 'town',
         nextLocation: 'town_gate',
       },
@@ -143,16 +156,19 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'ascend_tower',
         description: 'Ascend to the tower',
+        codeHint: 'If you ascend to the tower, run choose_path("ascend_tower").',
         nextLocation: 'castle_tower',
       },
       {
         id: 'explore_courtyard',
         description: 'Return to the courtyard',
+        codeHint: 'If you return to the courtyard, run choose_path("explore_courtyard").',
         nextLocation: 'castle_courtyard',
       },
       {
         id: 'search_hall',
         description: 'Search the hall for secrets',
+        codeHint: 'If you search the hall, run choose_path("search_hall").',
         nextLocation: 'castle_hall',
         message: 'You find ancient writings on the walls, but nothing else.',
       },
@@ -164,6 +180,7 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'explore_ocean',
         description: 'Use the telescope to spot the ocean (requires crown)',
+        codeHint: 'If you have the crown and wish to find the ocean, run choose_path("explore_ocean").',
         requiredItem: 'crown',
         unlocksScene: 'ocean',
         nextScene: 'ocean',
@@ -173,18 +190,21 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'continue_town',
         description: 'Leave the castle and go to town',
+        codeHint: 'If you leave for the town, run choose_path("continue_town").',
         nextScene: 'town',
         nextLocation: 'town_gate',
       },
       {
         id: 'search_tower',
         description: 'Search the tower for hidden treasures',
+        codeHint: 'If you search the tower, run choose_path("search_tower").',
         nextLocation: 'castle_tower',
         message: 'You find some old coins but nothing of great value.',
       },
       {
         id: 'return_hall',
         description: 'Return to the castle hall',
+        codeHint: 'If you return to the hall, run choose_path("return_hall").',
         nextLocation: 'castle_hall',
       },
     ],
@@ -195,6 +215,7 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'peaceful_ending',
         description: 'Make peace with the dragon (after hypnotizing it)',
+        codeHint: 'If you have hypnotized the dragon and choose peace, run choose_path("peaceful_ending").',
         requiredFlag: 'hypnotized_dragon',
         message: 'You offer peace instead of violence. The dragon agrees and the kingdom is safe.',
       },
@@ -206,16 +227,19 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'visit_market',
         description: 'Visit the bustling market',
+        codeHint: 'If you visit the market, run choose_path("visit_market").',
         nextLocation: 'town_market',
       },
       {
         id: 'explore_gate',
         description: 'Head to the town gate',
+        codeHint: 'If you head to the gate, run choose_path("explore_gate").',
         nextLocation: 'town_gate',
       },
       {
         id: 'rest_square',
         description: 'Rest in the town square',
+        codeHint: 'If you rest in the square, run choose_path("rest_square").',
         nextLocation: 'town_square',
         message: 'You take a moment to observe the town life.',
       },
@@ -227,6 +251,7 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'travel_to_castle',
         description: 'Travel to the castle to face the dragon',
+        codeHint: 'If you go to the castle, run choose_path("travel_to_castle"). Have sword and shield before facing the dragon!',
         nextScene: 'castle',
         nextLocation: 'castle_gate',
         message: 'You head to the castle! Once there, use move_to("castle_courtyard") then move_to("dragon_lair") to face the dragon. Make sure you have both sword and shield!',
@@ -234,6 +259,7 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'help_merchant',
         description: 'Help the merchant (requires bread)',
+        codeHint: 'If you have bread and help the merchant, run choose_path("help_merchant").',
         requiredItem: 'bread',
         unlocksScene: 'ocean',
         message: 'The merchant rewards you with a map to the ocean!',
@@ -242,6 +268,7 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'buy_potion',
         description: 'Buy a healing potion (requires coin)',
+        codeHint: 'If you have a coin and buy a potion, run choose_path("buy_potion").',
         requiredItem: 'coin',
         nextLocation: 'town_market',
         message: 'You purchase a healing potion from the market!',
@@ -249,11 +276,13 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'ignore_merchant',
         description: 'Continue exploring the town',
+        codeHint: 'If you ignore the merchant, run choose_path("ignore_merchant").',
         nextLocation: 'town_square',
       },
       {
         id: 'leave_town',
         description: 'Leave the town',
+        codeHint: 'If you leave the town, run choose_path("leave_town").',
         nextLocation: 'town_exit',
       },
     ],
@@ -264,18 +293,21 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'return_castle',
         description: 'Return to the castle',
+        codeHint: 'If you return to the castle, run choose_path("return_castle").',
         nextScene: 'castle',
         nextLocation: 'castle_gate',
       },
       {
         id: 'path_forest',
         description: 'Take the path back to the forest',
+        codeHint: 'If you go back to the forest, run choose_path("path_forest").',
         nextScene: 'forest',
         nextLocation: 'forest_entrance',
       },
       {
         id: 'explore_ocean',
         description: 'Follow the map to the ocean (requires map from merchant)',
+        codeHint: 'If you have the map and go to the ocean, run choose_path("explore_ocean").',
         requiredItem: 'bread', // If they helped merchant, they got the map
         unlocksScene: 'ocean',
         nextScene: 'ocean',
@@ -285,6 +317,7 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'ask_merchant_ocean',
         description: 'Ask the merchant about the ocean (only if you helped them earlier)',
+        codeHint: 'If you helped the merchant and ask about the ocean, run choose_path("ask_merchant_ocean").',
         requiredFlag: 'helped_merchant',
         unlocksScene: 'ocean',
         nextScene: 'ocean',
@@ -294,8 +327,15 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'treasure_escape_ending',
         description: 'Leave with your treasure and seek new adventures',
+        codeHint: 'If you have the treasure map and leave the kingdom, run choose_path("treasure_escape_ending").',
         requiredItem: 'treasure_map',
         message: "You slip away with the treasure map. The kingdom's riches await elsewhere!",
+      },
+      {
+        id: 'abandon_kingdom',
+        description: 'Leave the kingdom forever (without facing the dragon)',
+        codeHint: 'If you abandon the kingdom, run choose_path("abandon_kingdom").',
+        message: 'You turn your back on the castle and the dragon. The kingdom will have to find another hero.',
       },
     ],
   },
@@ -305,21 +345,25 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'explore_tide_pool',
         description: 'Explore the tide pools',
+        codeHint: 'If you explore the tide pools, run choose_path("explore_tide_pool").',
         nextLocation: 'tide_pool',
       },
       {
         id: 'enter_cave',
         description: 'Enter the mysterious cave',
+        codeHint: 'If you enter the cave, run choose_path("enter_cave").',
         nextLocation: 'cave_entrance',
       },
       {
         id: 'search_treasure',
         description: 'Search for treasure along the shore',
+        codeHint: 'If you search for treasure, run choose_path("search_treasure").',
         nextLocation: 'treasure_cove',
       },
       {
         id: 'dive_deep',
         description: 'Dive into the deep ocean (WARNING: Requires pearl!)',
+        codeHint: 'Only if you have the pearl, run choose_path("dive_deep"). Otherwise you will not survive.',
         nextLocation: 'deep_trench',
         message: 'The ocean depths call to you...',
       },
@@ -331,16 +375,19 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'continue_shore',
         description: 'Return to the beach shore',
+        codeHint: 'If you return to the shore, run choose_path("continue_shore").',
         nextLocation: 'beach_shore',
       },
       {
         id: 'explore_cave',
         description: 'Follow the path to the cave entrance',
+        codeHint: 'If you go to the cave, run choose_path("explore_cave").',
         nextLocation: 'cave_entrance',
       },
       {
         id: 'search_pool',
         description: 'Search the tide pool for treasures',
+        codeHint: 'If you search the pool, run choose_path("search_pool").',
         nextLocation: 'tide_pool',
         message: 'You find interesting shells but nothing magical.',
       },
@@ -352,6 +399,7 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'path_mountain',
         description: 'Follow the map to the mountains (requires treasure_map)',
+        codeHint: 'If you have the treasure map and go to the mountains, run choose_path("path_mountain").',
         requiredItem: 'treasure_map',
         unlocksScene: 'mountain',
         nextScene: 'mountain',
@@ -361,6 +409,7 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'path_desert',
         description: 'Take the ancient scroll to the desert (requires scroll)',
+        codeHint: 'If you have the scroll and go to the desert, run choose_path("path_desert").',
         requiredItem: 'scroll',
         unlocksScene: 'desert',
         nextScene: 'desert',
@@ -370,11 +419,13 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'stay_ocean',
         description: 'Continue exploring the ocean',
+        codeHint: 'If you stay at the ocean, run choose_path("stay_ocean").',
         nextLocation: 'beach_shore',
       },
       {
         id: 'search_more',
         description: 'Search for more treasures',
+        codeHint: 'If you search for more, run choose_path("search_more").',
         nextLocation: 'treasure_cove',
         message: 'You search thoroughly but find nothing else.',
       },
@@ -386,6 +437,7 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'climb_cliff',
         description: 'Climb the cliff path (requires rope)',
+        codeHint: 'If you have a rope and climb the cliff, run choose_path("climb_cliff").',
         requiredItem: 'rope',
         nextLocation: 'cliff_path',
         message: 'Your rope helps you safely climb the cliff!',
@@ -393,12 +445,14 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'explore_base',
         description: 'Explore the mountain base',
+        codeHint: 'If you explore the base, run choose_path("explore_base").',
         nextLocation: 'mountain_base',
         message: 'You explore the base but don\'t find anything new. Try climbing the cliff path or looking for items to collect!',
       },
       {
         id: 'travel_to_town',
         description: 'Travel to the town to find a shield',
+        codeHint: 'If you go to the town for a shield, run choose_path("travel_to_town").',
         nextScene: 'town',
         nextLocation: 'town_gate',
         message: 'You head down the mountain toward the town. Once there, use move_to("town_market") to find the shield!',
@@ -406,6 +460,7 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'return_previous',
         description: 'Return to previous area',
+        codeHint: 'If you return to the previous area, run choose_path("return_previous").',
         nextScene: 'ocean',
         nextLocation: 'beach_shore',
       },
@@ -417,22 +472,26 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'enter_cave',
         description: 'Enter the crystal cave',
+        codeHint: 'If you enter the crystal cave, run choose_path("enter_cave").',
         nextLocation: 'cave',
       },
       {
         id: 'enter_dark_cave',
         description: 'Enter the dark cave (WARNING: Requires torch!)',
+        codeHint: 'Only if you have a torch, run choose_path("enter_dark_cave"). Otherwise it is deadly.',
         nextLocation: 'dark_cave',
         message: 'The dark cave looks ominous...',
       },
       {
         id: 'descend_cliff',
         description: 'Descend back to the cliff path',
+        codeHint: 'If you descend, run choose_path("descend_cliff").',
         nextLocation: 'cliff_path',
       },
       {
         id: 'rest_summit',
         description: 'Rest at the summit and enjoy the view',
+        codeHint: 'If you rest at the summit, run choose_path("rest_summit").',
         nextLocation: 'summit',
         message: 'The view from the summit is breathtaking!',
       },
@@ -444,6 +503,7 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'path_desert',
         description: 'Use the crystal to find the desert path (requires crystal)',
+        codeHint: 'If you have the crystal and go to the desert, run choose_path("path_desert").',
         requiredItem: 'crystal',
         unlocksScene: 'desert',
         nextScene: 'desert',
@@ -453,16 +513,19 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'return_summit',
         description: 'Return to the summit',
+        codeHint: 'If you return to the summit, run choose_path("return_summit").',
         nextLocation: 'summit',
       },
       {
         id: 'return_base',
         description: 'Return to the mountain base',
+        codeHint: 'If you return to the base, run choose_path("return_base").',
         nextLocation: 'mountain_base',
       },
       {
         id: 'explore_cave',
         description: 'Explore the cave deeper',
+        codeHint: 'If you explore deeper, run choose_path("explore_cave").',
         nextLocation: 'cave',
         message: 'You find some interesting rock formations but nothing else.',
       },
@@ -474,27 +537,32 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'explore_dunes',
         description: 'Explore the sand dunes',
+        codeHint: 'If you explore the dunes, run choose_path("explore_dunes").',
         nextLocation: 'sand_dunes',
       },
       {
         id: 'search_ruins',
         description: 'Search for ancient ruins',
+        codeHint: 'If you search for ruins, run choose_path("search_ruins").',
         nextLocation: 'ancient_ruins',
       },
       {
         id: 'rest_oasis',
         description: 'Rest at the oasis',
+        codeHint: 'If you rest at the oasis, run choose_path("rest_oasis").',
         nextLocation: 'oasis',
         message: 'The oasis provides much-needed rest and water.',
       },
       {
         id: 'find_temple',
         description: 'Look for the ancient temple',
+        codeHint: 'If you look for the temple, run choose_path("find_temple").',
         nextLocation: 'temple',
       },
       {
         id: 'merchant_shortcut',
         description: 'Take the path the merchant described (only if you helped them)',
+        codeHint: 'If you helped the merchant and take their shortcut, run choose_path("merchant_shortcut").',
         requiredChoice: { location: 'town_market', choice: 'help_merchant' },
         nextLocation: 'sand_dunes',
         message: "You remember the merchant's directions and find a shortcut through the dunes!",
@@ -507,16 +575,19 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'continue_ruins',
         description: 'Continue to the ancient ruins',
+        codeHint: 'If you continue to the ruins, run choose_path("continue_ruins").',
         nextLocation: 'ancient_ruins',
       },
       {
         id: 'return_oasis',
         description: 'Return to the oasis',
+        codeHint: 'If you return to the oasis, run choose_path("return_oasis").',
         nextLocation: 'oasis',
       },
       {
         id: 'explore_dunes',
         description: 'Explore the sand dunes more',
+        codeHint: 'If you explore the dunes more, run choose_path("explore_dunes").',
         nextLocation: 'sand_dunes',
         message: 'You find some interesting patterns in the sand.',
       },
@@ -528,22 +599,26 @@ export const DECISION_POINTS: Record<string, {
       {
         id: 'enter_temple',
         description: 'Enter the ancient temple (WARNING: Requires artifact!)',
+        codeHint: 'Only if you have the artifact, run choose_path("enter_temple"). Otherwise the curse will strike.',
         nextLocation: 'ancient_temple',
         message: 'The ancient temple radiates powerful energy...',
       },
       {
         id: 'visit_temple',
         description: 'Visit the regular temple',
+        codeHint: 'If you visit the temple, run choose_path("visit_temple").',
         nextLocation: 'temple',
       },
       {
         id: 'return_oasis',
         description: 'Return to the oasis',
+        codeHint: 'If you return to the oasis, run choose_path("return_oasis").',
         nextLocation: 'oasis',
       },
       {
         id: 'search_ruins',
         description: 'Search the ruins for artifacts',
+        codeHint: 'If you search the ruins, run choose_path("search_ruins").',
         nextLocation: 'ancient_ruins',
         message: 'You carefully search the ruins for anything valuable.',
       },
@@ -726,6 +801,16 @@ export const SCENES = {
   },
 };
 
+// Chapter titles for book-like overlay (scene id -> chapter number and title)
+export const CHAPTERS: Record<string, { number: number; title: string }> = {
+  forest: { number: 1, title: 'The Mystical Forest' },
+  castle: { number: 2, title: 'The Ancient Castle' },
+  town: { number: 3, title: 'The Medieval Town' },
+  ocean: { number: 4, title: 'The Mystical Ocean' },
+  mountain: { number: 5, title: 'The Mountain Peak' },
+  desert: { number: 6, title: 'The Ancient Desert' },
+};
+
 // Multiple endings: id, title, message. Triggered when conditions are met in execute route.
 export const ENDINGS: Record<string, { id: string; title: string; message: string }> = {
   dragon_defeated: {
@@ -743,51 +828,85 @@ export const ENDINGS: Record<string, { id: string; title: string; message: strin
     title: 'Peaceful Resolution',
     message: 'You brokered peace with the dragon using the magic gem. The kingdom is safe without bloodshed.',
   },
+  left_kingdom: {
+    id: 'left_kingdom',
+    title: 'Left the Kingdom',
+    message: 'You left the kingdom behind. The dragon was never faced, and the realm must find another hero.',
+  },
+  curse_of_temple: {
+    id: 'curse_of_temple',
+    title: 'Curse of the Temple',
+    message: "The ancient temple's curse strikes you down. You should have brought an artifact to protect yourself.",
+  },
+  merchants_friend: {
+    id: 'merchants_friend',
+    title: "The Merchant's Friend",
+    message: "You helped the merchant and claimed the ocean's treasure. You leave the kingdom as a friend to many—and rich in story.",
+  },
 };
 
-// Book-like narrative for each location. Value can be a string or { default, helped_merchant? }.
-export const LOCATION_NARRATIVE: Record<string, string | { default: string; helped_merchant?: string }> = {
-  forest_entrance: 'Tall trees loom on either side of the path. Somewhere in this forest lies a key—and a door that needs opening.',
-  forest_path: 'The path winds deeper into the woods. Birds call from the canopy; something glints between the ferns ahead.',
-  forest_clearing: 'Sun breaks through the leaves into a peaceful clearing. A good place to rest—or to press on toward the forest exit.',
-  forest_exit: 'The trees thin. Before you: paths to the castle, the town, or the mountains. Your choice will shape the journey.',
-  castle_gate: 'The ancient castle rises before you, stone worn by years. The gate stands open. Inside, a courtyard and the promise of danger—or glory.',
-  castle_courtyard: 'Stone walls enclose the courtyard. Ivy climbs the walls; somewhere above, a tower. To one side, the great hall. To the other, the way out.',
-  castle_hall: 'Torchlight flickers in the hall. Tapestries tell of kings and dragons. Stairs lead to the tower; the courtyard lies behind you.',
-  castle_tower: 'From the tower window you see the whole kingdom. A telescope points to distant shores. Here, among maps and old books, a crown waits.',
-  dragon_lair: 'The lair is hot and reeks of smoke. The dragon watches. With the right tools—and courage—you might end this threat for good.',
-  town_gate: 'The town gate bustles with travelers. Beyond it: the square, the market, and the chance to gather what you need for the road ahead.',
-  town_square: 'The heart of the town. Merchants call out; the market is nearby. Rest here, or seek the gate to other lands.',
-  town_market: 'Stalls overflow with bread, potions, and gear. A merchant catches your eye. Helping them might open doors—or maps—later.',
-  town_exit: 'The edge of town. From here you can return to the castle, the forest, or follow a map to the ocean—if you earned one.',
-  beach_shore: {
-    default: 'Waves roll onto the sand. Tide pools and a cave entrance dot the shore. Somewhere, treasure and deeper waters call.',
-    helped_merchant: "The merchant's map led you true. The ocean stretches before you—tide pools, a cave, and the promise of treasure.",
+// Book-like narrative for each location. String or object with default + optional flag-keyed variants.
+export type LocationNarrativeEntry = string | { default: string; [flag: string]: string };
+
+export const LOCATION_NARRATIVE: Record<string, LocationNarrativeEntry> = {
+  forest_entrance: 'Tall trees loom on either side of the path. The air is cool and still. Somewhere in this forest lies a key—and a door that needs opening. Use move_to() to explore the path or the clearing.',
+  forest_path: 'The path winds deeper into the woods. Birds call from the canopy; something glints between the ferns ahead. You can press on to the clearing or search here. A map is said to lie along this way.',
+  forest_clearing: 'Sun breaks through the leaves into a peaceful clearing. A good place to rest—or to press on toward the forest exit where the paths to castle, town, and mountains await. Your choice will shape the journey.',
+  forest_exit: 'The trees thin. Before you: the path to the ancient castle, the road to the medieval town, or the winding way to the mountains—if you have a map. Each path leads to a different fate.',
+  castle_gate: 'The ancient castle rises before you, stone worn by years. The gate stands open. Inside, a courtyard and the promise of danger—or glory. The dragon\'s lair lies within for those who dare.',
+  castle_courtyard: 'Stone walls enclose the courtyard. Ivy climbs the walls; somewhere above, a tower where a crown is kept. To one side, the great hall. To the other, the way out—or the path to the dragon\'s lair. Choose with care.',
+  castle_hall: 'Torchlight flickers in the hall. Tapestries tell of kings and dragons. Stairs lead to the tower where the crown waits; the courtyard lies behind you. From the tower, those with the crown may find the way to the ocean.',
+  castle_tower: {
+    default: 'From the tower window you see the whole kingdom. A telescope points to distant shores. Here, among maps and old books, a crown waits. With it, the path to the mystical ocean may open.',
+    found_crown: 'You have already taken the crown. From here you may seek the ocean with choose_path("explore_ocean") or leave for the town. The kingdom spreads below like a story waiting to end.',
   },
-  tide_pool: 'Shells and shallow water. You could search here, head for the cave, or return to the main shore.',
-  cave_entrance: 'The cave mouth is dark. Deeper in, something glows. You will need light—or magic—to go farther.',
-  treasure_cove: 'Hidden among the rocks, the cove holds more than shells. Maps and scrolls point to the mountains and the desert.',
-  deep_trench: 'The water presses in. Only a pearl\'s magic could see you through—and perhaps to what lies in the depths.',
-  mountain_base: 'The mountain rises ahead. A sword is said to rest here for the worthy. The cliff path and the summit wait above.',
-  cliff_path: 'The path is steep. A rope would make the climb safe. Above: the summit and a torch that could light the way.',
-  summit: 'You have reached the summit. The world spreads below. A cave holds a crystal; a darker cave demands a torch.',
-  cave: 'Crystals gleam in the walls. One might show the path to the desert. The summit and the base are still within reach.',
-  dark_cave: 'Darkness swallows the way. Without a torch, this place is death. With one, who knows what you might find.',
-  oasis: 'Palms and water in the endless sand. Travelers rest here before the dunes and the ancient ruins.',
-  sand_dunes: 'Dunes roll to the horizon. Water is life here. The ruins—and the temple—lie ahead for those who prepare.',
-  ancient_ruins: 'Broken stones and old magic. An artifact here might protect you in the temple. The oasis is behind; the temples, ahead.',
-  temple: 'A place of scrolls and quiet power. The magic gem waits for those who come prepared. The ancient temple is another step.',
-  ancient_temple: 'The heart of the desert\'s mystery. Only the protected may enter. The gem within could change the fate of the kingdom.',
+  dragon_lair: {
+    default: 'The lair is hot and reeks of smoke. The dragon watches. With sword and shield you might survive; with the crown and a hypnotized beast, you might end this threat for good—or choose peace.',
+    hypnotized_dragon: 'The dragon\'s eyes are glazed; the hypnosis holds. Now you may fight with sword and shield, or choose peace with choose_path("peaceful_ending"). The fate of the kingdom rests on your code.',
+  },
+  town_gate: 'The town gate bustles with travelers. Beyond it: the square, the market, and the chance to gather bread, shield, and coin. Rest and trade before you face the castle or the roads beyond.',
+  town_square: 'The heart of the town. Merchants call out; the market is nearby where you may find a shield or help a merchant in need. Rest here, or seek the gate to the castle, forest, or ocean.',
+  town_market: 'Stalls overflow with bread, potions, and gear. A merchant catches your eye—helping them with bread may earn you a map to the ocean. The shield here could save your life in the dragon\'s lair.',
+  town_exit: 'The edge of town. From here you can return to the castle, take the path back to the forest, or follow a map to the ocean if you earned one. Some leave with treasure and never look back.',
+  beach_shore: {
+    default: 'Waves roll onto the sand. Tide pools and a cave entrance dot the shore. Somewhere, treasure and deeper waters call. Only with a pearl should you dare the deep trench.',
+    helped_merchant: "The merchant's map led you true. The ocean stretches before you—tide pools, a cave, and the promise of treasure. You earned this path by helping another.",
+  },
+  tide_pool: 'Shells and shallow water. You could search here, head for the cave where a pearl might lie, or return to the main shore. The treasure cove awaits those who explore.',
+  cave_entrance: 'The cave mouth is dark. Deeper in, something glows—perhaps a pearl. You will need light or magic to go farther. From the shore, move_to("treasure_cove") when you are ready to seek maps and scrolls.',
+  treasure_cove: 'Hidden among the rocks, the cove holds more than shells. The treasure map points to the mountains; the ancient scroll to the desert. Choose your next journey with choose_path() when you have the right item.',
+  deep_trench: 'The water presses in. Only a pearl\'s magic could see you through—and perhaps to what lies in the depths. Without it, this place is death.',
+  mountain_base: 'The mountain rises ahead. A sword is said to rest here for the worthy. The cliff path and the summit wait above. You will need rope to climb safely and a torch for the dark cave.',
+  cliff_path: 'The path is steep. A rope would make the climb safe. Above: the summit and a torch that could light the way. Without a torch, the dark cave on the summit is certain death.',
+  summit: 'You have reached the summit. The world spreads below. A cave holds a crystal that may reveal the desert path; a darker cave demands a torch—without one, do not enter.',
+  cave: 'Crystals gleam in the walls. One might show the path to the desert; collect it and use choose_path("path_desert"). The summit and the base are still within reach.',
+  dark_cave: 'Darkness swallows the way. Without a torch, this place is death. With one, who knows what you might find. Only if you have the torch should you have come here.',
+  oasis: {
+    default: 'Palms and water in the endless sand. Travelers rest here before the dunes and the ancient ruins. If you helped the merchant in town, you may know a shortcut through the dunes.',
+    helped_merchant: 'Palms and water in the endless sand. You remember the merchant\'s directions—a shortcut through the dunes may be yours with choose_path("merchant_shortcut").',
+  },
+  sand_dunes: 'Dunes roll to the horizon. Water is life here. The ruins—and the temple—lie ahead for those who prepare. An artifact from the ruins will protect you in the ancient temple.',
+  ancient_ruins: 'Broken stones and old magic. An artifact here might protect you in the temple. The oasis is behind; the temples ahead. Do not enter the ancient temple without the artifact—the curse is real.',
+  temple: 'A place of scrolls and quiet power. The magic gem waits for those who come prepared. The ancient temple is another step—but enter it only with an artifact or the curse will strike.',
+  ancient_temple: {
+    default: 'The heart of the desert\'s mystery. Only the protected may enter. The gem within could change the fate of the kingdom.',
+    entered_temple: 'You have braved the temple with the artifact. The gem\'s power could bring peace to the dragon—or doom to those who misuse it.',
+  },
 };
 
 const DEFAULT_NARRATIVE = 'You take in your surroundings. The next step is yours.';
 
-/** Returns 1–3 sentence narrative for a location; uses flag variant (e.g. helped_merchant) when present. */
+// Priority order for picking narrative variant when multiple flags match.
+const NARRATIVE_FLAG_PRIORITY = ['hypnotized_dragon', 'found_crown', 'entered_temple', 'helped_merchant'];
+
+/** Returns narrative for a location; uses first matching flag variant, else default. */
 export function getNarrative(location: string, storyFlags?: string[]): string {
   const entry = LOCATION_NARRATIVE[location];
   if (!entry) return DEFAULT_NARRATIVE;
   if (typeof entry === 'string') return entry;
   const flags = storyFlags || [];
-  if (flags.includes('helped_merchant') && entry.helped_merchant) return entry.helped_merchant;
+  for (const flag of NARRATIVE_FLAG_PRIORITY) {
+    if (flags.includes(flag) && entry[flag]) return entry[flag];
+  }
   return entry.default;
 }

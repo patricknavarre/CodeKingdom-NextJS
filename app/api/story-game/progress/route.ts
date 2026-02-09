@@ -67,6 +67,7 @@ export async function GET(req: NextRequest) {
           .map((choice) => ({
             id: choice.id,
             description: choice.description,
+            codeHint: choice.codeHint,
             requiredItem: choice.requiredItem,
             available: true,
           }))
@@ -88,6 +89,7 @@ export async function GET(req: NextRequest) {
       inventory: storyGame.inventory.map(item => item.name),
       availableItems,
       availableChoices,
+      choices: storyGame.choices || [],
       unlockedScenes: storyGame.unlockedScenes || [],
       storyProgress,
       completedScenes: storyGame.completedScenes,

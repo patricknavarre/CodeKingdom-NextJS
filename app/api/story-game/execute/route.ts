@@ -250,13 +250,16 @@ export async function POST(req: NextRequest) {
             storyGame.isDead = true;
             storyGame.deathCount = (storyGame.deathCount || 0) + 1;
             storyGame.lastDeathLocation = result.location;
-            
-            // Return death response
+            // Bad ending: death at ancient temple is "Curse of the Temple"
+            if (result.location === 'ancient_temple') {
+              storyGame.ending = 'curse_of_temple';
+              storyGame.endingReachedAt = new Date();
+            }
             storyGame.currentLocation = updatedLocation;
-            storyGame.isDead = false; // Reset death flag after setting location
+            storyGame.isDead = false;
             storyGame.lastActive = new Date();
             await storyGame.save();
-            
+            const deathEndingConfig = result.location === 'ancient_temple' ? ENDINGS.curse_of_temple : null;
             return Response.json({
               success: false,
               action: 'death',
@@ -269,6 +272,7 @@ export async function POST(req: NextRequest) {
               coinsEarned: 0,
               experienceEarned: 0,
               deathCount: storyGame.deathCount,
+              ...(deathEndingConfig ? { endingId: deathEndingConfig.id, endingTitle: deathEndingConfig.title, endingMessage: deathEndingConfig.message } : {}),
             });
           } else {
             // Player has required item - safe passage
@@ -280,6 +284,10 @@ export async function POST(req: NextRequest) {
         } else {
           // Normal location - safe to move
           updatedLocation = result.location;
+          if (result.location === 'ancient_temple') {
+            if (!storyGame.storyFlags) storyGame.storyFlags = [];
+            if (!storyGame.storyFlags.includes('entered_temple')) storyGame.storyFlags.push('entered_temple');
+          }
           message = `You moved to ${result.location.replace(/_/g, ' ')}.`;
           coinsEarned = 5;
         }
@@ -312,6 +320,10 @@ export async function POST(req: NextRequest) {
             description: `A ${result.item} found in the ${storyGame.currentScene}.`,
             collectedAt: new Date(),
           });
+          if (result.item === 'crown') {
+            if (!storyGame.storyFlags) storyGame.storyFlags = [];
+            if (!storyGame.storyFlags.includes('found_crown')) storyGame.storyFlags.push('found_crown');
+          }
           message = `You collected a ${result.item}! 🎉`;
           coinsEarned = 15;
           experienceEarned = 20;
@@ -389,7 +401,10 @@ export async function POST(req: NextRequest) {
                 storyGame.ending = 'peaceful';
                 storyGame.endingReachedAt = new Date();
               } else if (choice.id === 'treasure_escape_ending') {
-                storyGame.ending = 'treasure_escape';
+                storyGame.ending = (storyGame.storyFlags || []).includes('helped_merchant') ? 'merchants_friend' : 'treasure_escape';
+                storyGame.endingReachedAt = new Date();
+              } else if (choice.id === 'abandon_kingdom') {
+                storyGame.ending = 'left_kingdom';
                 storyGame.endingReachedAt = new Date();
               }
             }
@@ -435,7 +450,10 @@ export async function POST(req: NextRequest) {
                 storyGame.ending = 'peaceful';
                 storyGame.endingReachedAt = new Date();
               } else if (choice.id === 'treasure_escape_ending') {
-                storyGame.ending = 'treasure_escape';
+                storyGame.ending = (storyGame.storyFlags || []).includes('helped_merchant') ? 'merchants_friend' : 'treasure_escape';
+                storyGame.endingReachedAt = new Date();
+              } else if (choice.id === 'abandon_kingdom') {
+                storyGame.ending = 'left_kingdom';
                 storyGame.endingReachedAt = new Date();
               }
           }

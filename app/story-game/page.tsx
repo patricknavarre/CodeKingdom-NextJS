@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useCharacter } from '@/contexts/CharacterContext';
 import { storyGameAPI } from '@/lib/api';
-import { SCENES, ENDINGS, getNarrative } from '@/lib/storyGameConstants';
+import { SCENES, ENDINGS, CHAPTERS, getNarrative } from '@/lib/storyGameConstants';
 import Navigation from '@/components/Navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import '@/styles/StoryGamePage.css';
@@ -25,6 +25,13 @@ const catPet = '/images/items/Pet_Cat.png';
 const goldenRetrieverPet = '/images/items/Pet_GoldenRetriever.png';
 const unicornPet = '/images/items/Pet_Unicorn.png';
 
+interface StoryChoice {
+  scene: string;
+  location: string;
+  choice: string;
+  chosenAt: string;
+}
+
 interface StoryProgress {
   currentScene: string;
   currentLocation: string;
@@ -34,6 +41,7 @@ interface StoryProgress {
   hintsUsed: any[];
   storyFlags?: string[];
   ending?: string | null;
+  choices?: StoryChoice[];
 }
 
 // Scene backgrounds for visual display
@@ -164,16 +172,17 @@ export default function StoryGamePage() {
   const [sceneChanged, setSceneChanged] = useState(false);
   const [lastRewards, setLastRewards] = useState({ coins: 0, experience: 0 });
   const [availableItems, setAvailableItems] = useState<string[]>([]);
-  const [availableChoices, setAvailableChoices] = useState<Array<{id: string; description: string; requiredItem?: string; available: boolean}>>([]);
+  const [availableChoices, setAvailableChoices] = useState<Array<{id: string; description: string; codeHint?: string; requiredItem?: string; available: boolean}>>([]);
   const [collectedItem, setCollectedItem] = useState<string | null>(null);
   const [showCharacterCollectEffect, setShowCharacterCollectEffect] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(true); // Start expanded by default
+  const [showYourJourney, setShowYourJourney] = useState(false);
   const [showDeathModal, setShowDeathModal] = useState(false);
   const [deathMessage, setDeathMessage] = useState('');
   const [deathCount, setDeathCount] = useState(0);
   const [endingModal, setEndingModal] = useState<{ title: string; message: string } | null>(null);
   const [showChapterOverlay, setShowChapterOverlay] = useState(false);
-  const [chapterOverlayData, setChapterOverlayData] = useState<{ title: string; body: string } | null>(null);
+  const [chapterOverlayData, setChapterOverlayData] = useState<{ title: string; subtitle?: string; body: string } | null>(null);
   const chapterOverlayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Get character image
@@ -293,11 +302,19 @@ export default function StoryGamePage() {
         setDeathMessage(response.data.deathMessage || '💀 You have died!');
         setDeathCount(response.data.deathCount || 0);
         setShowDeathModal(true);
+        // If death has an ending (e.g. curse_of_temple), also show ending modal
+        if (response.data.endingId) {
+          setEndingModal({
+            title: response.data.endingTitle || ENDINGS[response.data.endingId]?.title || 'The End',
+            message: response.data.endingMessage || ENDINGS[response.data.endingId]?.message || response.data.deathMessage,
+          });
+        }
         // Update progress to show reset location
         if (response.data.newLocation) {
           setStoryProgress(prev => prev ? {
             ...prev,
             currentLocation: response.data.newLocation,
+            ending: response.data.endingId ?? prev.ending,
           } : null);
         }
         // Reload progress after a short delay
@@ -412,9 +429,13 @@ export default function StoryGamePage() {
 
       // Chapter overlay when location changed (not on death or ending)
       if (response.data.newLocation !== storyProgress?.currentLocation) {
-        const formattedTitle = 'The ' + newLocation.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+        const chapter = newScene && CHAPTERS[newScene] ? CHAPTERS[newScene] : null;
+        const locationName = 'The ' + newLocation.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+        const title = chapter ? `Chapter ${chapter.number}: ${chapter.title}` : locationName;
+        const subtitle = chapter ? locationName : null;
         setChapterOverlayData({
-          title: formattedTitle,
+          title,
+          subtitle: subtitle || undefined,
           body: getNarrative(newLocation, storyProgress?.storyFlags),
         });
         setShowChapterOverlay(true);
@@ -438,15 +459,13 @@ export default function StoryGamePage() {
       setAvailableItems(newAvailableItems);
       setAvailableChoices(response.data.availableChoices || []);
       
-      // If it was a move action, reload progress to ensure sync
-      if (response.data.action === 'move' && response.data.success) {
-        // Small delay to ensure backend has saved
+      // If it was a move or choose_path action, reload progress to ensure sync (choices for "Your journey")
+      if ((response.data.action === 'move' || response.data.action === 'choose_path') && response.data.success) {
         setTimeout(async () => {
           try {
             const progressResponse = await storyGameAPI.getProgress();
-            const items = progressResponse.data.availableItems || [];
-            console.log('Reloaded available items:', items, 'at location:', progressResponse.data.currentLocation);
-            setAvailableItems(items);
+            setAvailableItems(progressResponse.data.availableItems || []);
+            setAvailableChoices(progressResponse.data.availableChoices || []);
             setStoryProgress(progressResponse.data);
           } catch (err) {
             console.error('Error reloading progress:', err);
@@ -655,6 +674,42 @@ export default function StoryGamePage() {
                   <p>{getNarrative(storyProgress.currentLocation, storyProgress.storyFlags)}</p>
                 </div>
               )}
+
+              {/* Your journey - path so far (collapsible) */}
+              <div className="your-journey-panel">
+                <div
+                  className="your-journey-header"
+                  onClick={() => setShowYourJourney(!showYourJourney)}
+                  style={{ cursor: 'pointer', userSelect: 'none' }}
+                >
+                  <h3>📖 Your path so far</h3>
+                  <span className="dropdown-arrow">{showYourJourney ? '▲' : '▼'}</span>
+                </div>
+                {showYourJourney && (
+                  <div className="your-journey-content">
+                    {(storyProgress?.choices && storyProgress.choices.length > 0) ? (
+                      <>
+                        <ul className="your-journey-list">
+                          {[...storyProgress.choices].reverse().slice(0, 15).map((c, i) => (
+                            <li key={`${c.location}-${c.choice}-${i}`}>
+                              <span className="journey-location">{c.location.replace(/_/g, ' ')}</span>
+                              <span className="journey-choice"> → {c.choice.replace(/_/g, ' ')}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        {storyProgress.storyFlags && storyProgress.storyFlags.length > 0 && (
+                          <p className="journey-flags">
+                            <strong>Consequences:</strong>{' '}
+                            {storyProgress.storyFlags.map(f => f.replace(/_/g, ' ')).join(', ')}
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      <p className="journey-empty">No choices made yet. Run code to choose paths!</p>
+                    )}
+                  </div>
+                )}
+              </div>
               
               {/* How to Play Instructions - Collapsible */}
               <div className="how-to-play-panel" style={{ display: 'block' }}>
@@ -779,10 +834,10 @@ export default function StoryGamePage() {
                         boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
                       }}>
                         <strong>🔀 Decision Point!</strong>
-                        <p style={{ marginTop: '10px', marginBottom: '10px' }}>You&apos;re at a choice. Use <code style={{ background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: '4px', color: 'white' }}>choose_path("choice_id")</code> with one of the IDs below. Some choices take you to another scene (e.g. town, ocean, desert).</p>
+                        <p style={{ marginTop: '10px', marginBottom: '10px' }}>Choose your path. If you take an option below, run the code shown—like a choose-your-own-adventure book.</p>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                           {availableChoices.map((choice) => (
-                            <div key={choice.id} style={{
+                            <div key={choice.id} className="cyoa-choice" style={{
                               background: choice.available ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.3)',
                               padding: '10px',
                               borderRadius: '6px',
@@ -790,17 +845,8 @@ export default function StoryGamePage() {
                               opacity: choice.available ? 1 : 0.6
                             }}>
                               <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
-                                {choice.available ? '✅' : '🔒'} {choice.description}
+                                {choice.available ? '✅' : '🔒'} If you <strong>{choice.description.toLowerCase()}</strong>, run:
                               </div>
-                              {choice.requiredItem && (
-                                <div style={{ fontSize: '0.85rem', marginTop: '4px' }}>
-                                  {choice.available ? (
-                                    <span>✓ You have: {choice.requiredItem}</span>
-                                  ) : (
-                                    <span>⚠️ Requires: {choice.requiredItem}</span>
-                                  )}
-                                </div>
-                              )}
                               <code style={{ 
                                 display: 'block', 
                                 marginTop: '6px', 
@@ -810,8 +856,17 @@ export default function StoryGamePage() {
                                 borderRadius: '4px',
                                 color: 'white'
                               }}>
-                                choose_path("{choice.id}")
+                                choose_path(&quot;{choice.id}&quot;)
                               </code>
+                              {choice.requiredItem && (
+                                <div style={{ fontSize: '0.85rem', marginTop: '4px' }}>
+                                  {choice.available ? (
+                                    <span>✓ You have: {choice.requiredItem}</span>
+                                  ) : (
+                                    <span>⚠️ Requires: {choice.requiredItem}</span>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           ))}
                         </div>
@@ -1419,6 +1474,9 @@ export default function StoryGamePage() {
             <div className="chapter-overlay">
               <div className="chapter-overlay-content">
                 <h1 className="chapter-overlay-title">{chapterOverlayData.title}</h1>
+                {chapterOverlayData.subtitle && (
+                  <p className="chapter-overlay-subtitle">{chapterOverlayData.subtitle}</p>
+                )}
                 <p className="chapter-overlay-body">{chapterOverlayData.body}</p>
                 <button
                   className="chapter-overlay-continue"

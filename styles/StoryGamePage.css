@@ -106,6 +106,74 @@
   margin: 0;
 }
 
+/* Your journey - path so far (book-like) */
+.your-journey-panel {
+  margin-bottom: 15px;
+  border: 1px solid #e8e0d4;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #faf8f5 0%, #f5f0e8 100%);
+  overflow: hidden;
+}
+
+.your-journey-header {
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(102, 126, 234, 0.08);
+  border-bottom: 1px solid #e8e0d4;
+}
+
+.your-journey-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-family: Georgia, "Times New Roman", serif;
+  color: #3d3829;
+}
+
+.your-journey-content {
+  padding: 12px 14px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.9rem;
+  color: #3d3829;
+}
+
+.your-journey-list {
+  margin: 0 0 8px 0;
+  padding-left: 1.25rem;
+  line-height: 1.6;
+}
+
+.your-journey-list li {
+  margin-bottom: 4px;
+}
+
+.journey-location {
+  font-style: italic;
+}
+
+.journey-choice {
+  font-weight: 500;
+}
+
+.journey-flags {
+  margin: 8px 0 0 0;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: #5c5244;
+}
+
+.journey-empty {
+  margin: 0;
+  font-style: italic;
+  color: #6b6358;
+}
+
+/* Decision block - CYOA style */
+.cyoa-choice {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
 .hint-buttons {
   display: flex;
   gap: 10px;
@@ -1188,9 +1256,17 @@
   font-size: 2.35rem;
   font-weight: 600;
   color: #1f1a14;
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 0.5rem 0;
   letter-spacing: 0.02em;
   line-height: 1.25;
+}
+
+.chapter-overlay-subtitle {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.15rem;
+  color: #5c5244;
+  margin: 0 0 1.5rem 0;
+  font-style: italic;
 }
 
 .chapter-overlay-body {
