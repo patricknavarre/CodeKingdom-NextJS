@@ -35,18 +35,24 @@ export const DANGEROUS_LOCATIONS: Record<string, {
   },
 };
 
+// Choice type with optional branching fields
+export type DecisionChoice = {
+  id: string;
+  description: string;
+  requiredItem?: string;
+  unlocksScene?: string;
+  unlocksLocation?: string;
+  nextScene?: string;
+  nextLocation?: string;
+  message?: string;
+  setsFlag?: string; // when chosen, add this flag to story state
+  requiredFlag?: string; // show only if player has this flag
+  requiredChoice?: { location: string; choice: string }; // show only if player made this choice at this location
+};
+
 export const DECISION_POINTS: Record<string, {
   location: string;
-  choices: Array<{
-    id: string;
-    description: string;
-    requiredItem?: string; // Item needed to unlock this choice
-    unlocksScene?: string; // Scene this choice unlocks
-    unlocksLocation?: string; // Location this choice unlocks
-    nextScene?: string; // Scene to move to after choice
-    nextLocation?: string; // Location to move to after choice
-    message?: string; // Custom message when this choice is made
-  }>;
+  choices: DecisionChoice[];
 }> = {
   forest_clearing: {
     location: 'forest_clearing',
@@ -183,6 +189,17 @@ export const DECISION_POINTS: Record<string, {
       },
     ],
   },
+  dragon_lair: {
+    location: 'dragon_lair',
+    choices: [
+      {
+        id: 'peaceful_ending',
+        description: 'Make peace with the dragon (after hypnotizing it)',
+        requiredFlag: 'hypnotized_dragon',
+        message: 'You offer peace instead of violence. The dragon agrees and the kingdom is safe.',
+      },
+    ],
+  },
   town_square: {
     location: 'town_square',
     choices: [
@@ -220,6 +237,7 @@ export const DECISION_POINTS: Record<string, {
         requiredItem: 'bread',
         unlocksScene: 'ocean',
         message: 'The merchant rewards you with a map to the ocean!',
+        setsFlag: 'helped_merchant',
       },
       {
         id: 'buy_potion',
@@ -263,6 +281,21 @@ export const DECISION_POINTS: Record<string, {
         nextScene: 'ocean',
         nextLocation: 'beach_shore',
         message: 'You follow the merchant\'s map to the ocean!',
+      },
+      {
+        id: 'ask_merchant_ocean',
+        description: 'Ask the merchant about the ocean (only if you helped them earlier)',
+        requiredFlag: 'helped_merchant',
+        unlocksScene: 'ocean',
+        nextScene: 'ocean',
+        nextLocation: 'beach_shore',
+        message: 'The merchant points you to the coast. You set off for the ocean!',
+      },
+      {
+        id: 'treasure_escape_ending',
+        description: 'Leave with your treasure and seek new adventures',
+        requiredItem: 'treasure_map',
+        message: "You slip away with the treasure map. The kingdom's riches await elsewhere!",
       },
     ],
   },
@@ -459,6 +492,13 @@ export const DECISION_POINTS: Record<string, {
         description: 'Look for the ancient temple',
         nextLocation: 'temple',
       },
+      {
+        id: 'merchant_shortcut',
+        description: 'Take the path the merchant described (only if you helped them)',
+        requiredChoice: { location: 'town_market', choice: 'help_merchant' },
+        nextLocation: 'sand_dunes',
+        message: "You remember the merchant's directions and find a shortcut through the dunes!",
+      },
     ],
   },
   sand_dunes: {
@@ -587,7 +627,7 @@ export const SCENES = {
       },
       2: { 
         cost: 20, 
-        text: 'Move to different locations using move_to("location_name"), then use if to check where you are.',
+        text: 'Move to different locations using move_to("location_name"), then use if to check where you are. Helping the merchant can open new options later!',
         example: 'move_to("town_market")\nif current_location == "town_market":\n    collect_item("bread")'
       },
       3: { 
@@ -683,5 +723,24 @@ export const SCENES = {
         example: 'if "water" in inventory:\n    if "artifact" in inventory:\n        move_to("ancient_temple")\n    else:\n        move_to("ancient_ruins")\n        collect_item("artifact")\nelse:\n    move_to("sand_dunes")\n    collect_item("water")'
       },
     },
+  },
+};
+
+// Multiple endings: id, title, message. Triggered when conditions are met in execute route.
+export const ENDINGS: Record<string, { id: string; title: string; message: string }> = {
+  dragon_defeated: {
+    id: 'dragon_defeated',
+    title: 'Dragon Defeated!',
+    message: 'You have defeated the dragon and saved the kingdom. The people celebrate your bravery!',
+  },
+  treasure_escape: {
+    id: 'treasure_escape',
+    title: 'Treasure Escape',
+    message: "You leave with the kingdom's treasure and set off for new adventures.",
+  },
+  peaceful: {
+    id: 'peaceful',
+    title: 'Peaceful Resolution',
+    message: 'You brokered peace with the dragon using the magic gem. The kingdom is safe without bloodshed.',
   },
 };

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useCharacter } from '@/contexts/CharacterContext';
 import { storyGameAPI } from '@/lib/api';
-import { SCENES } from '@/lib/storyGameConstants';
+import { SCENES, ENDINGS } from '@/lib/storyGameConstants';
 import Navigation from '@/components/Navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import '@/styles/StoryGamePage.css';
@@ -32,6 +32,8 @@ interface StoryProgress {
   storyProgress: number;
   completedScenes: any[];
   hintsUsed: any[];
+  storyFlags?: string[];
+  ending?: string | null;
 }
 
 // Scene backgrounds for visual display
@@ -146,6 +148,7 @@ export default function StoryGamePage() {
   const [showDeathModal, setShowDeathModal] = useState(false);
   const [deathMessage, setDeathMessage] = useState('');
   const [deathCount, setDeathCount] = useState(0);
+  const [endingModal, setEndingModal] = useState<{ title: string; message: string } | null>(null);
 
   // Get character image
   const getCharacterImage = () => {
@@ -213,6 +216,14 @@ export default function StoryGamePage() {
       console.log('Available choices loaded:', choices);
       setAvailableItems(items);
       setAvailableChoices(choices);
+      if (response.data.ending && ENDINGS[response.data.ending]) {
+        setEndingModal({
+          title: ENDINGS[response.data.ending].title,
+          message: ENDINGS[response.data.ending].message,
+        });
+      } else {
+        setEndingModal(null);
+      }
       // Set default code based on current scene
       if (response.data.currentScene) {
         setCode(getDefaultCode(response.data.currentScene));
@@ -265,7 +276,40 @@ export default function StoryGamePage() {
         return;
       }
 
-      // Dragon defeated: show victory modal and rewards
+      // Any ending reached (dragon defeated, peaceful, treasure escape): show ending modal
+      if (response.data.endingId) {
+        const newLocation = response.data.newLocation || storyProgress?.currentLocation;
+        const newScene = response.data.newScene || storyProgress?.currentScene;
+        setStoryProgress(prev => ({
+          ...prev!,
+          currentLocation: newLocation,
+          currentScene: newScene,
+          inventory: response.data.newInventory ?? prev?.inventory,
+          storyProgress: response.data.storyProgress ?? prev?.storyProgress ?? 0,
+          ending: response.data.endingId,
+        }));
+        if (response.data.coinsEarned) addCoins(response.data.coinsEarned);
+        if (response.data.experienceEarned) addExperience(response.data.experienceEarned);
+        setEndingModal({
+          title: response.data.endingTitle || ENDINGS[response.data.endingId]?.title || 'The End',
+          message: response.data.endingMessage || ENDINGS[response.data.endingId]?.message || response.data.message,
+        });
+        if (response.data.dragonDefeated) {
+          setLevelCompleteData({
+            message: response.data.message,
+            coinsEarned: response.data.coinsEarned ?? 0,
+            experienceEarned: response.data.experienceEarned ?? 0,
+          });
+          setShowLevelComplete(true);
+          setTimeout(() => setShowLevelComplete(false), 4000);
+        }
+        setMessage(response.data.message || '');
+        setExecuting(false);
+        setIsWalking(false);
+        return;
+      }
+
+      // Legacy: dragon defeated without endingId (backward compat)
       if (response.data.dragonDefeated === true) {
         const newLocation = response.data.newLocation || storyProgress?.currentLocation;
         const newScene = response.data.newScene || storyProgress?.currentScene;
@@ -285,9 +329,7 @@ export default function StoryGamePage() {
         });
         setShowLevelComplete(true);
         setMessage(response.data.message || 'You defeat the dragon!');
-        setTimeout(() => {
-          setShowLevelComplete(false);
-        }, 4000);
+        setTimeout(() => setShowLevelComplete(false), 4000);
         setExecuting(false);
         setIsWalking(false);
         return;
@@ -1312,6 +1354,27 @@ export default function StoryGamePage() {
                   }}
                 >
                   Try Again
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Ending Modal */}
+          {endingModal && (
+            <div className="death-modal-overlay" onClick={(e) => e.stopPropagation()}>
+              <div className="death-modal ending-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="ending-icon">🏆</div>
+                <h2>{endingModal.title}</h2>
+                <p className="death-message">{endingModal.message}</p>
+                <button
+                  className="try-again-button"
+                  onClick={async () => {
+                    setEndingModal(null);
+                    await storyGameAPI.resetProgress();
+                    loadStoryProgress();
+                  }}
+                >
+                  Play Again
                 </button>
               </div>
             </div>

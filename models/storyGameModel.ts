@@ -35,6 +35,9 @@ export interface IStoryGame extends Document {
   lastDeathLocation?: string;
   dragonHypnotized?: boolean;
   dragonDefeated?: boolean;
+  storyFlags?: string[]; // e.g. ["helped_merchant"] - set by choices, used for conditional content
+  ending?: string; // ending id when player reaches an ending
+  endingReachedAt?: Date;
   lastActive: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -131,6 +134,15 @@ const storyGameSchema = new Schema<IStoryGame>(
     dragonDefeated: {
       type: Boolean,
       default: false,
+    },
+    storyFlags: [{
+      type: String,
+    }],
+    ending: {
+      type: String,
+    },
+    endingReachedAt: {
+      type: Date,
     },
     lastActive: {
       type: Date,

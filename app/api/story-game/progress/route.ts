@@ -3,6 +3,7 @@ import connectDB from '@/lib/mongodb';
 import StoryGame from '@/models/storyGameModel';
 import jwt from 'jsonwebtoken';
 import { SCENES, DECISION_POINTS } from '@/lib/storyGameConstants';
+import { isChoiceAvailable } from '@/lib/storyGameUtils';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_jwt_secret';
 
@@ -30,7 +31,15 @@ export async function GET(req: NextRequest) {
         currentLocation: 'forest_entrance',
         inventory: [],
         storyProgress: 0,
+        visitedLocations: ['forest_entrance'],
       });
+    }
+    
+    // Backfill visitedLocations for existing saves so progress % is accurate
+    if (!Array.isArray(storyGame.visitedLocations) || storyGame.visitedLocations.length === 0) {
+      storyGame.visitedLocations = [storyGame.currentLocation];
+      storyGame.markModified('visitedLocations');
+      await storyGame.save();
     }
     
     // Get available items at current location
@@ -45,14 +54,33 @@ export async function GET(req: NextRequest) {
       return !storyGame.inventory.some(invItem => invItem.name === itemName);
     });
 
-    // Get available choices at current location
+    // Get available choices at current location (filter by flags / requiredChoice / requiredItem)
     const decisionPoint = DECISION_POINTS[storyGame.currentLocation];
-    const availableChoices = decisionPoint ? decisionPoint.choices.map(choice => ({
-      id: choice.id,
-      description: choice.description,
-      requiredItem: choice.requiredItem,
-      available: !choice.requiredItem || storyGame.inventory.some(item => item.name === choice.requiredItem),
-    })) : [];
+    const storyGameForChoice = {
+      inventory: storyGame.inventory,
+      choices: storyGame.choices || [],
+      storyFlags: storyGame.storyFlags || [],
+    };
+    const availableChoices = decisionPoint
+      ? decisionPoint.choices
+          .filter((choice) => isChoiceAvailable(choice, storyGameForChoice))
+          .map((choice) => ({
+            id: choice.id,
+            description: choice.description,
+            requiredItem: choice.requiredItem,
+            available: true,
+          }))
+      : [];
+    
+    // Compute progress from visited locations (accurate); fallback to stored value for old saves
+    const totalLocations = Object.values(SCENES).reduce((sum, s) => sum + s.locations.length, 0);
+    const visitedLocations = Array.isArray(storyGame.visitedLocations) ? storyGame.visitedLocations : [];
+    const uniqueVisited = visitedLocations.filter((loc: string) =>
+      Object.values(SCENES).some(scene => scene.locations.includes(loc))
+    );
+    const storyProgress = visitedLocations.length > 0
+      ? Math.min(100, Math.round((uniqueVisited.length / totalLocations) * 100))
+      : (storyGame.storyProgress ?? 0);
     
     return Response.json({
       currentScene: storyGame.currentScene,
@@ -61,9 +89,11 @@ export async function GET(req: NextRequest) {
       availableItems,
       availableChoices,
       unlockedScenes: storyGame.unlockedScenes || [],
-      storyProgress: storyGame.storyProgress,
+      storyProgress,
       completedScenes: storyGame.completedScenes,
       hintsUsed: storyGame.hintsUsed,
+      storyFlags: storyGame.storyFlags || [],
+      ending: storyGame.ending ?? null,
     });
   } catch (error: any) {
     console.error(error);

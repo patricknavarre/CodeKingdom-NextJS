@@ -1121,3 +1121,13 @@
   transform: scale(0.98);
 }
 
+.ending-modal {
+  background: linear-gradient(135deg, #2d2a1a 0%, #1a1810 50%, #0f0d08 100%);
+  border: 2px solid rgba(255, 215, 0, 0.4);
+}
+
+.ending-modal .ending-icon {
+  font-size: 4rem;
+  margin-bottom: 15px;
+}
+

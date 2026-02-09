@@ -26,7 +26,15 @@ export async function POST(req: NextRequest) {
       storyGame.currentLocation = 'forest_entrance';
       storyGame.inventory = [];
       storyGame.completedScenes = [];
+      storyGame.choices = [];
+      storyGame.unlockedScenes = [];
+      storyGame.visitedLocations = ['forest_entrance'];
       storyGame.storyProgress = 0;
+      storyGame.storyFlags = [];
+      storyGame.ending = undefined;
+      storyGame.endingReachedAt = undefined;
+      storyGame.dragonHypnotized = false;
+      storyGame.dragonDefeated = false;
       await storyGame.save();
     }
     

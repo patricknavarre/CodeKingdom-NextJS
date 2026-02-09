@@ -3,7 +3,8 @@ import connectDB from '@/lib/mongodb';
 import StoryGame from '@/models/storyGameModel';
 import User from '@/models/userModel';
 import { executePython, validatePythonCode } from '@/services/pythonExecutor';
-import { SCENES, DECISION_POINTS, DANGEROUS_LOCATIONS } from '@/lib/storyGameConstants';
+import { SCENES, DECISION_POINTS, DANGEROUS_LOCATIONS, ENDINGS } from '@/lib/storyGameConstants';
+import { isChoiceAvailable } from '@/lib/storyGameUtils';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_jwt_secret';
@@ -328,9 +329,16 @@ export async function POST(req: NextRequest) {
           const availableChoiceIds = decisionPoint.choices.map(c => c.id).join(', ');
           message = `Invalid choice! Available choices at this location are: ${availableChoiceIds}. Use choose_path("choice_id") with one of these.`;
           result.success = false;
-        } else if (choice) {
-          // Check if choice requires an item
-          if (choice.requiredItem) {
+        } else {
+          const storyGameForChoice = {
+            inventory: storyGame.inventory,
+            choices: storyGame.choices || [],
+            storyFlags: storyGame.storyFlags || [],
+          };
+          if (!isChoiceAvailable(choice, storyGameForChoice)) {
+            message = 'That choice is not available here. You may need an item, a prior decision, or to have helped someone first.';
+            result.success = false;
+          } else if (choice.requiredItem) {
             const hasItem = storyGame.inventory.some(item => item.name === choice.requiredItem);
             if (!hasItem) {
               message = `You need a ${choice.requiredItem} to choose this path!`;
@@ -343,7 +351,10 @@ export async function POST(req: NextRequest) {
                 choice: result.choiceId,
                 chosenAt: new Date(),
               });
-              
+              if (choice.setsFlag) {
+                if (!storyGame.storyFlags) storyGame.storyFlags = [];
+                if (!storyGame.storyFlags.includes(choice.setsFlag)) storyGame.storyFlags.push(choice.setsFlag);
+              }
               // Unlock scene if specified
               if (choice.unlocksScene && !storyGame.unlockedScenes.includes(choice.unlocksScene)) {
                 storyGame.unlockedScenes.push(choice.unlocksScene);
@@ -371,6 +382,16 @@ export async function POST(req: NextRequest) {
                 coinsEarned = 10;
                 experienceEarned = 10;
               }
+              if (updatedLocation === 'beach_shore' && (storyGame.storyFlags || []).includes('helped_merchant')) {
+                message += " The merchant's map led you here.";
+              }
+              if (choice.id === 'peaceful_ending') {
+                storyGame.ending = 'peaceful';
+                storyGame.endingReachedAt = new Date();
+              } else if (choice.id === 'treasure_escape_ending') {
+                storyGame.ending = 'treasure_escape';
+                storyGame.endingReachedAt = new Date();
+              }
             }
           } else {
             // No item required, just record choice
@@ -380,11 +401,13 @@ export async function POST(req: NextRequest) {
               choice: result.choiceId,
               chosenAt: new Date(),
             });
-            
+            if (choice.setsFlag) {
+              if (!storyGame.storyFlags) storyGame.storyFlags = [];
+              if (!storyGame.storyFlags.includes(choice.setsFlag)) storyGame.storyFlags.push(choice.setsFlag);
+            }
             if (choice.unlocksScene && !storyGame.unlockedScenes.includes(choice.unlocksScene)) {
               storyGame.unlockedScenes.push(choice.unlocksScene);
             }
-            
             if (choice.nextScene) {
                 storyGame.currentScene = choice.nextScene as any;
                 updatedLocation = choice.nextLocation || (SCENES[choice.nextScene as keyof typeof SCENES]?.locations[0] || storyGame.currentLocation);
@@ -405,11 +428,17 @@ export async function POST(req: NextRequest) {
                 coinsEarned = 10;
                 experienceEarned = 10;
               }
+              if (updatedLocation === 'beach_shore' && (storyGame.storyFlags || []).includes('helped_merchant')) {
+                message += " The merchant's map led you here.";
+              }
+              if (choice.id === 'peaceful_ending') {
+                storyGame.ending = 'peaceful';
+                storyGame.endingReachedAt = new Date();
+              } else if (choice.id === 'treasure_escape_ending') {
+                storyGame.ending = 'treasure_escape';
+                storyGame.endingReachedAt = new Date();
+              }
           }
-        } else {
-          // This shouldn't happen now due to the check above, but keep as fallback
-          message = 'Invalid choice! Check available choices at this location.';
-          result.success = false;
         }
       } else {
         // No decision point at this location - provide helpful message
@@ -435,6 +464,8 @@ export async function POST(req: NextRequest) {
         result.success = false;
       } else {
         storyGame.dragonHypnotized = true;
+        if (!storyGame.storyFlags) storyGame.storyFlags = [];
+        if (!storyGame.storyFlags.includes('hypnotized_dragon')) storyGame.storyFlags.push('hypnotized_dragon');
         message = 'You use the magic gem and the dragon falls into a trance!';
         coinsEarned = 15;
         experienceEarned = 15;
@@ -466,6 +497,8 @@ export async function POST(req: NextRequest) {
         result.success = false;
       } else {
         storyGame.dragonDefeated = true;
+        storyGame.ending = 'dragon_defeated';
+        storyGame.endingReachedAt = new Date();
         message = "With the dragon hypnotized, you strike with your sword and shield! The crown's power seals the victory! You defeat the dragon!";
         coinsEarned = 100;
         experienceEarned = 50;
@@ -487,6 +520,7 @@ export async function POST(req: NextRequest) {
         const finalAvailableItems = locationItems.filter(
           (itemName: string) => !storyGame.inventory.some((i: { name: string }) => i.name === itemName)
         );
+        const endingConfig = ENDINGS.dragon_defeated;
         return Response.json({
           success: true,
           message,
@@ -502,6 +536,9 @@ export async function POST(req: NextRequest) {
           userExperience: user.experience,
           userLevel: user.level,
           storyProgress: storyGame.storyProgress,
+          endingId: endingConfig.id,
+          endingTitle: endingConfig.title,
+          endingMessage: endingConfig.message,
         });
       }
     } else if (result.action === 'continue') {
@@ -588,6 +625,7 @@ export async function POST(req: NextRequest) {
       })()
     });
 
+    const endingConfig = storyGame.ending ? ENDINGS[storyGame.ending] : null;
     return Response.json({
       success: result.success,
       message,
@@ -602,6 +640,7 @@ export async function POST(req: NextRequest) {
       userExperience: user.experience,
       userLevel: user.level,
       storyProgress: storyGame.storyProgress,
+      ...(endingConfig ? { endingId: endingConfig.id, endingTitle: endingConfig.title, endingMessage: endingConfig.message } : {}),
     });
   } catch (error: any) {
     console.error('Execute code error:', error);
