@@ -12,8 +12,8 @@ All your code is on GitHub and ready.
 ### 2. Deploy to Vercel
 
 1. Go to https://vercel.com/new
-2. Import your GitHub repository: `patricknavarre/CodeKingdom`
-3. **Important:** Set the **Root Directory** to: `nextjs-app`
+2. Import your GitHub repository: **`patricknavarre/CodeKingdom-NextJS`** (this repo)
+3. Use the repo root as the project root—no Root Directory override needed (flat layout: `app/`, `lib/`, etc.)
 4. Vercel will auto-detect Next.js
 
 ### 3. Set Environment Variables
