@@ -730,9 +730,14 @@ export default function StoryGamePage() {
                       }}>
                         <strong>🗺️ Where Can I Go?</strong>
                         {availableChoices.length > 0 && (
-                          <p style={{ marginTop: '8px', marginBottom: '6px', fontSize: '0.9rem', fontWeight: 600, color: '#333' }}>
-                            You&apos;re at a decision point. Use the choices above with <code>choose_path("choice_id")</code> to move or change scenes. Or use <code>move_to("location_name")</code> for locations in this scene (below).
-                          </p>
+                          <>
+                            <p style={{ marginTop: '8px', marginBottom: '6px', fontSize: '0.9rem', fontWeight: 600, color: '#333' }}>
+                              You&apos;re at a decision point. Use the choices above with <code>choose_path("choice_id")</code> to move or change scenes. Or use <code>move_to("location_name")</code> for locations in this scene (below).
+                            </p>
+                            <p style={{ marginTop: '6px', marginBottom: '6px', fontSize: '0.85rem', color: '#1565c0', fontWeight: 500 }}>
+                              💡 You can also type just the choice id and Run Code (e.g. <code>leave_castle</code> to leave the castle).
+                            </p>
+                          </>
                         )}
                         {availableChoices.length === 0 && (
                           <>

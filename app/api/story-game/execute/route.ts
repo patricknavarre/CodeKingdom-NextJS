@@ -63,8 +63,20 @@ export async function POST(req: NextRequest) {
     };
     
     // Execute Python code
-    const result = await executePython(code, context);
-    
+    let result = await executePython(code, context);
+
+    // If user typed just a choice id (e.g. "leave_castle"), treat as choose_path("leave_castle")
+    if (result.action === 'continue' && result.success) {
+      const trimmedCode = code.trim().replace(/\s+/g, ' ');
+      const singleLine = trimmedCode.split('\n').filter((l: string) => l.trim()).length === 1;
+      const bareId = trimmedCode.trim();
+      const decisionPoint = DECISION_POINTS[storyGame.currentLocation];
+      const choiceIds = decisionPoint?.choices?.map((c: { id: string }) => c.id) || [];
+      if (singleLine && choiceIds.includes(bareId)) {
+        result = { action: 'choose_path', choiceId: bareId, success: true };
+      }
+    }
+
     // Process result and update game state
     let updatedLocation = storyGame.currentLocation;
     let updatedInventory = [...storyGame.inventory];
