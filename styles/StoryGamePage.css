@@ -1147,3 +1147,66 @@
   margin-bottom: 15px;
 }
 
+/* Chapter overlay - full-screen narrative on location change */
+.chapter-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #1a1510 0%, #0d0a07 50%, #1a1510 100%);
+  animation: chapterOverlayFadeIn 0.35s ease-out;
+}
+
+@keyframes chapterOverlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.chapter-overlay-content {
+  max-width: 560px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+}
+
+.chapter-overlay-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.25rem;
+  font-weight: 600;
+  color: #f5f0e8;
+  margin: 0 0 1.25rem 0;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.chapter-overlay-body {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: #d8d0c4;
+  margin: 0 0 2rem 0;
+}
+
+.chapter-overlay-continue {
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  padding: 0.65rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1510;
+  background: linear-gradient(180deg, #e8dcc8 0%, #c9b896 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+
+.chapter-overlay-continue:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+

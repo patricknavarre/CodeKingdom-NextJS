@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useCharacter } from '@/contexts/CharacterContext';
 import { storyGameAPI } from '@/lib/api';
 import { SCENES, ENDINGS, getNarrative } from '@/lib/storyGameConstants';
@@ -172,6 +172,9 @@ export default function StoryGamePage() {
   const [deathMessage, setDeathMessage] = useState('');
   const [deathCount, setDeathCount] = useState(0);
   const [endingModal, setEndingModal] = useState<{ title: string; message: string } | null>(null);
+  const [showChapterOverlay, setShowChapterOverlay] = useState(false);
+  const [chapterOverlayData, setChapterOverlayData] = useState<{ title: string; body: string } | null>(null);
+  const chapterOverlayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Get character image
   const getCharacterImage = () => {
@@ -226,6 +229,13 @@ export default function StoryGamePage() {
   // Load story progress
   useEffect(() => {
     loadStoryProgress();
+  }, []);
+
+  // Clear chapter overlay timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (chapterOverlayTimeoutRef.current) clearTimeout(chapterOverlayTimeoutRef.current);
+    };
   }, []);
 
   const loadStoryProgress = async () => {
@@ -398,6 +408,21 @@ export default function StoryGamePage() {
       // Update default code when scene or location changes (story-guided hints)
       if (newScene !== prevScene || newLocation !== storyProgress?.currentLocation) {
         setCode(getDefaultCode(newScene, newLocation));
+      }
+
+      // Chapter overlay when location changed (not on death or ending)
+      if (response.data.newLocation !== storyProgress?.currentLocation) {
+        const formattedTitle = 'The ' + newLocation.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+        setChapterOverlayData({
+          title: formattedTitle,
+          body: getNarrative(newLocation, storyProgress?.storyFlags),
+        });
+        setShowChapterOverlay(true);
+        if (chapterOverlayTimeoutRef.current) clearTimeout(chapterOverlayTimeoutRef.current);
+        chapterOverlayTimeoutRef.current = setTimeout(() => {
+          setShowChapterOverlay(false);
+          chapterOverlayTimeoutRef.current = null;
+        }, 2500);
       }
 
       // Update available items from response
@@ -1384,6 +1409,28 @@ export default function StoryGamePage() {
                   }}
                 >
                   Try Again
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Chapter overlay - full-screen narrative when location changes */}
+          {showChapterOverlay && chapterOverlayData && (
+            <div className="chapter-overlay">
+              <div className="chapter-overlay-content">
+                <h1 className="chapter-overlay-title">{chapterOverlayData.title}</h1>
+                <p className="chapter-overlay-body">{chapterOverlayData.body}</p>
+                <button
+                  className="chapter-overlay-continue"
+                  onClick={() => {
+                    if (chapterOverlayTimeoutRef.current) {
+                      clearTimeout(chapterOverlayTimeoutRef.current);
+                      chapterOverlayTimeoutRef.current = null;
+                    }
+                    setShowChapterOverlay(false);
+                  }}
+                >
+                  Continue
                 </button>
               </div>
             </div>
