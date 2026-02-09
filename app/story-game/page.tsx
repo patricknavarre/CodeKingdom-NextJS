@@ -412,7 +412,7 @@ export default function StoryGamePage() {
 
       // Chapter overlay when location changed (not on death or ending)
       if (response.data.newLocation !== storyProgress?.currentLocation) {
-        const formattedTitle = 'The ' + newLocation.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+        const formattedTitle = 'The ' + newLocation.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
         setChapterOverlayData({
           title: formattedTitle,
           body: getNarrative(newLocation, storyProgress?.storyFlags),
