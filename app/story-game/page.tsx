@@ -965,6 +965,7 @@ export default function StoryGamePage() {
             <div className="story-game-scene-panel">
               <div
                 className="scene-background"
+                data-location={storyProgress?.currentLocation || ''}
                 style={{ 
                   background: (() => {
                     const scene = storyProgress?.currentScene || 'forest';

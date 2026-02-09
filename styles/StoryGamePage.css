@@ -672,6 +672,20 @@
 /* Item positions for castle */
 .item-crown { top: 15%; left: 50%; transform: translateX(-50%); }
 
+/* Castle tower: crown on desk area, larger and clearly visible */
+.scene-background[data-location="castle_tower"] .item-crown {
+  top: 52%;
+  left: 28%;
+  font-size: 4rem;
+  transform: none;
+  z-index: 8;
+}
+.scene-background[data-location="castle_tower"] .item-crown .item-glow {
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.55) 0%, rgba(255, 200, 0, 0.2) 40%, transparent 70%);
+}
+
 /* Item positions for town */
 .item-coin { bottom: 30%; left: 40%; }
 .item-bread { top: 40%; right: 30%; }
