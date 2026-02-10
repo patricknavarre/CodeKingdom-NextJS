@@ -743,7 +743,20 @@ export default function WebDevGamePage() {
   const checkRequirements = (): boolean => {
     const req = level.requirements;
     const combinedCode = htmlCode + cssCode;
-    
+    const combinedLower = combinedCode.toLowerCase();
+
+    // Level 2: explicit pass when heading is present and CSS has color + text-align (CSS Code box or style tag)
+    if (level.id === 2) {
+      const hasH1 = combinedLower.includes('<h1');
+      const allCssForL2 = (cssCode + '\n' + (htmlCode.match(/<style[\s\S]*?>([\s\S]*?)<\/style>/gi)?.reduce((acc: string, m: string) => {
+        const c = m.match(/<style[\s\S]*?>([\s\S]*?)<\/style>/i);
+        return acc + (c && c[1] ? c[1] + '\n' : '');
+      }, '') || '')).toLowerCase().replace(/\s+/g, ' ');
+      const hasColor = /color\s*:/.test(allCssForL2);
+      const hasTextAlign = /text\s*-\s*align\s*:/.test(allCssForL2);
+      if (hasH1 && hasColor && hasTextAlign) return true;
+    }
+
     // Extract CSS from HTML style tags for validation
     const styleTagMatch = htmlCode.match(/<style[\s\S]*?>([\s\S]*?)<\/style>/gi);
     let cssFromHtml = '';
@@ -1213,7 +1226,7 @@ export default function WebDevGamePage() {
                     )}
                     {level.id === 2 && (
                       <ul style={{ marginLeft: '20px', lineHeight: '1.6' }}>
-                        <li>Add CSS inside the <code>&lt;style&gt;</code> tag in the <code>&lt;head&gt;</code> section</li>
+                        <li>Use the <strong>CSS Code</strong> box below (or a <code>&lt;style&gt;</code> tag in <code>&lt;head&gt;</code>)</li>
                         <li>To make text blue: <code>color: blue;</code></li>
                         <li>To center text: <code>text-align: center;</code></li>
                         <li>Example: <code>h1 &#123; color: blue; text-align: center; &#125;</code></li>
