@@ -42,31 +42,30 @@
 
 .level-panel {
   background: white;
-  padding: 8px 12px;
+  padding: 14px 16px;
   margin: 5px 10px;
-  border-radius: 6px;
+  border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
 }
 
 .level-panel h2 {
   margin: 0;
   color: #667eea;
-  font-size: 1rem;
-  flex: 0 0 auto;
+  font-size: 1.15rem;
 }
 
 .level-description {
   margin: 0;
   color: #666;
-  font-size: 0.85rem;
-  flex: 0 0 auto;
+  font-size: 0.9rem;
 }
 
+/* Prominent challenge box - first thing kids see */
 .challenge-box {
   background: #fff3cd;
   border-left: 3px solid #ffc107;
@@ -74,12 +73,64 @@
   margin: 0;
   border-radius: 4px;
   font-size: 0.85rem;
-  flex: 1 1 auto;
-  min-width: 200px;
+}
+
+.challenge-box-prominent {
+  background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+  border: 2px solid #ffc107;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin: 0;
+  box-shadow: 0 2px 6px rgba(255, 193, 7, 0.25);
+}
+
+.challenge-label {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #b38600;
+  margin-bottom: 6px;
+}
+
+.challenge-text {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #333;
 }
 
 .challenge-box strong {
   font-size: 0.8rem;
+}
+
+/* Step-by-step instructions for beginners */
+.instructions-box {
+  background: #e8f5e9;
+  border: 2px solid #81c784;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 0;
+}
+
+.instructions-label {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #2e7d32;
+  margin-bottom: 8px;
+}
+
+.instructions-list {
+  margin: 0;
+  padding-left: 22px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #333;
+}
+
+.instructions-list li {
+  margin-bottom: 6px;
+}
+
+.instructions-list li:last-child {
+  margin-bottom: 0;
 }
 
 .requirements-box {

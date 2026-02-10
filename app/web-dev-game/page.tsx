@@ -22,6 +22,8 @@ interface Level {
   title: string;
   description: string;
   challenge: string;
+  /** Step-by-step instructions for beginners (shown prominently). */
+  instructions?: string[];
   htmlTemplate: string;
   cssTemplate: string;
   requirements: {
@@ -39,13 +41,21 @@ const levels: Level[] = [
     title: 'Welcome to HTML!',
     description: 'Create your first heading',
     challenge: 'Add an <h1> heading that says "Hello, CodeKingdom!"',
+    instructions: [
+      'Your goal: Add a big heading that says Hello, CodeKingdom!',
+      'In HTML, most tags come in two parts: an opening tag and a closing tag.',
+      'Opening tag: <h1> — tells the browser "start a heading here."',
+      'Closing tag: </h1> — the slash / before the h1 tells the browser "end the heading here." Don\'t forget the slash!',
+      'The words you want to show go in between the two tags.',
+      'Type this inside the <body> section (where the comment says "Add your heading here"): <h1>Hello, CodeKingdom!</h1>',
+    ],
     htmlTemplate: `<!DOCTYPE html>
 <html>
 <head>
   <title>My First Website</title>
 </head>
 <body>
-  <!-- Add your heading here -->
+  <!-- Add your heading here: use <h1>Your text here</h1> (don't forget the closing </h1>!) -->
   
 </body>
 </html>`,
@@ -62,6 +72,13 @@ const levels: Level[] = [
     title: 'Add Some Style',
     description: 'Style your heading with CSS',
     challenge: 'Make your heading blue and centered',
+    instructions: [
+      'Your goal: Change how the heading looks using CSS (styling).',
+      'Find the <style> tag inside <head> — that\'s where you add CSS.',
+      'CSS uses selectors (like h1) and properties (like color: blue;).',
+      'Each property ends with a semicolon ; — don\'t forget it!',
+      'Type inside the <style> tag: h1 { color: blue; text-align: center; }',
+    ],
     htmlTemplate: `<!DOCTYPE html>
 <html>
 <head>
@@ -87,6 +104,12 @@ const levels: Level[] = [
     title: 'Add a Paragraph',
     description: 'Write about yourself',
     challenge: 'Add a paragraph introducing yourself',
+    instructions: [
+      'Your goal: Add a paragraph of text below the heading.',
+      'Paragraphs use <p> and </p> tags — just like <h1>, you need both opening and closing.',
+      'Whatever you write between <p> and </p> will show as a normal paragraph.',
+      'Add it inside <body>, after the </h1> tag. Example: <p>My name is... and I love coding!</p>',
+    ],
     htmlTemplate: `<!DOCTYPE html>
 <html>
 <head>
@@ -1074,9 +1097,25 @@ export default function WebDevGamePage() {
           <div className="level-panel">
             <h2>{level.title}</h2>
             <p className="level-description">{level.description}</p>
-            <div className="challenge-box">
-              <strong>Challenge:</strong> {level.challenge}
+
+            {/* Prominent challenge - what the user needs to accomplish */}
+            <div className="challenge-box challenge-box-prominent">
+              <div className="challenge-label">🎯 Your challenge</div>
+              <div className="challenge-text">{level.challenge}</div>
             </div>
+
+            {/* Step-by-step "What to do" for beginners */}
+            {level.instructions && level.instructions.length > 0 && (
+              <div className="instructions-box">
+                <div className="instructions-label">📋 What to do (step by step)</div>
+                <ol className="instructions-list">
+                  {level.instructions.map((step, i) => (
+                    <li key={i}>{step}</li>
+                  ))}
+                </ol>
+              </div>
+            )}
+
             <div className="requirements-box">
               <strong>Requirements:</strong>
               <ul>
@@ -1146,9 +1185,10 @@ export default function WebDevGamePage() {
                     <h4 style={{ color: '#9b59b6', marginBottom: '8px' }}>💡 Hints for This Level:</h4>
                     {level.id === 1 && (
                       <ul style={{ marginLeft: '20px', lineHeight: '1.6' }}>
-                        <li>Use <code>&lt;h1&gt;</code> tags to create a heading</li>
-                        <li>Example: <code>&lt;h1&gt;Hello, CodeKingdom!&lt;/h1&gt;</code></li>
-                        <li>Add it inside the <code>&lt;body&gt;</code> section</li>
+                        <li>Use <code>&lt;h1&gt;</code> for the opening tag and <code>&lt;/h1&gt;</code> for the closing tag — the <strong>slash /</strong> in <code>&lt;/h1&gt;</code> is important!</li>
+                        <li>Full example: <code>&lt;h1&gt;Hello, CodeKingdom!&lt;/h1&gt;</code></li>
+                        <li>Add it inside the <code>&lt;body&gt;</code> section, where the comment says &quot;Add your heading here&quot;</li>
+                        <li>If your page looks broken, check that you didn&apos;t forget the closing <code>&lt;/h1&gt;</code></li>
                       </ul>
                     )}
                     {level.id === 2 && (
