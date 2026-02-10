@@ -755,8 +755,9 @@ export default function WebDevGamePage() {
         }
       });
     }
-    // Combine CSS from editor and from HTML style tags
-    const allCss = (cssCode + '\n' + cssFromHtml).toLowerCase();
+    // Combine CSS from editor and from HTML style tags; normalize for matching
+    const rawCss = (cssCode + '\n' + cssFromHtml).toLowerCase();
+    const allCss = rawCss.replace(/\u2013|\u2014|\u2212/g, '-').trim();
 
     // Check HTML requirements
     if (req.html) {
@@ -781,9 +782,9 @@ export default function WebDevGamePage() {
             return false;
           }
         } else {
-          // Check for the property name (with or without colon, with or without value)
-          // This handles "background-color", "background-color:", "background-color: magenta", etc.
-          const propPattern = new RegExp(propLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*[:{]', 'i');
+          // Escape hyphen in property names (e.g. text-align) so regex matches literal hyphen
+          const escapedProp = propLower.replace(/-/g, '\\-').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const propPattern = new RegExp(escapedProp + '\\s*[:{]', 'i');
           if (!allCss.match(propPattern)) {
             return false;
           }
