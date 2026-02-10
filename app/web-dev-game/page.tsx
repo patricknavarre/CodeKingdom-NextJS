@@ -74,10 +74,10 @@ const levels: Level[] = [
     challenge: 'Make your heading blue and centered',
     instructions: [
       'Your goal: Change how the heading looks using CSS (styling).',
-      'Find the <style> tag inside <head> — that\'s where you add CSS.',
+      'Use the CSS Code box below — that\'s where you add your styles.',
       'CSS uses selectors (like h1) and properties (like color: blue;).',
       'Each property ends with a semicolon ; — don\'t forget it!',
-      'Type inside the <style> tag: h1 { color: blue; text-align: center; }',
+      'Example: h1 { color: blue; text-align: center; }',
     ],
     htmlTemplate: `<!DOCTYPE html>
 <html>
@@ -93,7 +93,7 @@ const levels: Level[] = [
 </html>`,
     cssTemplate: `/* Add your styles here */`,
     requirements: {
-      html: ['h1', 'style'],
+      html: ['h1'],
       css: ['color', 'text-align']
     },
     xpReward: 30,
