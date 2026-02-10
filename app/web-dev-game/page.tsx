@@ -564,6 +564,9 @@ export default function WebDevGamePage() {
   // 'html' = show only HTML editor bigger, 'css' = show only CSS editor bigger, null = show both
   const [expandedEditor, setExpandedEditor] = useState<'html' | 'css' | null>(null);
 
+  // Collapsible upper section (challenge + requirements + hints) so code editor and preview can use full height
+  const [showChallengePanel, setShowChallengePanel] = useState(true);
+
   // Persist current level so players resume the Web Dev Game where they left off (user-specific)
   useEffect(() => {
     if (typeof window === 'undefined' || !user) return;
@@ -1094,9 +1097,20 @@ export default function WebDevGamePage() {
             </div>
           </div>
 
-          {/* Scrollable main area so level panel + code editor can both be seen */}
+          {/* Scrollable main area; upper section is collapsible so editor + preview can use full height */}
           <div className="web-dev-game-main">
-          <div className="level-panel">
+          <div className="challenge-panel-wrapper">
+            <button
+              type="button"
+              className="challenge-panel-toggle"
+              onClick={() => setShowChallengePanel(!showChallengePanel)}
+              aria-expanded={showChallengePanel}
+            >
+              <span>📋 Challenge & Hints</span>
+              <span className="challenge-panel-arrow" aria-hidden>{showChallengePanel ? '▼' : '▶'}</span>
+            </button>
+            {showChallengePanel && (
+            <div className="level-panel">
             <h2>{level.title}</h2>
             <p className="level-description">{level.description}</p>
 
@@ -1329,6 +1343,8 @@ export default function WebDevGamePage() {
                 </div>
               </div>
             </div>
+          </div>
+            )}
           </div>
 
           <div className="split-container">

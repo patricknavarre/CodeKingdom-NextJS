@@ -17,6 +17,44 @@
   flex-direction: column;
 }
 
+/* Collapsible upper section: click to hide challenge/hints and give full height to editor + preview */
+.challenge-panel-wrapper {
+  flex-shrink: 0;
+  margin: 0 10px 0;
+}
+
+.challenge-panel-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+  color: white;
+  border: none;
+  border-radius: 8px 8px 0 0;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.challenge-panel-toggle:hover {
+  background: linear-gradient(135deg, #8e44ad 0%, #7d3c98 100%);
+}
+
+.challenge-panel-arrow {
+  font-size: 0.9rem;
+  transition: transform 0.2s;
+}
+
+.challenge-panel-wrapper .level-panel {
+  border-radius: 0 0 8px 8px;
+  margin-top: 0;
+  border: 1px solid rgba(155, 89, 182, 0.3);
+  border-top: none;
+}
+
 .game-header {
   background: white;
   padding: 6px 12px;
@@ -206,18 +244,20 @@
 
 .editor-content {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 10px;
   gap: 10px;
 }
 
 .editor-section {
-  flex: 1;
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  min-height: 300px;
+  min-height: 140px;
 }
 
 .editor-section label {
@@ -235,12 +275,12 @@
   border-radius: 6px;
   font-family: 'Courier New', monospace;
   font-size: 16px;
-  resize: none;
+  resize: vertical;
   background: #f8f9fa;
   color: #333;
   line-height: 1.6;
   tab-size: 2;
-  min-height: 300px;
+  min-height: 120px;
 }
 
 .code-editor:focus {
