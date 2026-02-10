@@ -757,7 +757,10 @@ export default function WebDevGamePage() {
     }
     // Combine CSS from editor and from HTML style tags; normalize for matching
     const rawCss = (cssCode + '\n' + cssFromHtml).toLowerCase();
-    const allCss = rawCss.replace(/\u2013|\u2014|\u2212/g, '-').trim();
+    const allCss = rawCss
+      .replace(/\u2013|\u2014|\u2212/g, '-')
+      .replace(/\s+/g, ' ')
+      .trim();
 
     // Check HTML requirements
     if (req.html) {
