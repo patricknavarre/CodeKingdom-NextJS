@@ -560,9 +560,9 @@ export default function WebDevGamePage() {
     acc => acc.type !== 'pet' && acc.isEquipped && acc.type !== 'background'
   ) || [];
 
-  // Allow players (especially on desktop) to expand one editor at a time
-  // 'html' = show only HTML editor bigger, 'css' = show only CSS editor bigger, null = show both
-  const [expandedEditor, setExpandedEditor] = useState<'html' | 'css' | null>(null);
+  // Each code section can be collapsed (hide textarea) or expanded (show textarea)
+  const [htmlExpanded, setHtmlExpanded] = useState(true);
+  const [cssExpanded, setCssExpanded] = useState(true);
 
   // Collapsible upper section (challenge + requirements + hints) so code editor and preview can use full height
   const [showChallengePanel, setShowChallengePanel] = useState(true);
@@ -1354,70 +1354,50 @@ export default function WebDevGamePage() {
                 <h3>Code Editor</h3>
               </div>
               <div className="editor-content">
-                {(expandedEditor === null || expandedEditor === 'html') && (
-                  <div className="editor-section">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                      <label>HTML Code:</label>
-                      <button
-                        type="button"
-                        onClick={() => setExpandedEditor(expandedEditor === 'html' ? null : 'html')}
-                        style={{
-                          border: 'none',
-                          background: 'transparent',
-                          color: '#2563eb',
-                          fontSize: '0.8rem',
-                          fontWeight: 600,
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {expandedEditor === 'html' ? 'Show both' : 'Expand'}
-                      </button>
-                    </div>
+                <div className={`editor-section ${htmlExpanded ? 'editor-section-expanded' : 'editor-section-collapsed'}`}>
+                  <div className="editor-section-header">
+                    <label>HTML Code:</label>
+                    <button
+                      type="button"
+                      className="editor-toggle-btn"
+                      onClick={() => setHtmlExpanded(!htmlExpanded)}
+                      aria-expanded={htmlExpanded}
+                    >
+                      {htmlExpanded ? 'Collapse' : 'Expand'}
+                    </button>
+                  </div>
+                  {htmlExpanded && (
                     <textarea
                       className="code-editor"
                       value={htmlCode}
                       onChange={(e) => setHtmlCode(e.target.value)}
                       spellCheck={false}
                       placeholder="Write your HTML here..."
-                      style={{
-                        minHeight: expandedEditor === 'html' ? '260px' : '140px',
-                        resize: 'vertical'
-                      }}
                     />
+                  )}
+                </div>
+                <div className={`editor-section ${cssExpanded ? 'editor-section-expanded' : 'editor-section-collapsed'}`}>
+                  <div className="editor-section-header">
+                    <label>CSS Code:</label>
+                    <button
+                      type="button"
+                      className="editor-toggle-btn"
+                      onClick={() => setCssExpanded(!cssExpanded)}
+                      aria-expanded={cssExpanded}
+                    >
+                      {cssExpanded ? 'Collapse' : 'Expand'}
+                    </button>
                   </div>
-                )}
-                {(expandedEditor === null || expandedEditor === 'css') && (
-                  <div className="editor-section">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                      <label>CSS Code:</label>
-                      <button
-                        type="button"
-                        onClick={() => setExpandedEditor(expandedEditor === 'css' ? null : 'css')}
-                        style={{
-                          border: 'none',
-                          background: 'transparent',
-                          color: '#2563eb',
-                          fontSize: '0.8rem',
-                          fontWeight: 600,
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {expandedEditor === 'css' ? 'Show both' : 'Expand'}
-                      </button>
-                    </div>
+                  {cssExpanded && (
                     <textarea
                       className="code-editor"
                       value={cssCode}
                       onChange={(e) => setCssCode(e.target.value)}
                       spellCheck={false}
                       placeholder={cssCode.trim() === '' || cssCode === level.cssTemplate ? 'Example: h1 { color: blue; text-align: center; }' : ''}
-                      style={{
-                        minHeight: expandedEditor === 'css' ? '260px' : '140px',
-                        resize: 'vertical'
-                      }}
                     />
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
               <div className="editor-actions">
                 <button className="btn-secondary" onClick={prevLevel} disabled={currentLevel === 0}>
