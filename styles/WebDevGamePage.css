@@ -44,8 +44,11 @@
 }
 
 .challenge-panel-arrow {
-  font-size: 0.9rem;
-  transition: transform 0.2s;
+  font-size: 1.25rem;
+  font-weight: bold;
+  min-width: 1.25em;
+  display: inline-block;
+  text-align: center;
 }
 
 .challenge-panel-wrapper .level-panel {

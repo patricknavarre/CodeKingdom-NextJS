@@ -1124,7 +1124,7 @@ export default function WebDevGamePage() {
               aria-expanded={showChallengePanel}
             >
               <span>📋 Challenge & Hints</span>
-              <span className="challenge-panel-arrow" aria-hidden>{showChallengePanel ? '▼' : '▶'}</span>
+              <span className="challenge-panel-arrow" aria-hidden>{showChallengePanel ? '−' : '+'}</span>
             </button>
             {showChallengePanel && (
             <div className="level-panel">
@@ -1192,9 +1192,7 @@ export default function WebDevGamePage() {
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#9b59b6'}
               >
                 <span>💡 How to Play & Hints</span>
-                <span style={{ fontSize: '20px', transition: 'transform 0.3s', transform: showHowToPlay ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                  ▼
-                </span>
+                <span className="challenge-panel-arrow" aria-hidden>{showHowToPlay ? '−' : '+'}</span>
               </button>
               <div style={{
                 maxHeight: showHowToPlay ? '2000px' : '0',
