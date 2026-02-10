@@ -1094,6 +1094,8 @@ export default function WebDevGamePage() {
             </div>
           </div>
 
+          {/* Scrollable main area so level panel + code editor can both be seen */}
+          <div className="web-dev-game-main">
           <div className="level-panel">
             <h2>{level.title}</h2>
             <p className="level-description">{level.description}</p>
@@ -1433,6 +1435,7 @@ export default function WebDevGamePage() {
                 />
               </div>
             </div>
+          </div>
           </div>
 
           {/* Success Modal */}
