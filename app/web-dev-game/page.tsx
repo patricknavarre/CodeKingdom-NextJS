@@ -757,6 +757,16 @@ export default function WebDevGamePage() {
       if (hasH1 && hasColor && hasTextAlign) return true;
     }
 
+    // Level 4: explicit pass when CSS has background-color (CSS Code box or style tag)
+    if (level.id === 4) {
+      const allCssForL4 = (cssCode + '\n' + (htmlCode.match(/<style[\s\S]*?>([\s\S]*?)<\/style>/gi)?.reduce((acc: string, m: string) => {
+        const c = m.match(/<style[\s\S]*?>([\s\S]*?)<\/style>/i);
+        return acc + (c && c[1] ? c[1] + '\n' : '');
+      }, '') || '')).toLowerCase().replace(/\s+/g, ' ');
+      const hasBackgroundColor = /background\s*-\s*color\s*:/.test(allCssForL4);
+      if (hasBackgroundColor) return true;
+    }
+
     // Extract CSS from HTML style tags for validation
     const styleTagMatch = htmlCode.match(/<style[\s\S]*?>([\s\S]*?)<\/style>/gi);
     let cssFromHtml = '';
@@ -1243,7 +1253,7 @@ export default function WebDevGamePage() {
                         <li>Add a background color to the <code>body</code> element</li>
                         <li>Use: <code>body &#123; background-color: lightblue; &#125;</code></li>
                         <li>You can use colors like: <code>lightblue</code>, <code>lightgreen</code>, <code>pink</code>, <code>yellow</code>, etc.</li>
-                        <li>Add this CSS inside the <code>&lt;style&gt;</code> tag</li>
+                        <li>Use the <strong>CSS Code</strong> box below (or a <code>&lt;style&gt;</code> tag in <code>&lt;head&gt;</code>)</li>
                       </ul>
                     )}
                     {level.id === 5 && (
