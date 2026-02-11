@@ -47,6 +47,7 @@ interface StoryProgress {
 // Scene backgrounds for visual display
 const SCENE_BACKGROUNDS: Record<string, string> = {
   forest: 'url(/images/backgrounds/Background_Forest.png)',
+  forestPath: 'url(/images/backgrounds/Background_Forest_Path.png)',
   castle: 'url(/images/backgrounds/Background_Castle.png)',
   town: 'url(/images/backgrounds/Background_Village_Square.png)',
   ocean: 'linear-gradient(135deg, #1e3a5f 0%, #0a1f3d 50%, #006994 100%)',
@@ -1132,6 +1133,10 @@ export default function StoryGamePage() {
                   background: (() => {
                     const scene = storyProgress?.currentScene || 'forest';
                     const location = storyProgress?.currentLocation || '';
+                    // Use forest path background when at forest_path (forest scene)
+                    if (scene === 'forest' && location === 'forest_path') {
+                      return SCENE_BACKGROUNDS.forestPath || SCENE_BACKGROUNDS.forest;
+                    }
                     // Use cave background when in cave or dark_cave (mountain scene)
                     if (scene === 'mountain' && (location === 'cave' || location === 'dark_cave')) {
                       return SCENE_BACKGROUNDS.cave || SCENE_BACKGROUNDS.mountain;
