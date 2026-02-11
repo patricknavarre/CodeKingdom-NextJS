@@ -909,6 +909,7 @@ export const QUIZ_FOREST_EXIT = {
   correctIndex: 1,
   successMessage: 'Correct! The guardian lets you pass.',
   wrongMessage: 'Not quite. Try again!',
+  reward: { coins: 5, experience: 10 },
 };
 
 /** Block minigame at dragon_lair: click Block when indicator is in green zone. Flag: dragon_block_won. */
@@ -921,6 +922,7 @@ export const BLOCK_MINIGAME_DRAGON = {
   greenZoneStart: 0.35,
   greenZoneEnd: 0.65,
   indicatorSpeed: 0.015,
+  reward: { coins: 15, experience: 25 },
 };
 
 /** Modal content when player collects key story items (e.g. map at forest path). */

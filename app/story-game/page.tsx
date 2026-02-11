@@ -189,10 +189,12 @@ export default function StoryGamePage() {
   const [itemStoryModal, setItemStoryModal] = useState<{ title: string; message: string } | null>(null);
   const [showQuizModal, setShowQuizModal] = useState<typeof QUIZ_FOREST_EXIT | null>(null);
   const [quizWrongMessage, setQuizWrongMessage] = useState<string | null>(null);
+  const [quizSuccessShowing, setQuizSuccessShowing] = useState(false);
   const [showBlockMinigameModal, setShowBlockMinigameModal] = useState(false);
   const [blockMinigameRoundsWon, setBlockMinigameRoundsWon] = useState(0);
   const [blockMinigameIndicatorPos, setBlockMinigameIndicatorPos] = useState(0);
   const [blockMinigameMessage, setBlockMinigameMessage] = useState<string | null>(null);
+  const [blockMinigameSuccessShowing, setBlockMinigameSuccessShowing] = useState(false);
   const blockMinigameIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const blockMinigameIndicatorPosRef = useRef(0);
 
@@ -1506,28 +1508,59 @@ export default function StoryGamePage() {
             <div className="quiz-modal-overlay">
               <div className="quiz-modal" onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}>
                 <h3>🧙 {showQuizModal.title}</h3>
-                <p className="quiz-question">{showQuizModal.question}</p>
-                {quizWrongMessage && <p className="quiz-wrong">{quizWrongMessage}</p>}
-                <div className="quiz-options">
-                  {showQuizModal.options.map((opt: string, i: number) => (
+                {quizSuccessShowing ? (
+                  <>
+                    <div className="quiz-success-message">
+                      <span className="quiz-success-icon">✅</span>
+                      <p className="quiz-success-text">{showQuizModal.successMessage}</p>
+                      {'reward' in showQuizModal && showQuizModal.reward && (
+                        <p className="quiz-reward-text">
+                          +{showQuizModal.reward.coins} coins, +{showQuizModal.reward.experience} XP
+                        </p>
+                      )}
+                    </div>
                     <button
-                      key={i}
-                      className="quiz-option-btn"
-                      onClick={async () => {
-                        if (i === showQuizModal.correctIndex) {
-                          const res = await storyGameAPI.setFlag(showQuizModal.flagWhenDone);
-                          setShowQuizModal(null);
-                          setQuizWrongMessage(null);
-                          setStoryProgress((prev: StoryProgress | null) => prev && res.data.storyFlags ? { ...prev, storyFlags: res.data.storyFlags } : prev);
-                        } else {
-                          setQuizWrongMessage(showQuizModal.wrongMessage);
-                        }
+                      className="quiz-continue-btn"
+                      onClick={() => {
+                        setShowQuizModal(null);
+                        setQuizSuccessShowing(false);
+                        setQuizWrongMessage(null);
                       }}
                     >
-                      {opt}
+                      Continue
                     </button>
-                  ))}
-                </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="quiz-question">{showQuizModal.question}</p>
+                    {quizWrongMessage && <p className="quiz-wrong">{quizWrongMessage}</p>}
+                    <div className="quiz-options">
+                      {showQuizModal.options.map((opt: string, i: number) => (
+                        <button
+                          key={i}
+                          className="quiz-option-btn"
+                          onClick={async () => {
+                            if (i === showQuizModal.correctIndex) {
+                              const reward = 'reward' in showQuizModal ? showQuizModal.reward : null;
+                              if (reward) {
+                                addCoins(reward.coins);
+                                addExperience(reward.experience);
+                              }
+                              const res = await storyGameAPI.setFlag(showQuizModal.flagWhenDone);
+                              setStoryProgress((prev: StoryProgress | null) => prev && res.data.storyFlags ? { ...prev, storyFlags: res.data.storyFlags } : prev);
+                              setQuizWrongMessage(null);
+                              setQuizSuccessShowing(true);
+                            } else {
+                              setQuizWrongMessage(showQuizModal.wrongMessage);
+                            }
+                          }}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -1537,43 +1570,74 @@ export default function StoryGamePage() {
             <div className="block-minigame-overlay">
               <div className="block-minigame-modal" onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}>
                 <h3>🐉 {BLOCK_MINIGAME_DRAGON.title}</h3>
-                <p className="block-minigame-instruction">{BLOCK_MINIGAME_DRAGON.instruction}</p>
-                <p className="block-minigame-rounds">Rounds: {blockMinigameRoundsWon} / {BLOCK_MINIGAME_DRAGON.roundsRequired}</p>
-                <div className="block-minigame-bar-wrap">
-                  <div
-                    className="block-minigame-green-zone"
-                    style={{
-                      left: `${BLOCK_MINIGAME_DRAGON.greenZoneStart * 100}%`,
-                      width: `${(BLOCK_MINIGAME_DRAGON.greenZoneEnd - BLOCK_MINIGAME_DRAGON.greenZoneStart) * 100}%`,
-                    }}
-                  />
-                  <div
-                    className="block-minigame-indicator"
-                    style={{ left: `${blockMinigameIndicatorPos * 100}%` }}
-                  />
-                </div>
-                {blockMinigameMessage && <p className="block-minigame-feedback">{blockMinigameMessage}</p>}
-                <button
-                  className="block-minigame-block-btn"
-                  onClick={async () => {
-                    const pos = blockMinigameIndicatorPosRef.current;
-                    const inZone = pos >= BLOCK_MINIGAME_DRAGON.greenZoneStart && pos <= BLOCK_MINIGAME_DRAGON.greenZoneEnd;
-                    if (inZone) {
-                      const next = blockMinigameRoundsWon + 1;
-                      setBlockMinigameRoundsWon(next);
-                      setBlockMinigameMessage('Blocked!');
-                      if (next >= BLOCK_MINIGAME_DRAGON.roundsRequired) {
-                        const res = await storyGameAPI.setFlag(BLOCK_MINIGAME_DRAGON.flagWhenDone);
+                {blockMinigameSuccessShowing ? (
+                  <>
+                    <div className="block-minigame-success-message">
+                      <span className="block-minigame-success-icon">🛡️</span>
+                      <p className="block-minigame-success-text">You blocked the dragon&apos;s fire! Victory!</p>
+                      {BLOCK_MINIGAME_DRAGON.reward && (
+                        <p className="block-minigame-reward-text">
+                          +{BLOCK_MINIGAME_DRAGON.reward.coins} coins, +{BLOCK_MINIGAME_DRAGON.reward.experience} XP
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      className="block-minigame-continue-btn"
+                      onClick={() => {
                         setShowBlockMinigameModal(false);
-                        setStoryProgress((prev: StoryProgress | null) => prev && res.data.storyFlags ? { ...prev, storyFlags: res.data.storyFlags } : prev);
-                      }
-                    } else {
-                      setBlockMinigameMessage('Missed! Try again.');
-                    }
-                  }}
-                >
-                  Block!
-                </button>
+                        setBlockMinigameSuccessShowing(false);
+                        setBlockMinigameRoundsWon(0);
+                        setBlockMinigameMessage(null);
+                      }}
+                    >
+                      Continue
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="block-minigame-instruction">{BLOCK_MINIGAME_DRAGON.instruction}</p>
+                    <p className="block-minigame-rounds">Rounds: {blockMinigameRoundsWon} / {BLOCK_MINIGAME_DRAGON.roundsRequired}</p>
+                    <div className="block-minigame-bar-wrap">
+                      <div
+                        className="block-minigame-green-zone"
+                        style={{
+                          left: `${BLOCK_MINIGAME_DRAGON.greenZoneStart * 100}%`,
+                          width: `${(BLOCK_MINIGAME_DRAGON.greenZoneEnd - BLOCK_MINIGAME_DRAGON.greenZoneStart) * 100}%`,
+                        }}
+                      />
+                      <div
+                        className="block-minigame-indicator"
+                        style={{ left: `${blockMinigameIndicatorPos * 100}%` }}
+                      />
+                    </div>
+                    {blockMinigameMessage && <p className="block-minigame-feedback">{blockMinigameMessage}</p>}
+                    <button
+                      className="block-minigame-block-btn"
+                      onClick={async () => {
+                        const pos = blockMinigameIndicatorPosRef.current;
+                        const inZone = pos >= BLOCK_MINIGAME_DRAGON.greenZoneStart && pos <= BLOCK_MINIGAME_DRAGON.greenZoneEnd;
+                        if (inZone) {
+                          const next = blockMinigameRoundsWon + 1;
+                          setBlockMinigameRoundsWon(next);
+                          setBlockMinigameMessage('Blocked!');
+                          if (next >= BLOCK_MINIGAME_DRAGON.roundsRequired) {
+                            if (BLOCK_MINIGAME_DRAGON.reward) {
+                              addCoins(BLOCK_MINIGAME_DRAGON.reward.coins);
+                              addExperience(BLOCK_MINIGAME_DRAGON.reward.experience);
+                            }
+                            const res = await storyGameAPI.setFlag(BLOCK_MINIGAME_DRAGON.flagWhenDone);
+                            setStoryProgress((prev: StoryProgress | null) => prev && res.data.storyFlags ? { ...prev, storyFlags: res.data.storyFlags } : prev);
+                            setBlockMinigameSuccessShowing(true);
+                          }
+                        } else {
+                          setBlockMinigameMessage('Missed! Try again.');
+                        }
+                      }}
+                    >
+                      Block!
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           )}

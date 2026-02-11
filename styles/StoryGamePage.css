@@ -1131,6 +1131,51 @@
   transform: translateX(4px);
 }
 
+.quiz-success-message {
+  margin: 16px 0 20px 0;
+  text-align: center;
+}
+
+.quiz-success-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.quiz-success-text {
+  margin: 0 0 8px 0;
+  color: #27ae60;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.quiz-reward-text {
+  margin: 0;
+  color: #667eea;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.quiz-continue-btn {
+  display: block;
+  width: 100%;
+  padding: 12px 24px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.quiz-continue-btn:hover {
+  background: #5568d3;
+  transform: scale(1.02);
+}
+
 /* Block minigame modal (dragon_lair) */
 .block-minigame-overlay {
   position: fixed;
@@ -1226,6 +1271,51 @@
 .block-minigame-modal .block-minigame-block-btn:hover {
   background: #e74c3c;
   transform: scale(1.05);
+}
+
+.block-minigame-success-message {
+  margin: 16px 0 20px 0;
+  text-align: center;
+}
+
+.block-minigame-success-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.block-minigame-success-text {
+  margin: 0 0 8px 0;
+  color: #f5d0a9;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.block-minigame-reward-text {
+  margin: 0;
+  color: #27ae60;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.block-minigame-continue-btn {
+  display: block;
+  width: 100%;
+  padding: 12px 24px;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.block-minigame-continue-btn:hover {
+  background: #2ecc71;
+  transform: scale(1.02);
 }
 
 /* Level Complete Modal */
