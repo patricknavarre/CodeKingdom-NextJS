@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useCharacter } from '@/contexts/CharacterContext';
 import { storyGameAPI } from '@/lib/api';
-import { SCENES, ENDINGS, CHAPTERS, getNarrative } from '@/lib/storyGameConstants';
+import { SCENES, ENDINGS, CHAPTERS, getNarrative, ITEM_STORY_MODALS } from '@/lib/storyGameConstants';
 import Navigation from '@/components/Navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import '@/styles/StoryGamePage.css';
@@ -184,6 +184,7 @@ export default function StoryGamePage() {
   const [showChapterOverlay, setShowChapterOverlay] = useState(false);
   const [chapterOverlayData, setChapterOverlayData] = useState<{ title: string; subtitle?: string; body: string } | null>(null);
   const chapterOverlayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [itemStoryModal, setItemStoryModal] = useState<{ title: string; message: string } | null>(null);
 
   // Get character image
   const getCharacterImage = () => {
@@ -479,6 +480,10 @@ export default function StoryGamePage() {
         if (itemName) {
           setCollectedItem(itemName);
           setTimeout(() => setCollectedItem(null), 2000);
+        }
+        const item = (response.data.collectedItem || itemName)?.toLowerCase?.() || response.data.message?.match(/collected a (\w+)/)?.[1]?.toLowerCase();
+        if (item && ITEM_STORY_MODALS[item]) {
+          setItemStoryModal(ITEM_STORY_MODALS[item]);
         }
         // Trigger a short sparkle effect near the character
         setShowCharacterCollectEffect(true);
@@ -1416,6 +1421,17 @@ export default function StoryGamePage() {
                 <h3>💡 Hint Level {selectedHintLevel}</h3>
                 <p>{hintText}</p>
                 <button onClick={() => setShowHintModal(false)}>Close</button>
+              </div>
+            </div>
+          )}
+
+          {/* Item story modal (e.g. when collecting the map) */}
+          {itemStoryModal && (
+            <div className="item-story-modal-overlay" onClick={() => setItemStoryModal(null)}>
+              <div className="item-story-modal" onClick={(e) => e.stopPropagation()}>
+                <h3>🗺️ {itemStoryModal.title}</h3>
+                <p>{itemStoryModal.message}</p>
+                <button onClick={() => setItemStoryModal(null)}>Continue</button>
               </div>
             </div>
           )}

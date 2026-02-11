@@ -658,6 +658,7 @@ export async function POST(req: NextRequest) {
       userExperience: user.experience,
       userLevel: user.level,
       storyProgress: storyGame.storyProgress,
+      ...(result.action === 'collect' && result.success && result.item ? { collectedItem: result.item } : {}),
       ...(endingConfig ? { endingId: endingConfig.id, endingTitle: endingConfig.title, endingMessage: endingConfig.message } : {}),
     });
   } catch (error: any) {

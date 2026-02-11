@@ -899,6 +899,14 @@ const DEFAULT_NARRATIVE = 'You take in your surroundings. The next step is yours
 // Priority order for picking narrative variant when multiple flags match.
 const NARRATIVE_FLAG_PRIORITY = ['hypnotized_dragon', 'found_crown', 'entered_temple', 'helped_merchant'];
 
+/** Modal content when player collects key story items (e.g. map at forest path). */
+export const ITEM_STORY_MODALS: Record<string, { title: string; message: string }> = {
+  map: {
+    title: 'You found a Map!',
+    message: 'The old map shows hidden paths through the kingdom. When you reach the forest exit, you can use it to take the path to the mountains. For now, keep exploring—find the key in the forest, then make your way to the clearing and beyond!',
+  },
+};
+
 /** Returns narrative for a location; uses first matching flag variant, else default. */
 export function getNarrative(location: string, storyFlags?: string[]): string {
   const entry = LOCATION_NARRATIVE[location];
