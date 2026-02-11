@@ -512,12 +512,19 @@ export default function StoryGamePage() {
       
       // If it was a move or choose_path action, reload progress to ensure sync (choices for "Your journey")
       if ((response.data.action === 'move' || response.data.action === 'choose_path') && response.data.success) {
+        const locationJustSet = response.data.newLocation;
+        const sceneJustSet = response.data.newScene;
         setTimeout(async () => {
           try {
             const progressResponse = await storyGameAPI.getProgress();
             setAvailableItems(progressResponse.data.availableItems || []);
             setAvailableChoices(progressResponse.data.availableChoices || []);
-            setStoryProgress(progressResponse.data);
+            // Merge progress but keep the location we just moved to (avoid stale progress overwriting and breaking quiz/minigame triggers)
+            setStoryProgress((prev: StoryProgress | null) => ({
+              ...progressResponse.data,
+              currentLocation: locationJustSet ?? prev?.currentLocation ?? progressResponse.data.currentLocation,
+              currentScene: sceneJustSet ?? prev?.currentScene ?? progressResponse.data.currentScene,
+            }));
           } catch (err) {
             console.error('Error reloading progress:', err);
           }
