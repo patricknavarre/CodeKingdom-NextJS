@@ -267,11 +267,69 @@ export const executePython = (code: string, context: Record<string, any> = {}): 
 };
 
 /**
+ * Check that quotes are balanced and properly closed (no missing/mismatched quotes).
+ * Catches e.g. choose_path("forest_clearing) or move_to("forest_path')
+ */
+function validateQuotes(code: string): { valid: boolean; error?: string } {
+  type State = 'outside' | 'in_double' | 'in_single';
+  let state: State = 'outside';
+  for (let i = 0; i < code.length; i++) {
+    const c = code[i];
+    if (state === 'outside') {
+      if (c === '\\' && i + 1 < code.length) {
+        i++; // skip escaped char
+        continue;
+      }
+      if (c === '"') state = 'in_double';
+      else if (c === "'") state = 'in_single';
+    } else if (state === 'in_double') {
+      if (c === '\\' && i + 1 < code.length) {
+        i++;
+        continue;
+      }
+      if (c === '"') state = 'outside';
+      else if (c === ')' || c === '\n') {
+        return {
+          valid: false,
+          error: 'Missing closing double quote. Every opening " needs a closing ".',
+        };
+      }
+    } else if (state === 'in_single') {
+      if (c === '\\' && i + 1 < code.length) {
+        i++;
+        continue;
+      }
+      if (c === "'") state = 'outside';
+      else if (c === ')' || c === '\n') {
+        return {
+          valid: false,
+          error: "Missing closing single quote. Every opening ' needs a closing '.",
+        };
+      }
+    }
+  }
+  if (state !== 'outside') {
+    return {
+      valid: false,
+      error: state === 'in_double'
+        ? 'Missing closing double quote. Every opening " needs a closing ".'
+        : "Missing closing single quote. Every opening ' needs a closing '.",
+    };
+  }
+  return { valid: true };
+}
+
+/**
  * Validate Python code syntax (basic check)
  * @param {string} code - Python code to validate
  * @returns {Object} - Validation result
  */
 export const validatePythonCode = (code: string) => {
+  const quoteCheck = validateQuotes(code);
+  if (!quoteCheck.valid) {
+    return { valid: false, error: quoteCheck.error };
+  }
+
   // Basic validation - check for dangerous operations
   const dangerousPatterns = [
     /import\s+os/,
