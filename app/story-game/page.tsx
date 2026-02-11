@@ -48,6 +48,7 @@ interface StoryProgress {
 const SCENE_BACKGROUNDS: Record<string, string> = {
   forest: 'url(/images/backgrounds/Background_Forest.png)',
   forestPath: 'url(/images/backgrounds/Background_Forest_Path.png)',
+  forestClearing: 'url(/images/backgrounds/Background_Forest_Clearing.png)',
   castle: 'url(/images/backgrounds/Background_Castle.png)',
   town: 'url(/images/backgrounds/Background_Village_Square.png)',
   ocean: 'linear-gradient(135deg, #1e3a5f 0%, #0a1f3d 50%, #006994 100%)',
@@ -1136,6 +1137,10 @@ export default function StoryGamePage() {
                     // Use forest path background when at forest_path (forest scene)
                     if (scene === 'forest' && location === 'forest_path') {
                       return SCENE_BACKGROUNDS.forestPath || SCENE_BACKGROUNDS.forest;
+                    }
+                    // Use forest clearing background when at forest_clearing (forest scene)
+                    if (scene === 'forest' && location === 'forest_clearing') {
+                      return SCENE_BACKGROUNDS.forestClearing || SCENE_BACKGROUNDS.forest;
                     }
                     // Use cave background when in cave or dark_cave (mountain scene)
                     if (scene === 'mountain' && (location === 'cave' || location === 'dark_cave')) {
