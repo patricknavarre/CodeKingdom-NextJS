@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useCharacter } from '@/contexts/CharacterContext';
 import { storyGameAPI } from '@/lib/api';
-import { SCENES, ENDINGS, CHAPTERS, getNarrative, ITEM_STORY_MODALS } from '@/lib/storyGameConstants';
+import { SCENES, ENDINGS, CHAPTERS, getNarrative, ITEM_STORY_MODALS, QUIZ_FOREST_EXIT, BLOCK_MINIGAME_DRAGON } from '@/lib/storyGameConstants';
 import Navigation from '@/components/Navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import '@/styles/StoryGamePage.css';
@@ -187,6 +187,14 @@ export default function StoryGamePage() {
   const [chapterOverlayData, setChapterOverlayData] = useState<{ title: string; subtitle?: string; body: string } | null>(null);
   const chapterOverlayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [itemStoryModal, setItemStoryModal] = useState<{ title: string; message: string } | null>(null);
+  const [showQuizModal, setShowQuizModal] = useState<typeof QUIZ_FOREST_EXIT | null>(null);
+  const [quizWrongMessage, setQuizWrongMessage] = useState<string | null>(null);
+  const [showBlockMinigameModal, setShowBlockMinigameModal] = useState(false);
+  const [blockMinigameRoundsWon, setBlockMinigameRoundsWon] = useState(0);
+  const [blockMinigameIndicatorPos, setBlockMinigameIndicatorPos] = useState(0);
+  const [blockMinigameMessage, setBlockMinigameMessage] = useState<string | null>(null);
+  const blockMinigameIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const blockMinigameIndicatorPosRef = useRef(0);
 
   // Get character image
   const getCharacterImage = () => {
@@ -250,6 +258,46 @@ export default function StoryGamePage() {
     };
   }, []);
 
+  // Trigger quiz modal at forest_exit (once per player) and block minigame at dragon_lair (once per player)
+  useEffect(() => {
+    if (!storyProgress || loading) return;
+    const loc = storyProgress.currentLocation;
+    const flags = storyProgress.storyFlags || [];
+    if (loc === QUIZ_FOREST_EXIT.locationId && !flags.includes(QUIZ_FOREST_EXIT.flagWhenDone) && !showQuizModal) {
+      setShowQuizModal(QUIZ_FOREST_EXIT);
+      setQuizWrongMessage(null);
+    }
+    if (loc === BLOCK_MINIGAME_DRAGON.locationId && !flags.includes(BLOCK_MINIGAME_DRAGON.flagWhenDone) && !showBlockMinigameModal) {
+      setShowBlockMinigameModal(true);
+      setBlockMinigameRoundsWon(0);
+      setBlockMinigameIndicatorPos(0);
+      setBlockMinigameMessage(null);
+    }
+  }, [storyProgress?.currentLocation, storyProgress?.storyFlags, loading]);
+
+  // Block minigame: animate indicator when modal is open (bounce 0 -> 1 -> 0)
+  useEffect(() => {
+    if (!showBlockMinigameModal) return;
+    let direction = 1;
+    blockMinigameIndicatorPosRef.current = 0;
+    setBlockMinigameIndicatorPos(0);
+    const tick = () => {
+      const speed = BLOCK_MINIGAME_DRAGON.indicatorSpeed;
+      let next = blockMinigameIndicatorPosRef.current + direction * speed;
+      if (next >= 1) { next = 1; direction = -1; }
+      if (next <= 0) { next = 0; direction = 1; }
+      blockMinigameIndicatorPosRef.current = next;
+      setBlockMinigameIndicatorPos(next);
+    };
+    blockMinigameIntervalRef.current = setInterval(tick, 16);
+    return () => {
+      if (blockMinigameIntervalRef.current) {
+        clearInterval(blockMinigameIntervalRef.current);
+        blockMinigameIntervalRef.current = null;
+      }
+    };
+  }, [showBlockMinigameModal]);
+
   const loadStoryProgress = async () => {
     try {
       const response = await storyGameAPI.getProgress();
@@ -296,7 +344,7 @@ export default function StoryGamePage() {
     try {
       // Animate character walking
       setIsWalking(true);
-      setCharacterPosition(prev => ({ x: prev.x + 20, y: prev.y }));
+      setCharacterPosition((prev: { x: number; y: number }) => ({ x: prev.x + 20, y: prev.y }));
 
       const response = await storyGameAPI.executeCode(code);
 
@@ -314,7 +362,7 @@ export default function StoryGamePage() {
         }
         // Update progress to show reset location
         if (response.data.newLocation) {
-          setStoryProgress(prev => prev ? {
+          setStoryProgress((prev: StoryProgress | null) => prev ? {
             ...prev,
             currentLocation: response.data.newLocation,
             ending: response.data.endingId ?? prev.ending,
@@ -333,7 +381,7 @@ export default function StoryGamePage() {
       if (response.data.endingId) {
         const newLocation = response.data.newLocation || storyProgress?.currentLocation;
         const newScene = response.data.newScene || storyProgress?.currentScene;
-        setStoryProgress(prev => ({
+        setStoryProgress((prev: StoryProgress | null) => ({
           ...prev!,
           currentLocation: newLocation,
           currentScene: newScene,
@@ -366,7 +414,7 @@ export default function StoryGamePage() {
       if (response.data.dragonDefeated === true) {
         const newLocation = response.data.newLocation || storyProgress?.currentLocation;
         const newScene = response.data.newScene || storyProgress?.currentScene;
-        setStoryProgress(prev => ({
+        setStoryProgress((prev: StoryProgress | null) => ({
           ...prev!,
           currentLocation: newLocation,
           currentScene: newScene,
@@ -417,7 +465,7 @@ export default function StoryGamePage() {
         responseData: response.data
       });
       
-      setStoryProgress(prev => ({
+      setStoryProgress((prev: StoryProgress | null) => ({
         ...prev!,
         currentLocation: newLocation,
         currentScene: newScene,
@@ -707,7 +755,7 @@ export default function StoryGamePage() {
                         {storyProgress.storyFlags && storyProgress.storyFlags.length > 0 && (
                           <p className="journey-flags">
                             <strong>Consequences:</strong>{' '}
-                            {storyProgress.storyFlags.map(f => f.replace(/_/g, ' ')).join(', ')}
+                            {storyProgress.storyFlags.map((f: string) => f.replace(/_/g, ' ')).join(', ')}
                           </p>
                         )}
                       </>
@@ -843,7 +891,7 @@ export default function StoryGamePage() {
                         <strong>🔀 Decision Point!</strong>
                         <p style={{ marginTop: '10px', marginBottom: '10px' }}>Choose your path. If you take an option below, run the code shown—like a choose-your-own-adventure book.</p>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                          {availableChoices.map((choice) => (
+                          {availableChoices.map((choice: { id: string; description: string; codeHint?: string; requiredItem?: string; available: boolean }) => (
                             <div key={choice.id} className="cyoa-choice" style={{
                               background: choice.available ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.3)',
                               padding: '10px',
@@ -999,8 +1047,8 @@ export default function StoryGamePage() {
                 <textarea
                   className="python-code-editor"
                   value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  onKeyDown={(e) => {
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCode(e.target.value)}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
                     // Allow Ctrl+Enter or Cmd+Enter to run code
                     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                       e.preventDefault();
@@ -1094,7 +1142,7 @@ export default function StoryGamePage() {
                 <h3>📦 Inventory</h3>
                 <div className="inventory-items">
                   {storyProgress?.inventory && storyProgress.inventory.length > 0 ? (
-                    storyProgress.inventory.map((item, index) => (
+                    storyProgress.inventory.map((item: string, index: number) => (
                       <div key={index} className="inventory-item">
                         {item === 'key' && '🗝️'}
                         {item === 'sword' && '⚔️'}
@@ -1427,7 +1475,7 @@ export default function StoryGamePage() {
           {/* Hint Modal */}
           {showHintModal && (
             <div className="hint-modal-overlay" onClick={() => setShowHintModal(false)}>
-              <div className="hint-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="hint-modal" onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}>
                 <h3>💡 Hint Level {selectedHintLevel}</h3>
                 <p>{hintText}</p>
                 <button onClick={() => setShowHintModal(false)}>Close</button>
@@ -1438,10 +1486,87 @@ export default function StoryGamePage() {
           {/* Item story modal (e.g. when collecting the map) */}
           {itemStoryModal && (
             <div className="item-story-modal-overlay" onClick={() => setItemStoryModal(null)}>
-              <div className="item-story-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="item-story-modal" onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}>
                 <h3>🗺️ {itemStoryModal.title}</h3>
                 <p>{itemStoryModal.message}</p>
                 <button onClick={() => setItemStoryModal(null)}>Continue</button>
+              </div>
+            </div>
+          )}
+
+          {/* Code quiz modal (forest_exit) */}
+          {showQuizModal && (
+            <div className="quiz-modal-overlay">
+              <div className="quiz-modal" onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}>
+                <h3>🧙 {showQuizModal.title}</h3>
+                <p className="quiz-question">{showQuizModal.question}</p>
+                {quizWrongMessage && <p className="quiz-wrong">{quizWrongMessage}</p>}
+                <div className="quiz-options">
+                  {showQuizModal.options.map((opt: string, i: number) => (
+                    <button
+                      key={i}
+                      className="quiz-option-btn"
+                      onClick={async () => {
+                        if (i === showQuizModal.correctIndex) {
+                          const res = await storyGameAPI.setFlag(showQuizModal.flagWhenDone);
+                          setShowQuizModal(null);
+                          setQuizWrongMessage(null);
+                          setStoryProgress((prev: StoryProgress | null) => prev && res.data.storyFlags ? { ...prev, storyFlags: res.data.storyFlags } : prev);
+                        } else {
+                          setQuizWrongMessage(showQuizModal.wrongMessage);
+                        }
+                      }}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Block minigame modal (dragon_lair) */}
+          {showBlockMinigameModal && (
+            <div className="block-minigame-overlay">
+              <div className="block-minigame-modal" onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}>
+                <h3>🐉 {BLOCK_MINIGAME_DRAGON.title}</h3>
+                <p className="block-minigame-instruction">{BLOCK_MINIGAME_DRAGON.instruction}</p>
+                <p className="block-minigame-rounds">Rounds: {blockMinigameRoundsWon} / {BLOCK_MINIGAME_DRAGON.roundsRequired}</p>
+                <div className="block-minigame-bar-wrap">
+                  <div
+                    className="block-minigame-green-zone"
+                    style={{
+                      left: `${BLOCK_MINIGAME_DRAGON.greenZoneStart * 100}%`,
+                      width: `${(BLOCK_MINIGAME_DRAGON.greenZoneEnd - BLOCK_MINIGAME_DRAGON.greenZoneStart) * 100}%`,
+                    }}
+                  />
+                  <div
+                    className="block-minigame-indicator"
+                    style={{ left: `${blockMinigameIndicatorPos * 100}%` }}
+                  />
+                </div>
+                {blockMinigameMessage && <p className="block-minigame-feedback">{blockMinigameMessage}</p>}
+                <button
+                  className="block-minigame-block-btn"
+                  onClick={async () => {
+                    const pos = blockMinigameIndicatorPosRef.current;
+                    const inZone = pos >= BLOCK_MINIGAME_DRAGON.greenZoneStart && pos <= BLOCK_MINIGAME_DRAGON.greenZoneEnd;
+                    if (inZone) {
+                      const next = blockMinigameRoundsWon + 1;
+                      setBlockMinigameRoundsWon(next);
+                      setBlockMinigameMessage('Blocked!');
+                      if (next >= BLOCK_MINIGAME_DRAGON.roundsRequired) {
+                        const res = await storyGameAPI.setFlag(BLOCK_MINIGAME_DRAGON.flagWhenDone);
+                        setShowBlockMinigameModal(false);
+                        setStoryProgress((prev: StoryProgress | null) => prev && res.data.storyFlags ? { ...prev, storyFlags: res.data.storyFlags } : prev);
+                      }
+                    } else {
+                      setBlockMinigameMessage('Missed! Try again.');
+                    }
+                  }}
+                >
+                  Block!
+                </button>
               </div>
             </div>
           )}
@@ -1474,7 +1599,7 @@ export default function StoryGamePage() {
               setShowDeathModal(false);
               loadStoryProgress();
             }}>
-              <div className="death-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="death-modal" onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}>
                 <div className="death-icon">💀</div>
                 <h2>You Have Died!</h2>
                 <p className="death-message">{deathMessage}</p>
@@ -1522,8 +1647,8 @@ export default function StoryGamePage() {
 
           {/* Ending Modal */}
           {endingModal && (
-            <div className="death-modal-overlay" onClick={(e) => e.stopPropagation()}>
-              <div className="death-modal ending-modal" onClick={(e) => e.stopPropagation()}>
+<div className="death-modal-overlay" onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}>
+              <div className="death-modal ending-modal" onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}>
                 <div className="ending-icon">🏆</div>
                 <h2>{endingModal.title}</h2>
                 <p className="death-message">{endingModal.message}</p>

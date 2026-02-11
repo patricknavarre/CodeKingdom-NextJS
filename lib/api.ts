@@ -56,6 +56,7 @@ export const storyGameAPI = {
   executeCode: (code: string) => api.post('/story-game/execute', { code }),
   purchaseHint: (hintLevel: number) => api.post('/story-game/hint', { hintLevel }),
   resetProgress: () => api.post('/story-game/reset'),
+  setFlag: (flag: string) => api.post('/story-game/set-flag', { flag }),
 };
 
 // Block Builder API

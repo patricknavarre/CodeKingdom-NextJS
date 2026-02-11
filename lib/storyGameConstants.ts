@@ -899,6 +899,30 @@ const DEFAULT_NARRATIVE = 'You take in your surroundings. The next step is yours
 // Priority order for picking narrative variant when multiple flags match.
 const NARRATIVE_FLAG_PRIORITY = ['hypnotized_dragon', 'found_crown', 'entered_temple', 'helped_merchant'];
 
+/** Code quiz at forest_exit: one question, multiple choice. Show once per player (flag: quiz_done_forest_exit). */
+export const QUIZ_FOREST_EXIT = {
+  locationId: 'forest_exit',
+  flagWhenDone: 'quiz_done_forest_exit',
+  title: 'A guardian of the path asks...',
+  question: 'What function do you use to pick up an item?',
+  options: ['move_to("item")', 'collect_item("item_name")', 'choose_path("item")', 'get_item("item")'],
+  correctIndex: 1,
+  successMessage: 'Correct! The guardian lets you pass.',
+  wrongMessage: 'Not quite. Try again!',
+};
+
+/** Block minigame at dragon_lair: click Block when indicator is in green zone. Flag: dragon_block_won. */
+export const BLOCK_MINIGAME_DRAGON = {
+  locationId: 'dragon_lair',
+  flagWhenDone: 'dragon_block_won',
+  title: 'The dragon is about to breathe fire!',
+  instruction: 'Click Block when the bar is in the green zone!',
+  roundsRequired: 3,
+  greenZoneStart: 0.35,
+  greenZoneEnd: 0.65,
+  indicatorSpeed: 0.015,
+};
+
 /** Modal content when player collects key story items (e.g. map at forest path). */
 export const ITEM_STORY_MODALS: Record<string, { title: string; message: string }> = {
   map: {
