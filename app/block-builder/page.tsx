@@ -1085,32 +1085,48 @@ except Exception as e:
           return currentIndex + 1;
         }
 
-        // Parse create_wall(length=10) or create_wall(length=10, direction="z") or create_wall(x, y, z, length, height, color, direction)
-        const wallMatch = trimmed.match(/create_wall\s*\((?:(?:length\s*=\s*(\d+)(?:\s*,\s*direction\s*=\s*["']([xz])["'])?)|(?:(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*(\d+))?(?:\s*,\s*["'](\w+)["'])?(?:\s*,\s*["']([xz])["'])?))?\)/);
-        if (wallMatch) {
-          if (wallMatch[1]) {
-            // create_wall(length=10) or create_wall(length=10, direction="z")
-            const direction = wallMatch[2] || 'x';
-            const result = ctx.create_wall(0, 0, 0, parseInt(wallMatch[1]), 1, 'blue', direction);
-            res.push(result);
-          } else if (wallMatch[3]) {
-            // create_wall(x, y, z, length, height, color, direction)
-            const direction = wallMatch[9] || 'x';
+        // Parse create_wall: positional (x,y,z,length,...) OR keyword (length=, direction=, x=, y=, z=, ...) OR no-arg
+        const wallParenMatch = trimmed.match(/create_wall\s*\(([^)]*)\)/);
+        if (wallParenMatch) {
+          const args = wallParenMatch[1];
+          // Positional form: starts with digit (x, y, z, length, ...)
+          const positionalMatch = args.match(/^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*(\d+))?(?:\s*,\s*["'](\w+)["'])?(?:\s*,\s*["']([xz])["'])?\s*$/);
+          if (positionalMatch) {
             const result = ctx.create_wall(
-              parseInt(wallMatch[3]),
-              parseInt(wallMatch[4]),
-              parseInt(wallMatch[5]),
-              parseInt(wallMatch[6]),
-              wallMatch[7] ? parseInt(wallMatch[7]) : 1,
-              wallMatch[8] || 'blue',
-              direction
+              parseInt(positionalMatch[1]),
+              parseInt(positionalMatch[2]),
+              parseInt(positionalMatch[3]),
+              parseInt(positionalMatch[4]),
+              positionalMatch[5] ? parseInt(positionalMatch[5]) : 1,
+              positionalMatch[6] || 'blue',
+              positionalMatch[7] || 'x'
             );
             res.push(result);
-          } else {
-            // create_wall() - default
-            const result = ctx.create_wall();
-            res.push(result);
+            return currentIndex + 1;
           }
+          // Keyword form: length=N and optional direction=, x=, y=, z=, height=, color=
+          if (args.includes('length=')) {
+            const lengthMatch = args.match(/length\s*=\s*(\d+)/);
+            const length = lengthMatch ? parseInt(lengthMatch[1]) : 10;
+            const dirMatch = args.match(/direction\s*=\s*["']([xz])["']/i);
+            const direction = dirMatch ? dirMatch[1].toLowerCase() : 'x';
+            const xMatch = args.match(/x\s*=\s*(\d+)/);
+            const yMatch = args.match(/y\s*=\s*(\d+)/);
+            const zMatch = args.match(/z\s*=\s*(\d+)/);
+            const x = xMatch ? parseInt(xMatch[1]) : 0;
+            const y = yMatch ? parseInt(yMatch[1]) : 0;
+            const z = zMatch ? parseInt(zMatch[1]) : 0;
+            const heightMatch = args.match(/height\s*=\s*(\d+)/);
+            const height = heightMatch ? parseInt(heightMatch[1]) : 1;
+            const colorMatch = args.match(/color\s*=\s*["'](\w+)["']/);
+            const color = colorMatch ? colorMatch[1] : 'blue';
+            const result = ctx.create_wall(x, y, z, length, height, color, direction);
+            res.push(result);
+            return currentIndex + 1;
+          }
+          // create_wall() - no args, use defaults
+          const result = ctx.create_wall();
+          res.push(result);
           return currentIndex + 1;
         }
 
@@ -1325,7 +1341,8 @@ except Exception as e:
                         <li><code>build_tower(height=5)</code> - Build a tower 5 blocks high</li>
                         <li><code>create_wall(length=10)</code> - Create a wall 10 blocks long (along x-axis)</li>
                         <li><code>create_wall(length=10, direction="z")</code> - Create a wall 10 blocks long (along z-axis, perpendicular!)</li>
-                        <li><code>create_wall(0, 0, 0, 10, 1, "blue", "z")</code> - Create a blue wall at (0,0,0) along z-axis</li>
+                        <li><code>create_wall(0, 0, 0, 10, 1, "blue", "z")</code> - Blue wall at (0,0,0) along z-axis (positional)</li>
+                        <li><code>create_wall(x=2, z=4, length=10, direction="z")</code> - Wall at (2,0,4) along z-axis (keyword position)</li>
                         <li><code>remove_block(0, 0, 0)</code> - Remove a block at a position</li>
                         <li><code>clear_all()</code> - Remove all blocks</li>
                       </ul>
@@ -1383,7 +1400,8 @@ except Exception as e:
                   <li><code>place_block(x, y, z, "color")</code> - Place a block</li>
                   <li><code>remove_block(x, y, z)</code> - Remove a block</li>
                   <li><code>build_tower(height=5)</code> - Build a tower</li>
-                  <li><code>create_wall(length=10)</code> - Create a wall</li>
+                  <li><code>create_wall(length=10)</code> - Wall along x-axis; use <code>direction="z"</code> for z-axis</li>
+                  <li><code>create_wall(x=2, z=4, length=10, direction="z")</code> - Wall at (2,0,4) along z-axis</li>
                   <li><code>clear_all()</code> - Clear all blocks</li>
                 </ul>
               </div>
