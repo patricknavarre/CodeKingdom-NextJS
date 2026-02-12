@@ -3,7 +3,7 @@ import connectDB from '@/lib/mongodb';
 import StoryGame from '@/models/storyGameModel';
 import User from '@/models/userModel';
 import { executePython, validatePythonCode } from '@/services/pythonExecutor';
-import { SCENES, DECISION_POINTS, DANGEROUS_LOCATIONS, ENDINGS } from '@/lib/storyGameConstants';
+import { SCENES, DECISION_POINTS, DANGEROUS_LOCATIONS, ENDINGS, MOVE_EVENTS } from '@/lib/storyGameConstants';
 import { isChoiceAvailable } from '@/lib/storyGameUtils';
 import jwt from 'jsonwebtoken';
 
@@ -53,9 +53,14 @@ export async function POST(req: NextRequest) {
         currentScene: 'forest',
         currentLocation: 'forest_entrance',
         inventory: [],
+        health: 100,
       });
     }
-    
+    if (storyGame.health == null) {
+      storyGame.health = 100;
+      storyGame.markModified('health');
+    }
+
     // Prepare context for Python execution
     const context = {
       inventory: storyGame.inventory.map(item => item.name),
@@ -638,6 +643,22 @@ export async function POST(req: NextRequest) {
     });
 
     const endingConfig = storyGame.ending ? ENDINGS[storyGame.ending] : null;
+
+    // Move event: when player just moved or chose a path, show event for the location they arrived at
+    let moveEvent: { id: string; title: string; storyText: string; choices: Array<{ id: string; label: string; damage?: number; eatItem?: string; healthRestore?: number }> } | null = null;
+    if ((result.action === 'move' || result.action === 'choose_path') && result.success) {
+      const eventKey = `${storyGame.currentScene}_${updatedLocation}`;
+      const event = MOVE_EVENTS[eventKey];
+      if (event) {
+        const invNames = updatedInventory.map((i: { name: string }) => i.name);
+        let choices = event.choices.filter(
+          (c: { eatItem?: string }) => !c.eatItem || invNames.includes(c.eatItem)
+        );
+        if (choices.length === 0) choices = [{ id: 'continue', label: 'Continue' }];
+        moveEvent = { id: event.id, title: event.title, storyText: event.storyText, choices };
+      }
+    }
+
     return Response.json({
       success: result.success,
       message,
@@ -652,6 +673,8 @@ export async function POST(req: NextRequest) {
       userExperience: user.experience,
       userLevel: user.level,
       storyProgress: storyGame.storyProgress,
+      health: storyGame.health ?? 100,
+      ...(moveEvent ? { moveEvent } : {}),
       ...(result.action === 'collect' && result.success && result.item && !collectRequiresQuiz ? { collectedItem: result.item } : {}),
       ...(collectRequiresQuiz && collectItem ? { collectRequiresQuiz: true, collectItem } : {}),
       ...(endingConfig ? { endingId: endingConfig.id, endingTitle: endingConfig.title, endingMessage: endingConfig.message } : {}),

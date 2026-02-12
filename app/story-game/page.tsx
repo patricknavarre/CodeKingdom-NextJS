@@ -37,11 +37,19 @@ interface StoryProgress {
   currentLocation: string;
   inventory: string[];
   storyProgress: number;
+  health?: number;
   completedScenes: any[];
   hintsUsed: any[];
   storyFlags?: string[];
   ending?: string | null;
   choices?: StoryChoice[];
+}
+
+interface MoveEventPayload {
+  id: string;
+  title: string;
+  storyText: string;
+  choices: Array<{ id: string; label: string; damage?: number; eatItem?: string; healthRestore?: number }>;
 }
 
 // Scene backgrounds for visual display
@@ -201,6 +209,9 @@ export default function StoryGamePage() {
   const [collectQuizPending, setCollectQuizPending] = useState<{ item: string; questionIndex: number } | null>(null);
   const [collectQuizWrongMessage, setCollectQuizWrongMessage] = useState<string | null>(null);
   const [collectQuizSuccessShowing, setCollectQuizSuccessShowing] = useState(false);
+  const [health, setHealth] = useState(100);
+  const [pendingMoveEvent, setPendingMoveEvent] = useState<MoveEventPayload | null>(null);
+  const [pendingArrivalSimple, setPendingArrivalSimple] = useState<string | null>(null);
 
   // Get character image
   const getCharacterImage = () => {
@@ -308,6 +319,7 @@ export default function StoryGamePage() {
     try {
       const response = await storyGameAPI.getProgress();
       setStoryProgress(response.data);
+      setHealth(response.data.health ?? 100);
       // Set available items from backend
       const items = response.data.availableItems || [];
       const choices = response.data.availableChoices || [];
@@ -489,8 +501,15 @@ export default function StoryGamePage() {
         currentScene: newScene,
         inventory: response.data.newInventory,
         storyProgress: response.data.storyProgress || prev?.storyProgress || 0,
+        health: response.data.health ?? prev?.health ?? 100,
       }));
-      
+      if (response.data.health != null) setHealth(response.data.health);
+      if (response.data.moveEvent) {
+        setPendingMoveEvent(response.data.moveEvent);
+      } else if ((response.data.action === 'move' || response.data.action === 'choose_path') && response.data.success) {
+        setPendingArrivalSimple(response.data.newLocation || newLocation);
+      }
+
       // Update default code when scene or location changes (story-guided hints)
       if (newScene !== prevScene || newLocation !== storyProgress?.currentLocation) {
         setCode(getDefaultCode(newScene, newLocation));
@@ -543,6 +562,7 @@ export default function StoryGamePage() {
               currentLocation: locationJustSet ?? prev?.currentLocation ?? progressResponse.data.currentLocation,
               currentScene: sceneJustSet ?? prev?.currentScene ?? progressResponse.data.currentScene,
             }));
+            if (progressResponse.data.health != null) setHealth(progressResponse.data.health);
           } catch (err) {
             console.error('Error reloading progress:', err);
           }
@@ -705,6 +725,10 @@ export default function StoryGamePage() {
               <div className="stat-item">
                 <span className="stat-label">Location:</span>
                 <span className="stat-value">{storyProgress?.currentLocation.replace(/_/g, ' ')}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Health:</span>
+                <span className="stat-value">{health}</span>
               </div>
               <div className="stat-item">
                 <span className="stat-label">Coins:</span>
@@ -1732,6 +1756,72 @@ export default function StoryGamePage() {
                     </div>
                   </>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Move event modal: story + choices (damage / eat / continue) */}
+          {pendingMoveEvent && (
+            <div className="quiz-modal-overlay">
+              <div className="quiz-modal" onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}>
+                <h3>{pendingMoveEvent.title}</h3>
+                <p className="quiz-question">{pendingMoveEvent.storyText}</p>
+                <div className="quiz-options">
+                  {pendingMoveEvent.choices.map((choice: { id: string; label: string }) => (
+                    <button
+                      key={choice.id}
+                      className="quiz-option-btn"
+                      onClick={async () => {
+                        try {
+                          const res = await storyGameAPI.resolveEvent(pendingMoveEvent.id, choice.id);
+                          if (res.data.action === 'death') {
+                            setDeathMessage(res.data.deathMessage || 'You have run out of health!');
+                            setDeathCount(res.data.deathCount ?? 0);
+                            setStoryProgress((prev: StoryProgress | null) => prev ? {
+                              ...prev,
+                              currentLocation: res.data.newLocation,
+                              currentScene: res.data.newScene,
+                              inventory: res.data.newInventory ?? prev.inventory,
+                            } : null);
+                            setHealth(100);
+                            setPendingMoveEvent(null);
+                            setShowDeathModal(true);
+                          } else {
+                            setHealth(res.data.health ?? 100);
+                            setStoryProgress((prev: StoryProgress | null) => prev ? {
+                              ...prev,
+                              inventory: res.data.newInventory ?? prev.inventory,
+                              health: res.data.health ?? prev.health,
+                            } : null);
+                            setPendingMoveEvent(null);
+                          }
+                        } catch (err) {
+                          console.error('Resolve event error:', err);
+                        }
+                      }}
+                    >
+                      {choice.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Simple arrival modal when move has no story event */}
+          {pendingArrivalSimple && (
+            <div className="quiz-modal-overlay">
+              <div className="quiz-modal" onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}>
+                <h3>Arrival</h3>
+                <p className="quiz-question">You arrive at {pendingArrivalSimple.replace(/_/g, ' ')}.</p>
+                <div className="quiz-options">
+                  <button
+                    className="quiz-option-btn"
+                    onClick={() => setPendingArrivalSimple(null)}
+                  >
+                    Continue
+                  </button>
+                </div>
               </div>
             </div>
           )}

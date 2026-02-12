@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
         currentLocation: 'forest_entrance',
         inventory: [],
         storyProgress: 0,
+        health: 100,
         visitedLocations: ['forest_entrance'],
       });
     }
@@ -92,6 +93,7 @@ export async function GET(req: NextRequest) {
       choices: storyGame.choices || [],
       unlockedScenes: storyGame.unlockedScenes || [],
       storyProgress,
+      health: storyGame.health ?? 100,
       completedScenes: storyGame.completedScenes,
       hintsUsed: storyGame.hintsUsed,
       storyFlags: storyGame.storyFlags || [],

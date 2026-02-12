@@ -14,6 +14,7 @@ export interface IStoryGame extends Document {
     completedAt: Date;
   }>;
   storyProgress: number; // 0-100 percentage
+  health?: number; // 0-100, default 100; damage from move events, restore from food
   choices: Array<{
     scene: string;
     location: string;
@@ -83,6 +84,10 @@ const storyGameSchema = new Schema<IStoryGame>(
     storyProgress: {
       type: Number,
       default: 0, // 0-100 percentage
+    },
+    health: {
+      type: Number,
+      default: 100,
     },
     choices: [{
       scene: String,

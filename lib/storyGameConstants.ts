@@ -35,6 +35,161 @@ export const DANGEROUS_LOCATIONS: Record<string, {
   },
 };
 
+/** Health restored when eating a food item. Used by move-event choices and (optional) eat_item. */
+export const FOOD_ITEMS: Record<string, number> = {
+  bread: 20,
+  potion: 35,
+  water: 15,
+};
+
+/** Choice in a move event: can apply damage, consume food and restore health, or neither. */
+export type MoveEventChoice = {
+  id: string;
+  label: string;
+  damage?: number;
+  eatItem?: string;
+  healthRestore?: number;
+};
+
+/** Move event shown when arriving at a location. Key = sceneId_locationId. */
+export type MoveEvent = {
+  id: string;
+  title: string;
+  storyText: string;
+  choices: MoveEventChoice[];
+};
+
+const defaultMoveEvent = (key: string): MoveEvent => ({
+  id: key,
+  title: 'On the way...',
+  storyText: 'Something happens on the path. What do you do?',
+  choices: [{ id: 'continue', label: 'Continue' }],
+});
+
+/** One event per (scene, location). Key = sceneId_locationId. Unique story per location for a complex storyline. */
+export const MOVE_EVENTS: Record<string, MoveEvent> = {
+  // Forest
+  forest_forest_entrance: {
+    id: 'forest_forest_entrance',
+    title: 'The Forest Entrance',
+    storyText: 'Tall trees loom ahead. A root catches your foot and you stumble—your leg aches. Do you rest a moment or push on?',
+    choices: [
+      { id: 'rest', label: 'Rest a moment', healthRestore: 5 },
+      { id: 'push_on', label: 'Push on', damage: 10 },
+    ],
+  },
+  forest_forest_path: {
+    id: 'forest_forest_path',
+    title: 'The Forest Path',
+    storyText: 'The path winds deeper. A squirrel chitters and drops an acorn on your head. Ouch!',
+    choices: [
+      { id: 'rub_head', label: 'Rub your head and continue', damage: 5 },
+      { id: 'eat_bread', label: 'Eat some bread to feel better', eatItem: 'bread', healthRestore: 20 },
+      { id: 'continue', label: 'Shake it off', damage: 3 },
+    ],
+  },
+  forest_forest_clearing: {
+    id: 'forest_forest_clearing',
+    title: 'The Clearing',
+    storyText: 'Sun breaks through the leaves. A rapid unicorn bursts from the bushes and rams past you before vanishing!',
+    choices: [
+      { id: 'dodge', label: 'Dodge aside', damage: 15 },
+      { id: 'stand_ground', label: 'Stand your ground', damage: 25 },
+      { id: 'drink_potion', label: 'Drink a potion first', eatItem: 'potion', healthRestore: 35 },
+    ],
+  },
+  forest_forest_exit: {
+    id: 'forest_forest_exit',
+    title: 'The Forest Exit',
+    storyText: 'The trees thin. You\'re tired from the journey. A sign points to castle, town, or mountains.',
+    choices: [
+      { id: 'rest', label: 'Rest here a bit', healthRestore: 10 },
+      { id: 'continue', label: 'Press on' },
+    ],
+  },
+  // Castle
+  castle_castle_gate: {
+    id: 'castle_castle_gate',
+    title: 'The Castle Gate',
+    storyText: 'The gate looms before you. A guard\'s shadow moves on the wall. Your heart races—was that a dragon?',
+    choices: [
+      { id: 'calm', label: 'Take a breath and continue', damage: 5 },
+      { id: 'eat_bread', label: 'Eat bread to steady yourself', eatItem: 'bread', healthRestore: 20 },
+      { id: 'enter', label: 'Walk in boldly' },
+    ],
+  },
+  castle_castle_courtyard: defaultMoveEvent('castle_castle_courtyard'),
+  castle_castle_hall: defaultMoveEvent('castle_castle_hall'),
+  castle_castle_tower: defaultMoveEvent('castle_castle_tower'),
+  castle_dragon_lair: defaultMoveEvent('castle_dragon_lair'),
+  // Town
+  town_town_gate: {
+    id: 'town_town_gate',
+    title: 'The Town Gate',
+    storyText: 'Merchants and travelers stream past. A cart wheel bumps your ankle. Ouch!',
+    choices: [
+      { id: 'limp_on', label: 'Limp on', damage: 8 },
+      { id: 'rest', label: 'Sit and rest', healthRestore: 5 },
+    ],
+  },
+  town_town_square: defaultMoveEvent('town_town_square'),
+  town_town_market: {
+    id: 'town_town_market',
+    title: 'The Town Market',
+    storyText: 'Stalls overflow with bread and potions. The baker waves. "Try the bread!" Your stomach rumbles.',
+    choices: [
+      { id: 'buy_vibe', label: 'Just browsing', healthRestore: 2 },
+      { id: 'eat_bread', label: 'Eat the bread you have', eatItem: 'bread', healthRestore: 20 },
+      { id: 'drink_potion', label: 'Drink a potion', eatItem: 'potion', healthRestore: 35 },
+    ],
+  },
+  town_town_exit: defaultMoveEvent('town_town_exit'),
+  // Ocean
+  ocean_beach_shore: {
+    id: 'ocean_beach_shore',
+    title: 'The Beach',
+    storyText: 'Waves lap at the shore. You step on a hidden shell and hop on one foot. Ouch!',
+    choices: [
+      { id: 'shake_off', label: 'Shake it off', damage: 5 },
+      { id: 'rest', label: 'Sit and rest', healthRestore: 8 },
+    ],
+  },
+  ocean_tide_pool: defaultMoveEvent('ocean_tide_pool'),
+  ocean_cave_entrance: defaultMoveEvent('ocean_cave_entrance'),
+  ocean_treasure_cove: defaultMoveEvent('ocean_treasure_cove'),
+  ocean_deep_trench: defaultMoveEvent('ocean_deep_trench'),
+  // Mountain
+  mountain_mountain_base: {
+    id: 'mountain_mountain_base',
+    title: 'Mountain Base',
+    storyText: 'The path rises ahead. A loose stone rolls under your foot and you twist your ankle.',
+    choices: [
+      { id: 'push_on', label: 'Push on anyway', damage: 12 },
+      { id: 'rest', label: 'Rest a moment', healthRestore: 5 },
+      { id: 'drink_water', label: 'Drink some water', eatItem: 'water', healthRestore: 15 },
+    ],
+  },
+  mountain_cliff_path: defaultMoveEvent('mountain_cliff_path'),
+  mountain_summit: defaultMoveEvent('mountain_summit'),
+  mountain_cave: defaultMoveEvent('mountain_cave'),
+  mountain_dark_cave: defaultMoveEvent('mountain_dark_cave'),
+  // Desert
+  desert_oasis: {
+    id: 'desert_oasis',
+    title: 'The Oasis',
+    storyText: 'Shade and water at last! A mischievous desert fox nips at your pack. You fend it off but feel drained.',
+    choices: [
+      { id: 'rest', label: 'Rest by the water', healthRestore: 15 },
+      { id: 'drink_water', label: 'Drink your water', eatItem: 'water', healthRestore: 15 },
+      { id: 'continue', label: 'Press on', damage: 5 },
+    ],
+  },
+  desert_sand_dunes: defaultMoveEvent('desert_sand_dunes'),
+  desert_ancient_ruins: defaultMoveEvent('desert_ancient_ruins'),
+  desert_temple: defaultMoveEvent('desert_temple'),
+  desert_ancient_temple: defaultMoveEvent('desert_ancient_temple'),
+};
+
 // Choice type with optional branching fields
 export type DecisionChoice = {
   id: string;

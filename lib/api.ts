@@ -58,6 +58,7 @@ export const storyGameAPI = {
   resetProgress: () => api.post('/story-game/reset'),
   setFlag: (flag: string) => api.post('/story-game/set-flag', { flag }),
   confirmCollect: (item: string) => api.post('/story-game/confirm-collect', { item }),
+  resolveEvent: (eventId: string, choiceId: string) => api.post('/story-game/resolve-event', { eventId, choiceId }),
 };
 
 // Block Builder API
