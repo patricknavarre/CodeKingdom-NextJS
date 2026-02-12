@@ -925,6 +925,58 @@ export const BLOCK_MINIGAME_DRAGON = {
   reward: { coins: 15, experience: 25 },
 };
 
+/** Pool of multiple-choice coding questions shown when collecting an item. One is picked at random per collect. */
+export const COLLECT_ITEM_QUIZ_QUESTIONS: Array<{ question: string; options: string[]; correctIndex: number; wrongMessage?: string }> = [
+  {
+    question: 'What function do you use to pick up an item?',
+    options: ['move_to("item")', 'collect_item("item_name")', 'choose_path("item")', 'get_item("item")'],
+    correctIndex: 1,
+    wrongMessage: 'Not quite. Try again!',
+  },
+  {
+    question: 'How do you move to a different location in the same scene?',
+    options: ['choose_path("location")', 'go_to("location")', 'move_to("location_name")', 'walk("location")'],
+    correctIndex: 2,
+    wrongMessage: 'Not quite. Try again!',
+  },
+  {
+    question: 'In Python, how do you write a string with quotes?',
+    options: ['(forest_path)', '["forest_path"]', '"forest_path" or \'forest_path\'', '{forest_path}'],
+    correctIndex: 2,
+    wrongMessage: 'Not quite. Try again!',
+  },
+  {
+    question: 'What do you use at a decision point to change scenes (e.g. to desert or ocean)?',
+    options: ['move_to("desert")', 'choose_path("path_desert")', 'go("desert")', 'switch_scene("desert")'],
+    correctIndex: 1,
+    wrongMessage: 'Not quite. Try again!',
+  },
+  {
+    question: 'How do you check if you have an item in your inventory?',
+    options: ['inventory.has("key")', 'if "key" in inventory:', 'check("key", inventory)', 'inventory.contains("key")'],
+    correctIndex: 1,
+    wrongMessage: 'Not quite. Try again!',
+  },
+  {
+    question: 'Which symbol do you use for a single-line comment in Python?',
+    options: ['//', '/*', '#', '--'],
+    correctIndex: 2,
+    wrongMessage: 'Not quite. Try again!',
+  },
+  {
+    question: 'What is the correct way to call a function with a string argument?',
+    options: ['move_to(forest_path)', 'move_to("forest_path")', 'move_to(\'forest_path\')', 'Both B and C'],
+    correctIndex: 3,
+    wrongMessage: 'Not quite. Try again!',
+  },
+  {
+    question: 'How do you open the door in the forest?',
+    options: ['collect_item("door")', 'open_door()', 'use_key()', 'move_to("door")'],
+    correctIndex: 1,
+    wrongMessage: 'Not quite. Try again!',
+  },
+];
+
 /** Modal content when player collects key story items (e.g. map at forest path). */
 export const ITEM_STORY_MODALS: Record<string, { title: string; message: string }> = {
   map: {

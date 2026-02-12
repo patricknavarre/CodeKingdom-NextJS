@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useCharacter } from '@/contexts/CharacterContext';
 import { storyGameAPI } from '@/lib/api';
-import { SCENES, ENDINGS, CHAPTERS, getNarrative, ITEM_STORY_MODALS, QUIZ_FOREST_EXIT, BLOCK_MINIGAME_DRAGON } from '@/lib/storyGameConstants';
+import { SCENES, ENDINGS, CHAPTERS, getNarrative, ITEM_STORY_MODALS, QUIZ_FOREST_EXIT, BLOCK_MINIGAME_DRAGON, COLLECT_ITEM_QUIZ_QUESTIONS } from '@/lib/storyGameConstants';
 import Navigation from '@/components/Navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import '@/styles/StoryGamePage.css';
@@ -198,6 +198,9 @@ export default function StoryGamePage() {
   const [blockMinigameSuccessShowing, setBlockMinigameSuccessShowing] = useState(false);
   const blockMinigameIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const blockMinigameIndicatorPosRef = useRef(0);
+  const [collectQuizPending, setCollectQuizPending] = useState<{ item: string; questionIndex: number } | null>(null);
+  const [collectQuizWrongMessage, setCollectQuizWrongMessage] = useState<string | null>(null);
+  const [collectQuizSuccessShowing, setCollectQuizSuccessShowing] = useState(false);
 
   // Get character image
   const getCharacterImage = () => {
@@ -434,6 +437,18 @@ export default function StoryGamePage() {
         setShowLevelComplete(true);
         setMessage(response.data.message || 'You defeat the dragon!');
         setTimeout(() => setShowLevelComplete(false), 4000);
+        setExecuting(false);
+        setIsWalking(false);
+        return;
+      }
+
+      // Collect requires quiz: show modal, do not add item or rewards yet
+      if (response.data.collectRequiresQuiz && response.data.collectItem) {
+        const questionIndex = Math.floor(Math.random() * COLLECT_ITEM_QUIZ_QUESTIONS.length);
+        setCollectQuizPending({ item: response.data.collectItem, questionIndex });
+        setCollectQuizWrongMessage(null);
+        setCollectQuizSuccessShowing(false);
+        setMessage(response.data.message || `Answer the question to collect the ${response.data.collectItem}!`);
         setExecuting(false);
         setIsWalking(false);
         return;
@@ -1641,6 +1656,80 @@ export default function StoryGamePage() {
                     >
                       Block!
                     </button>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Collect-item quiz modal: answer coding question to collect the item */}
+          {collectQuizPending && (
+            <div className="quiz-modal-overlay">
+              <div className="quiz-modal" onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}>
+                <h3>Answer to collect the {collectQuizPending.item.replace(/_/g, ' ')}!</h3>
+                {collectQuizSuccessShowing ? (
+                  <>
+                    <div className="quiz-success-message">
+                      <span className="quiz-success-icon">✅</span>
+                      <p className="quiz-success-text">You got the {collectQuizPending.item.replace(/_/g, ' ')}!</p>
+                      <p className="quiz-reward-text">+15 coins, +20 XP</p>
+                    </div>
+                    <button
+                      className="quiz-continue-btn"
+                      onClick={() => {
+                        setCollectQuizPending(null);
+                        setCollectQuizSuccessShowing(false);
+                        setCollectQuizWrongMessage(null);
+                      }}
+                    >
+                      Continue
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="quiz-question">
+                      {COLLECT_ITEM_QUIZ_QUESTIONS[collectQuizPending.questionIndex]?.question}
+                    </p>
+                    {collectQuizWrongMessage && <p className="quiz-wrong">{collectQuizWrongMessage}</p>}
+                    <div className="quiz-options">
+                      {(COLLECT_ITEM_QUIZ_QUESTIONS[collectQuizPending.questionIndex]?.options || []).map((opt: string, i: number) => (
+                        <button
+                          key={i}
+                          className="quiz-option-btn"
+                          onClick={async () => {
+                            const q = COLLECT_ITEM_QUIZ_QUESTIONS[collectQuizPending.questionIndex];
+                            if (i === q.correctIndex) {
+                              try {
+                                const res = await storyGameAPI.confirmCollect(collectQuizPending.item);
+                                addCoins(res.data.coinsEarned ?? 0);
+                                addExperience(res.data.experienceEarned ?? 0);
+                                setStoryProgress((prev: StoryProgress | null) => prev ? {
+                                  ...prev,
+                                  inventory: res.data.newInventory ?? prev.inventory,
+                                  storyProgress: res.data.storyProgress ?? prev.storyProgress,
+                                } : null);
+                                setAvailableItems((prev: string[]) => prev.filter((name: string) => name !== collectQuizPending.item));
+                                setMessage(res.data.message || '');
+                                setCollectedItem(collectQuizPending.item);
+                                setTimeout(() => setCollectedItem(null), 2000);
+                                const itemKey = collectQuizPending.item.toLowerCase();
+                                if (ITEM_STORY_MODALS[itemKey]) setItemStoryModal(ITEM_STORY_MODALS[itemKey]);
+                                setShowCharacterCollectEffect(true);
+                                setTimeout(() => setShowCharacterCollectEffect(false), 800);
+                                setCollectQuizWrongMessage(null);
+                                setCollectQuizSuccessShowing(true);
+                              } catch (err: any) {
+                                setCollectQuizWrongMessage(err.response?.data?.message || 'Something went wrong. Try again!');
+                              }
+                            } else {
+                              setCollectQuizWrongMessage(q.wrongMessage || 'Not quite. Try again!');
+                            }
+                          }}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
                   </>
                 )}
               </div>

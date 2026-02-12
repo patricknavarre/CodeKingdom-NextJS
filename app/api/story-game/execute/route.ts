@@ -84,7 +84,9 @@ export async function POST(req: NextRequest) {
     let coinsEarned = 0;
     let experienceEarned = 10; // Base experience for executing code
     let message = '';
-    
+    let collectRequiresQuiz = false;
+    let collectItem: string | null = null;
+
     // Handle different actions
     if (result.action === 'open_door' && result.success) {
       // Check if player has key
@@ -315,18 +317,10 @@ export async function POST(req: NextRequest) {
         // Check if already collected
         const alreadyCollected = storyGame.inventory.some(item => item.name === result.item);
         if (!alreadyCollected) {
-          updatedInventory.push({
-            name: result.item,
-            description: `A ${result.item} found in the ${storyGame.currentScene}.`,
-            collectedAt: new Date(),
-          });
-          if (result.item === 'crown') {
-            if (!storyGame.storyFlags) storyGame.storyFlags = [];
-            if (!storyGame.storyFlags.includes('found_crown')) storyGame.storyFlags.push('found_crown');
-          }
-          message = `You collected a ${result.item}! 🎉`;
-          coinsEarned = 15;
-          experienceEarned = 20;
+          // Defer actual collect until user passes the quiz; return quiz payload
+          message = `Answer the question to collect the ${result.item}!`;
+          collectRequiresQuiz = true;
+          collectItem = result.item;
         } else {
           message = `You already have a ${result.item}!`;
         }
@@ -658,7 +652,8 @@ export async function POST(req: NextRequest) {
       userExperience: user.experience,
       userLevel: user.level,
       storyProgress: storyGame.storyProgress,
-      ...(result.action === 'collect' && result.success && result.item ? { collectedItem: result.item } : {}),
+      ...(result.action === 'collect' && result.success && result.item && !collectRequiresQuiz ? { collectedItem: result.item } : {}),
+      ...(collectRequiresQuiz && collectItem ? { collectRequiresQuiz: true, collectItem } : {}),
       ...(endingConfig ? { endingId: endingConfig.id, endingTitle: endingConfig.title, endingMessage: endingConfig.message } : {}),
     });
   } catch (error: any) {
