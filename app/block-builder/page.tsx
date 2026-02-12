@@ -30,6 +30,7 @@ interface Challenge {
   challenge: string;
   requirements: {
     minBlocks?: number;
+    minRemoved?: number;
     structure?: string;
     useLoop?: boolean;
   };
@@ -67,6 +68,24 @@ const CHALLENGES: Challenge[] = [
   },
   {
     id: 4,
+    title: 'Add a Door',
+    description: 'Use remove_block to make an opening in a wall',
+    challenge: 'Build a wall and use remove_block(x, y, z) to create a door opening (at least 8 blocks remaining).',
+    requirements: { minBlocks: 8, minRemoved: 1 },
+    xpReward: 85,
+    coinsReward: 35
+  },
+  {
+    id: 5,
+    title: 'Add a Window',
+    description: 'Add a window by removing a block from a wall',
+    challenge: 'Build a wall and use remove_block to create a door and a window (at least 10 blocks, at least 2 removals).',
+    requirements: { minBlocks: 10, minRemoved: 2 },
+    xpReward: 100,
+    coinsReward: 45
+  },
+  {
+    id: 6,
     title: 'Build a Simple Pyramid',
     description: 'Use loops to build a small pyramid',
     challenge: 'Create a pyramid 4 blocks wide at the base using a for loop',
@@ -75,7 +94,7 @@ const CHALLENGES: Challenge[] = [
     coinsReward: 40
   },
   {
-    id: 5,
+    id: 7,
     title: 'Build a Bridge',
     description: 'Create a bridge connecting two points',
     challenge: 'Build a bridge with two towers and blocks connecting them',
@@ -84,7 +103,7 @@ const CHALLENGES: Challenge[] = [
     coinsReward: 50
   },
   {
-    id: 6,
+    id: 8,
     title: 'Build a Staircase',
     description: 'Create stairs going upward',
     challenge: 'Build a staircase that goes up 5 steps using a loop',
@@ -93,7 +112,7 @@ const CHALLENGES: Challenge[] = [
     coinsReward: 60
   },
   {
-    id: 7,
+    id: 9,
     title: 'Build a Castle Tower',
     description: 'Create a tall defensive tower',
     challenge: 'Build a tall tower with walls around it (at least 25 blocks)',
@@ -102,7 +121,7 @@ const CHALLENGES: Challenge[] = [
     coinsReward: 75
   },
   {
-    id: 8,
+    id: 10,
     title: 'Build a House',
     description: 'Create a complete house structure',
     challenge: 'Build a house with four walls and a roof (at least 30 blocks)',
@@ -133,6 +152,7 @@ export default function BlockBuilderPage() {
   const [showHintModal, setShowHintModal] = useState(false);
   const [selectedHintLevel, setSelectedHintLevel] = useState(1);
   const [hintText, setHintText] = useState('');
+  const [removedCount, setRemovedCount] = useState(0);
   
   // First-person view state - start at ground level
   // Character body center is at y=0.5 relative, so group at y=0.5 puts feet at y=0 (ground level)
@@ -755,19 +775,18 @@ export default function BlockBuilderPage() {
     };
   }, [viewMode]);
 
-  // Check challenge completion when blocks change (with debouncing to avoid multiple checks)
+  // Check challenge completion when blocks or removals change (with debouncing to avoid multiple checks)
   useEffect(() => {
-    if (blocks.length > 0 && !isLoadingBuild && !showSuccess && !executing) {
+    if ((blocks.length > 0 || removedCount > 0) && !isLoadingBuild && !showSuccess && !executing) {
       // Small delay to ensure state is fully updated
       const timer = setTimeout(() => {
         const req = challenge.requirements;
-        if (req.minBlocks && blocks.length >= req.minBlocks) {
-          checkChallengeCompletion();
-        }
+        const blocksOk = !req.minBlocks || blocks.length >= req.minBlocks;
+        if (blocksOk) checkChallengeCompletion();
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [blocks.length, isLoadingBuild, showSuccess, executing, challenge.id]);
+  }, [blocks.length, removedCount, isLoadingBuild, showSuccess, executing, challenge.id]);
 
   // Load saved build on mount
   useEffect(() => {
@@ -843,6 +862,7 @@ export default function BlockBuilderPage() {
         },
         remove_block: (x: number, y: number, z: number) => {
           setBlocks(prev => prev.filter(b => !(b.x === x && b.y === y && b.z === z)));
+          setRemovedCount(prev => prev + 1);
           return { success: true, message: `Removed block at (${x}, ${y}, ${z})` };
         },
         build_tower: (x: number = 0, y: number = 0, z: number = 0, height: number = 5, color: string = 'red') => {
@@ -1172,6 +1192,10 @@ except Exception as e:
     if (req.minBlocks && blocks.length < req.minBlocks) {
       completed = false;
     }
+    // Check minimum removals requirement (for door/window challenges)
+    if (req.minRemoved != null && removedCount < req.minRemoved) {
+      completed = false;
+    }
 
     // Debug logging
     console.log('Challenge check:', {
@@ -1179,10 +1203,13 @@ except Exception as e:
       challengeTitle: challenge.title,
       blocksCount: blocks.length,
       requiredBlocks: req.minBlocks,
+      removedCount,
+      requiredRemoved: req.minRemoved,
       completed
     });
 
-    if (completed && blocks.length >= (req.minBlocks || 0)) {
+    const removalsOk = req.minRemoved == null || removedCount >= req.minRemoved;
+    if (completed && blocks.length >= (req.minBlocks || 0) && removalsOk) {
       // Challenge completed!
       console.log('Challenge completed!', challenge.title);
       addExperience(challenge.xpReward);
@@ -1195,8 +1222,8 @@ except Exception as e:
         if (currentChallenge < CHALLENGES.length - 1) {
           const nextChallenge = currentChallenge + 1;
           setCurrentChallenge(nextChallenge);
+          setRemovedCount(0);
           // Don't clear blocks - let user keep their build
-          // setBlocks([]);
           setShowSuccess(false);
         }
       }, 2000);
@@ -1205,6 +1232,7 @@ except Exception as e:
 
   const resetBuild = () => {
     setBlocks([]);
+    setRemovedCount(0);
     setMessage('');
     setError('');
     setCharacterPosition({ x: 0, y: 0.5, z: 0 });
@@ -1237,26 +1265,36 @@ except Exception as e:
         'Example: create_wall(length=10) creates 10 blocks from (0,0,0) to (9,0,0).'
       ],
       4: [
+        'Build a wall with create_wall(length=10), then use remove_block(x, y, z) to make an opening.',
+        'Pick coordinates of one block in the wall (e.g. (5, 0, 0) for a wall along x) and remove it.',
+        'Example: create_wall(length=10) then remove_block(5, 0, 0) creates a door opening.'
+      ],
+      5: [
+        'You need two openings: use remove_block() twice with different coordinates.',
+        'Build a wall (at least 10 blocks), then remove two blocks to make a door and a window.',
+        'Example: create_wall(length=10), then remove_block(3, 0, 0) and remove_block(7, 0, 0).'
+      ],
+      6: [
         'Use a for loop to build a pyramid layer by layer.',
         'Try: for i in range(4): build_tower(height=4-i, x=i, z=i)',
         'Each layer of the pyramid should be smaller than the one below it. Start with a 4-block base and decrease by 1 each layer.'
       ],
-      5: [
+      7: [
         'Build two towers, then connect them with blocks.',
         'Try: build_tower(height=3, x=0, z=0) and build_tower(height=3, x=5, z=0)',
         'Then use place_block() or a loop to place blocks between the towers at the same height.'
       ],
-      6: [
+      8: [
         'Use a for loop to place blocks that go up one step at a time.',
         'Try: for i in range(5): place_block(i, i, 0, "red")',
         'Each step should be one block higher (y coordinate increases) and one block forward (x coordinate increases).'
       ],
-      7: [
+      9: [
         'Build a tall central tower, then add walls around it.',
         'Start with build_tower(height=8) for the center, then use create_wall() to build walls around it.',
         'You can use multiple create_wall() calls at different positions to create a square or rectangular base.'
       ],
-      8: [
+      10: [
         'Build four walls to form the base of the house, then add a roof on top.',
         'Use create_wall() to build each of the four walls. Try walls at different positions and directions.',
         'Then use place_block() or build_tower() to add a roof on top of the walls. The roof should be at a higher y coordinate than the walls.'
