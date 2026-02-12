@@ -49,13 +49,12 @@ export async function POST(req: NextRequest) {
       health = Math.max(0, health - choice.damage);
     }
     if (choice.eatItem) {
-      const inv = storyGame.inventory as Array<{ name: string }>;
-      const idx = inv.findIndex((i: { name: string }) => i.name === choice.eatItem);
+      const inv = storyGame.inventory;
+      const idx = inv.findIndex((i) => i.name === choice.eatItem);
       if (idx === -1) {
         return Response.json({ message: 'You do not have that item' }, { status: 400 });
       }
       inv.splice(idx, 1);
-      storyGame.inventory = inv;
       storyGame.markModified('inventory');
       const restore = choice.healthRestore ?? FOOD_ITEMS[choice.eatItem] ?? 0;
       health = Math.min(100, health + restore);
