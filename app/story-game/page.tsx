@@ -51,6 +51,7 @@ const SCENE_BACKGROUNDS: Record<string, string> = {
   forestClearing: 'url(/images/backgrounds/Background_Forest_Clearing.png)',
   castle: 'url(/images/backgrounds/Background_Castle.png)',
   town: 'url(/images/backgrounds/Background_Village_Square.png)',
+  townMarket: 'url(/images/backgrounds/Background_Town_Market.png)',
   ocean: 'linear-gradient(135deg, #1e3a5f 0%, #0a1f3d 50%, #006994 100%)',
   mountain: 'url(/images/backgrounds/Background_Mountain.png)',
   cave: 'url(/images/backgrounds/Background_Cave.png)',
@@ -1218,6 +1219,10 @@ export default function StoryGamePage() {
                     // Use castle tower background when at castle_tower (castle scene)
                     if (scene === 'castle' && location === 'castle_tower') {
                       return SCENE_BACKGROUNDS.castleTower || SCENE_BACKGROUNDS.castle;
+                    }
+                    // Use town market background when at town_market (town scene)
+                    if (scene === 'town' && location === 'town_market') {
+                      return SCENE_BACKGROUNDS.townMarket || SCENE_BACKGROUNDS.town;
                     }
                     return SCENE_BACKGROUNDS[scene] || SCENE_BACKGROUNDS.forest;
                   })(),
