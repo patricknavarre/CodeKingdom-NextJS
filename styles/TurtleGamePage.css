@@ -92,6 +92,17 @@
   padding: 12px;
 }
 
+.turtle-tips-intro {
+  margin: 0 0 12px 0;
+  font-size: 0.95rem;
+  color: #333;
+  line-height: 1.5;
+}
+
+.turtle-tips-intro strong {
+  color: #1a7a3e;
+}
+
 .turtle-examples {
   display: flex;
   flex-direction: column;

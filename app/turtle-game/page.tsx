@@ -368,6 +368,9 @@ forward(100)
                 </div>
                 {showTipsOpen && (
                   <div className="turtle-tips-content">
+                    <p className="turtle-tips-intro">
+                      Click a <strong>name</strong> to load that code into the editor, or click <strong>Copy</strong> to copy it. Then click Run to see it draw!
+                    </p>
                     <div className="turtle-examples">
                       {TURTLE_EXAMPLES.map((ex) => (
                         <div key={ex.id} className="turtle-example-row">
