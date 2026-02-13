@@ -179,6 +179,13 @@ export default function Home() {
             <p className="game-description">Build amazing 3D structures with Python commands! Create towers, walls, and more!</p>
             <div className="game-badge">3D Building</div>
           </Link>
+          
+          <Link href="/turtle-game" className="game-card turtle-card">
+            <div className="game-icon">🐢</div>
+            <h3 className="game-title">Turtle Drawing</h3>
+            <p className="game-description">Draw pictures with Python-style Turtle commands! Forward, turn, and create art.</p>
+            <div className="game-badge">Python</div>
+          </Link>
         </div>
       </section>
 

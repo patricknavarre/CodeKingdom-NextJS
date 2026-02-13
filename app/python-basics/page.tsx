@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import Navigation from '@/components/Navigation';
 
 export default function PythonBasicsPage() {
@@ -522,7 +523,7 @@ export default function PythonBasicsPage() {
           <ul style={{ lineHeight: '1.6' }}>
             <li><strong>Number Guessing Game:</strong> Make a game where the computer picks a random number and you have to guess it!</li>
             <li><strong>Adventure Text Game:</strong> Create a story where the player makes choices that change the ending</li>
-            <li><strong>Drawing with Turtle:</strong> Python has a module called Turtle that lets you draw cool pictures</li>
+            <li><strong>Drawing with Turtle:</strong> Python has a module called Turtle that lets you draw cool pictures. Try it in our <Link href="/turtle-game" style={{ color: '#3776ab', fontWeight: 600 }}>Turtle Game</Link>!</li>
             <li><strong>Simple Calculator:</strong> Build a program that can add, subtract, multiply and divide</li>
             <li><strong>Hangman Game:</strong> Create the classic word-guessing game</li>
           </ul>

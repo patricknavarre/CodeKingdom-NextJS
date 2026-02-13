@@ -16,7 +16,7 @@ export default function Navigation() {
   const username = authState.user?.username || 'User';
   
   // Check if we're on a game page
-  const gamePages = ['/adventure', '/story-game', '/web-dev-game', '/block-builder'];
+  const gamePages = ['/adventure', '/story-game', '/web-dev-game', '/block-builder', '/turtle-game'];
   const isGamePage = gamePages.includes(pathname);
 
   // Close menu when route changes
@@ -109,6 +109,13 @@ export default function Navigation() {
           className="nav-link blockbuilder nav-sub-link"
         >
           🧱 3D Block Builder
+        </Link>
+        <Link 
+          href="/turtle-game" 
+          onClick={closeMenu} 
+          className="nav-link turtle nav-sub-link"
+        >
+          🐢 Turtle Drawing
         </Link>
         
         {/* Basics Section */}

@@ -439,6 +439,14 @@
   background: linear-gradient(90deg, #9b59b6, #8e44ad);
 }
 
+.turtle-card:hover {
+  border-color: #2e7d32;
+}
+
+.turtle-card::before {
+  background: linear-gradient(90deg, #2e7d32, #1b5e20);
+}
+
 .game-icon {
   font-size: 4rem;
   margin-bottom: 20px;
