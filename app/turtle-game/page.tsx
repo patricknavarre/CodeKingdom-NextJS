@@ -102,9 +102,126 @@ function parseAngle(deg: number): number {
   return (deg * Math.PI) / 180;
 }
 
+type TurtleState = { x: number; y: number; angle: number; penDown: boolean; color: string };
+type Segment = { from: { x: number; y: number }; to: { x: number; y: number }; color: string };
+
+function applyLine(line: string, state: TurtleState): { newState: TurtleState; segment?: Segment } {
+  const forwardMatch = line.match(/^(?:forward|fd)\s*\(\s*(\d+)\s*\)/);
+  if (forwardMatch) {
+    const dist = parseInt(forwardMatch[1], 10);
+    const rad = parseAngle(state.angle);
+    const nx = state.x + dist * Math.cos(rad);
+    const ny = state.y + dist * Math.sin(rad);
+    const segment = state.penDown
+      ? { from: { x: state.x, y: state.y }, to: { x: nx, y: ny }, color: state.color }
+      : undefined;
+    return { newState: { ...state, x: nx, y: ny }, segment };
+  }
+
+  const backwardMatch = line.match(/^(?:backward|bd)\s*\(\s*(\d+)\s*\)/);
+  if (backwardMatch) {
+    const dist = parseInt(backwardMatch[1], 10);
+    const rad = parseAngle(state.angle);
+    const nx = state.x - dist * Math.cos(rad);
+    const ny = state.y - dist * Math.sin(rad);
+    const segment = state.penDown
+      ? { from: { x: state.x, y: state.y }, to: { x: nx, y: ny }, color: state.color }
+      : undefined;
+    return { newState: { ...state, x: nx, y: ny }, segment };
+  }
+
+  const rightMatch = line.match(/^(?:right|rt)\s*\(\s*(\d+)\s*\)/);
+  if (rightMatch) {
+    return { newState: { ...state, angle: state.angle + parseInt(rightMatch[1], 10) } };
+  }
+
+  const leftMatch = line.match(/^(?:left|lt)\s*\(\s*(\d+)\s*\)/);
+  if (leftMatch) {
+    return { newState: { ...state, angle: state.angle - parseInt(leftMatch[1], 10) } };
+  }
+
+  if (line.match(/^(?:penup|pu)\s*\(\s*\)/)) {
+    return { newState: { ...state, penDown: false } };
+  }
+
+  if (line.match(/^(?:pendown|pd)\s*\(\s*\)/)) {
+    return { newState: { ...state, penDown: true } };
+  }
+
+  const colorMatch = line.match(/color\s*\(\s*["'](\w+)["']\s*\)/);
+  if (colorMatch) {
+    const name = colorMatch[1].toLowerCase();
+    return { newState: { ...state, color: COLOR_MAP[name] ?? state.color } };
+  }
+
+  const gotoMatch = line.match(/goto\s*\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\)/);
+  if (gotoMatch) {
+    const nx = parseInt(gotoMatch[1], 10);
+    const ny = parseInt(gotoMatch[2], 10);
+    const segment = state.penDown
+      ? { from: { x: state.x, y: state.y }, to: { x: nx, y: ny }, color: state.color }
+      : undefined;
+    return { newState: { ...state, x: nx, y: ny }, segment };
+  }
+
+  return { newState: state };
+}
+
+function drawSegmentsAndTurtle(
+  ctx: CanvasRenderingContext2D,
+  segments: Segment[],
+  state: TurtleState,
+  width: number,
+  height: number
+) {
+  const cx = width / 2;
+  const cy = height / 2;
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, width, height);
+  ctx.restore();
+
+  ctx.save();
+  ctx.setTransform(1, 0, 0, -1, cx, cy);
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+
+  for (const seg of segments) {
+    ctx.strokeStyle = seg.color;
+    ctx.beginPath();
+    ctx.moveTo(seg.from.x, seg.from.y);
+    ctx.lineTo(seg.to.x, seg.to.y);
+    ctx.stroke();
+  }
+
+  const bodyRadius = 10;
+  const headLen = 12;
+  ctx.translate(state.x, state.y);
+  ctx.rotate(parseAngle(state.angle));
+  ctx.fillStyle = '#2e7d32';
+  ctx.strokeStyle = '#1b5e20';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(0, 0, bodyRadius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(headLen, 0);
+  ctx.lineTo(-4, 6);
+  ctx.lineTo(-4, -6);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+}
+
+const DRAW_STEP_MS = 120;
+
 export default function TurtleGamePage() {
   const { authState } = useAuth();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationCancelledRef = useRef(false);
   const [code, setCode] = useState(`# Turtle drawing - try these commands!
 forward(100)
 right(90)
@@ -121,150 +238,14 @@ forward(100)
   const [copiedExampleId, setCopiedExampleId] = useState<string | null>(null);
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const drawTurtle = (
-    ctx: CanvasRenderingContext2D,
-    lines: string[],
-    width: number,
-    height: number
-  ) => {
-    const cx = width / 2;
-    const cy = height / 2;
-    ctx.save();
-    ctx.setTransform(1, 0, 0, -1, cx, cy);
-
-    let x = 0;
-    let y = 0;
-    let angle = 90;
-    let penDown = true;
-    let color = '#000000';
-
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (!line || line.startsWith('#')) continue;
-
-      const forwardMatch = line.match(/^(?:forward|fd)\s*\(\s*(\d+)\s*\)/);
-      if (forwardMatch) {
-        const dist = parseInt(forwardMatch[1], 10);
-        const rad = parseAngle(angle);
-        const nx = x + dist * Math.cos(rad);
-        const ny = y + dist * Math.sin(rad);
-        if (penDown) {
-          ctx.strokeStyle = color;
-          ctx.lineTo(nx, ny);
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.moveTo(nx, ny);
-        }
-        x = nx;
-        y = ny;
-        continue;
-      }
-
-      const backwardMatch = line.match(/^(?:backward|bd)\s*\(\s*(\d+)\s*\)/);
-      if (backwardMatch) {
-        const dist = parseInt(backwardMatch[1], 10);
-        const rad = parseAngle(angle);
-        const nx = x - dist * Math.cos(rad);
-        const ny = y - dist * Math.sin(rad);
-        if (penDown) {
-          ctx.strokeStyle = color;
-          ctx.lineTo(nx, ny);
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.moveTo(nx, ny);
-        }
-        x = nx;
-        y = ny;
-        continue;
-      }
-
-      const rightMatch = line.match(/^(?:right|rt)\s*\(\s*(\d+)\s*\)/);
-      if (rightMatch) {
-        angle += parseInt(rightMatch[1], 10);
-        continue;
-      }
-
-      const leftMatch = line.match(/^(?:left|lt)\s*\(\s*(\d+)\s*\)/);
-      if (leftMatch) {
-        angle -= parseInt(leftMatch[1], 10);
-        continue;
-      }
-
-      if (line.match(/^(?:penup|pu)\s*\(\s*\)/)) {
-        penDown = false;
-        continue;
-      }
-
-      if (line.match(/^(?:pendown|pd)\s*\(\s*\)/)) {
-        penDown = true;
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        continue;
-      }
-
-      const colorMatch = line.match(/color\s*\(\s*["'](\w+)["']\s*\)/);
-      if (colorMatch) {
-        const name = colorMatch[1].toLowerCase();
-        color = COLOR_MAP[name] ?? color;
-        ctx.strokeStyle = color;
-        continue;
-      }
-
-      const gotoMatch = line.match(/goto\s*\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\)/);
-      if (gotoMatch) {
-        const nx = parseInt(gotoMatch[1], 10);
-        const ny = parseInt(gotoMatch[2], 10);
-        if (penDown) {
-          ctx.strokeStyle = color;
-          ctx.lineTo(nx, ny);
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.moveTo(nx, ny);
-        }
-        x = nx;
-        y = ny;
-        continue;
-      }
-    }
-
-    // Cute turtle icon at final pen position (circle body + triangle head)
-    const bodyRadius = 10;
-    const headLen = 12;
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(parseAngle(angle));
-    ctx.fillStyle = '#2e7d32';
-    ctx.strokeStyle = '#1b5e20';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(0, 0, bodyRadius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(headLen, 0);
-    ctx.lineTo(-4, 6);
-    ctx.lineTo(-4, -6);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
-
-    ctx.restore();
-  };
-
-  const runCode = () => {
+  const runCode = async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     setExecuting(true);
     setMessage('');
     setMessageType('success');
+    animationCancelledRef.current = false;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) {
@@ -274,24 +255,41 @@ forward(100)
       return;
     }
 
-    ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-    ctx.restore();
-
     const lines = code.split('\n');
+    let state: TurtleState = {
+      x: 0,
+      y: 0,
+      angle: 90,
+      penDown: true,
+      color: '#000000',
+    };
+    const segments: Segment[] = [];
+
     try {
-      drawTurtle(ctx, lines, CANVAS_SIZE, CANVAS_SIZE);
-      setMessage('Drawing complete!');
+      for (let i = 0; i < lines.length; i++) {
+        if (animationCancelledRef.current) break;
+        const line = lines[i].trim();
+        if (!line || line.startsWith('#')) continue;
+
+        const result = applyLine(line, state);
+        if (result.segment) segments.push(result.segment);
+        state = result.newState;
+        drawSegmentsAndTurtle(ctx, segments, state, CANVAS_SIZE, CANVAS_SIZE);
+        await new Promise((r) => setTimeout(r, DRAW_STEP_MS));
+      }
+      if (!animationCancelledRef.current) setMessage('Drawing complete!');
     } catch (err: unknown) {
       setMessage(err instanceof Error ? err.message : 'Error drawing');
       setMessageType('error');
+    } finally {
+      setExecuting(false);
     }
-    setExecuting(false);
   };
 
   const clearCanvas = () => {
+    animationCancelledRef.current = true;
+    setExecuting(false);
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
