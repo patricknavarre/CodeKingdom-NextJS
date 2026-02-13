@@ -132,12 +132,12 @@ function applyLine(line: string, state: TurtleState): { newState: TurtleState; s
 
   const rightMatch = line.match(/^(?:right|rt)\s*\(\s*(\d+)\s*\)/);
   if (rightMatch) {
-    return { newState: { ...state, angle: state.angle + parseInt(rightMatch[1], 10) } };
+    return { newState: { ...state, angle: state.angle - parseInt(rightMatch[1], 10) } };
   }
 
   const leftMatch = line.match(/^(?:left|lt)\s*\(\s*(\d+)\s*\)/);
   if (leftMatch) {
-    return { newState: { ...state, angle: state.angle - parseInt(leftMatch[1], 10) } };
+    return { newState: { ...state, angle: state.angle + parseInt(leftMatch[1], 10) } };
   }
 
   if (line.match(/^(?:penup|pu)\s*\(\s*\)/)) {
