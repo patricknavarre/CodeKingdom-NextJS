@@ -1083,25 +1083,56 @@ except Exception as e:
           return currentIndex + 1;
         }
 
-        // Parse build_tower(height=5) or build_tower(x, y, z, height, color)
-        const towerMatch = trimmed.match(/build_tower\s*\((?:(?:height\s*=\s*(\d+))|(?:(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*["'](\w+)["'])?))?\)/);
-        if (towerMatch) {
-          if (towerMatch[1]) {
-            const result = ctx.build_tower(0, 0, 0, parseInt(towerMatch[1]));
-            res.push(result);
-          } else if (towerMatch[2]) {
+        // Parse build_tower: positional (x,y,z,height,color) OR mixed (x,y,z, height=, color=) OR keyword (x=, y=, z=, height=, color=) OR no-arg
+        const towerParenMatch = trimmed.match(/build_tower\s*\(([^)]*)\)/);
+        if (towerParenMatch) {
+          const args = towerParenMatch[1];
+          // A. Full positional: four or five values (x, y, z, height [, color])
+          const fullPosMatch = args.match(/^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*["']?(\w+)["']?)?\s*$/);
+          if (fullPosMatch) {
             const result = ctx.build_tower(
-              parseInt(towerMatch[2]),
-              parseInt(towerMatch[3]),
-              parseInt(towerMatch[4]),
-              parseInt(towerMatch[5]),
-              towerMatch[6] || 'red'
+              parseInt(fullPosMatch[1]),
+              parseInt(fullPosMatch[2]),
+              parseInt(fullPosMatch[3]),
+              parseInt(fullPosMatch[4]),
+              fullPosMatch[5] || 'red'
             );
             res.push(result);
-          } else {
-            const result = ctx.build_tower();
-            res.push(result);
+            return currentIndex + 1;
           }
+          // B. Mixed: three numbers then optional keywords (e.g. 1, 0, 1, height=5)
+          const mixedMatch = args.match(/^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,/);
+          if (mixedMatch) {
+            const x = parseInt(mixedMatch[1]);
+            const y = parseInt(mixedMatch[2]);
+            const z = parseInt(mixedMatch[3]);
+            const heightMatch = args.match(/height\s*=\s*(\d+)/);
+            const colorMatch = args.match(/color\s*=\s*["']?(\w+)["']?/);
+            const height = heightMatch ? parseInt(heightMatch[1]) : 5;
+            const color = colorMatch ? colorMatch[1] : 'red';
+            const result = ctx.build_tower(x, y, z, height, color);
+            res.push(result);
+            return currentIndex + 1;
+          }
+          // C. Keyword-only: height=, x=, y=, z=, color=
+          if (args.includes('height=') || args.includes('x=') || args.includes('y=') || args.includes('z=') || args.includes('color=')) {
+            const heightMatch = args.match(/height\s*=\s*(\d+)/);
+            const xMatch = args.match(/x\s*=\s*(\d+)/);
+            const yMatch = args.match(/y\s*=\s*(\d+)/);
+            const zMatch = args.match(/z\s*=\s*(\d+)/);
+            const colorMatch = args.match(/color\s*=\s*["']?(\w+)["']?/);
+            const x = xMatch ? parseInt(xMatch[1]) : 0;
+            const y = yMatch ? parseInt(yMatch[1]) : 0;
+            const z = zMatch ? parseInt(zMatch[1]) : 0;
+            const height = heightMatch ? parseInt(heightMatch[1]) : 5;
+            const color = colorMatch ? colorMatch[1] : 'red';
+            const result = ctx.build_tower(x, y, z, height, color);
+            res.push(result);
+            return currentIndex + 1;
+          }
+          // D. No-arg
+          const result = ctx.build_tower();
+          res.push(result);
           return currentIndex + 1;
         }
 
@@ -1359,7 +1390,7 @@ except Exception as e:
                       <ul style={{ marginLeft: '20px', lineHeight: '1.6' }}>
                         <li>Write <strong>Python code</strong> in the editor to place and manipulate blocks in the 3D world</li>
                         <li>Use commands like <code>place_block(x, y, z, "color")</code> to place individual blocks</li>
-                        <li>Use <code>build_tower(height=5)</code> to quickly build vertical structures</li>
+                        <li>Use <code>build_tower(height=5)</code> to quickly build vertical structures; use <code>build_tower(1, 0, 1, height=5)</code> or <code>build_tower(x=1, z=1, height=5)</code> to place a tower at a specific location</li>
                         <li>Use <code>create_wall(length=10)</code> to build horizontal walls</li>
                         <li><strong>Coordinates guide:</strong> <code>x</code> is left ↔ right, <code>y</code> is up ↕ down (height), and <code>z</code> is forward ↔ back on the grid. The X/Z numbers around the grid match these values.</li>
                         <li>Click <strong>"▶ Run Code"</strong> or press <strong>Ctrl+Enter</strong> to execute your code</li>
@@ -1376,7 +1407,8 @@ except Exception as e:
                         <li><strong>⚠️ Important:</strong> Always use commas between ALL parameters, including before the color!</li>
                         <li><strong>❌ Wrong:</strong> <code>place_block(2, 4, 4 "red")</code> - Missing comma!</li>
                         <li><strong>✅ Correct:</strong> <code>place_block(2, 4, 4, "red")</code> - All commas included!</li>
-                        <li><code>build_tower(height=5)</code> - Build a tower 5 blocks high</li>
+                        <li><code>build_tower(height=5)</code> - Build a tower 5 blocks high at (0,0,0)</li>
+                        <li><code>build_tower(1, 0, 1, height=5)</code> or <code>build_tower(x=1, z=1, height=5)</code> - Tower at (1,0,1)</li>
                         <li><code>create_wall(length=10)</code> - Create a wall 10 blocks long (along x-axis)</li>
                         <li><code>create_wall(length=10, direction="z")</code> - Create a wall 10 blocks long (along z-axis, perpendicular!)</li>
                         <li><code>create_wall(0, 0, 0, 10, 1, "blue", "z")</code> - Blue wall at (0,0,0) along z-axis (positional)</li>
@@ -1437,7 +1469,7 @@ except Exception as e:
                 <ul>
                   <li><code>place_block(x, y, z, "color")</code> - Place a block</li>
                   <li><code>remove_block(x, y, z)</code> - Remove a block</li>
-                  <li><code>build_tower(height=5)</code> - Build a tower</li>
+                  <li><code>build_tower(height=5)</code> - Build a tower; <code>build_tower(1, 0, 1, height=5)</code> - tower at (1,0,1)</li>
                   <li><code>create_wall(length=10)</code> - Wall along x-axis; use <code>direction="z"</code> for z-axis</li>
                   <li><code>create_wall(x=2, z=4, length=10, direction="z")</code> - Wall at (2,0,4) along z-axis</li>
                   <li><code>clear_all()</code> - Clear all blocks</li>
