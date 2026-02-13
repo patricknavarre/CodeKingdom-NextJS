@@ -8,6 +8,83 @@ import '@/styles/TurtleGamePage.css';
 
 const CANVAS_SIZE = 500;
 
+const TURTLE_EXAMPLES: { id: string; label: string; tip?: string; code: string }[] = [
+  { id: 'square', label: 'Square', tip: 'Turn 90° after each side.', code: `forward(100)
+right(90)
+forward(100)
+right(90)
+forward(100)
+right(90)
+forward(100)` },
+  { id: 'triangle', label: 'Triangle', tip: 'Turn 120° to make three equal sides.', code: `forward(120)
+right(120)
+forward(120)
+right(120)
+forward(120)` },
+  { id: 'star', label: 'Star', tip: 'Five lines, turn 144° each time.', code: `forward(150)
+right(144)
+forward(150)
+right(144)
+forward(150)
+right(144)
+forward(150)
+right(144)
+forward(150)` },
+  { id: 'hexagon', label: 'Hexagon', tip: 'Six sides, turn 60° each.', code: `forward(80)
+right(60)
+forward(80)
+right(60)
+forward(80)
+right(60)
+forward(80)
+right(60)
+forward(80)
+right(60)
+forward(80)` },
+  { id: 'house', label: 'House', tip: 'Square base, then goto() for the roof.', code: `forward(50)
+right(90)
+forward(50)
+right(90)
+forward(50)
+right(90)
+forward(50)
+right(90)
+goto(0, 50)
+goto(25, 80)
+goto(50, 50)` },
+  { id: 'flower', label: 'Flower', tip: 'Six petals: forward, backward, turn 60°.', code: `forward(50)
+backward(50)
+right(60)
+forward(50)
+backward(50)
+right(60)
+forward(50)
+backward(50)
+right(60)
+forward(50)
+backward(50)
+right(60)
+forward(50)
+backward(50)
+right(60)
+forward(50)
+backward(50)` },
+  { id: 'colorful-star', label: 'Colorful star', tip: 'Change color() before each segment.', code: `color("red")
+forward(150)
+right(144)
+color("blue")
+forward(150)
+right(144)
+color("green")
+forward(150)
+right(144)
+color("orange")
+forward(150)
+right(144)
+color("purple")
+forward(150)` },
+];
+
 const COLOR_MAP: Record<string, string> = {
   black: '#000000',
   red: '#e74c3c',
@@ -40,6 +117,9 @@ forward(100)
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
   const [executing, setExecuting] = useState(false);
+  const [showTipsOpen, setShowTipsOpen] = useState(false);
+  const [copiedExampleId, setCopiedExampleId] = useState<string | null>(null);
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const drawTurtle = (
     ctx: CanvasRenderingContext2D,
@@ -153,6 +233,28 @@ forward(100)
       }
     }
 
+    // Cute turtle icon at final pen position (circle body + triangle head)
+    const bodyRadius = 10;
+    const headLen = 12;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(parseAngle(angle));
+    ctx.fillStyle = '#2e7d32';
+    ctx.strokeStyle = '#1b5e20';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(0, 0, bodyRadius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(headLen, 0);
+    ctx.lineTo(-4, 6);
+    ctx.lineTo(-4, -6);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
     ctx.restore();
   };
 
@@ -220,6 +322,28 @@ forward(100)
     }
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+    };
+  }, []);
+
+  const loadExample = (example: typeof TURTLE_EXAMPLES[0]) => {
+    setCode(example.code);
+  };
+
+  const copyExample = async (example: typeof TURTLE_EXAMPLES[0]) => {
+    try {
+      await navigator.clipboard.writeText(example.code);
+      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+      setCopiedExampleId(example.id);
+      copyTimeoutRef.current = setTimeout(() => setCopiedExampleId(null), 2000);
+    } catch {
+      setMessage('Copy failed');
+      setMessageType('error');
+    }
+  };
+
   return (
     <ProtectedRoute>
       <div style={{ width: '100%', height: '100vh', margin: 0, padding: 0 }}>
@@ -235,6 +359,41 @@ forward(100)
               <p style={{ marginBottom: '15px', color: '#555' }}>
                 Write turtle commands and click Run to draw. The turtle starts at the center facing up.
               </p>
+              <div className="turtle-tips-panel">
+                <div
+                  className="turtle-tips-header"
+                  onClick={() => setShowTipsOpen(!showTipsOpen)}
+                  style={{ cursor: 'pointer', userSelect: 'none' }}
+                >
+                  <span>Tips & tricks</span>
+                  <span className="turtle-tips-toggle">{showTipsOpen ? '−' : '+'}</span>
+                </div>
+                {showTipsOpen && (
+                  <div className="turtle-tips-content">
+                    <div className="turtle-examples">
+                      {TURTLE_EXAMPLES.map((ex) => (
+                        <div key={ex.id} className="turtle-example-row">
+                          <button
+                            type="button"
+                            className="turtle-example-btn"
+                            onClick={() => loadExample(ex)}
+                          >
+                            {ex.label}
+                          </button>
+                          <button
+                            type="button"
+                            className={`turtle-copy-btn ${copiedExampleId === ex.id ? 'copied' : ''}`}
+                            onClick={() => copyExample(ex)}
+                          >
+                            {copiedExampleId === ex.id ? 'Copied!' : 'Copy'}
+                          </button>
+                          {ex.tip && <span className="turtle-example-tip">{ex.tip}</span>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
               <textarea
                 className="turtle-code-editor"
                 value={code}

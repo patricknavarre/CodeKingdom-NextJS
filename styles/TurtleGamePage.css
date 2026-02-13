@@ -63,6 +63,90 @@
   margin-bottom: 15px;
 }
 
+/* Tips & tricks dropdown */
+.turtle-tips-panel {
+  margin-bottom: 15px;
+  border: 2px solid #1a7a3e;
+  border-radius: 8px;
+  background: #f0f8f4;
+  overflow: hidden;
+}
+
+.turtle-tips-header {
+  padding: 10px 14px;
+  background: #1a7a3e;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+}
+
+.turtle-tips-toggle {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.turtle-tips-content {
+  padding: 12px;
+}
+
+.turtle-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.turtle-example-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.turtle-example-btn {
+  padding: 8px 14px;
+  background: #2e7d32;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.turtle-example-btn:hover {
+  background: #1b5e20;
+}
+
+.turtle-copy-btn {
+  padding: 8px 14px;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.turtle-copy-btn:hover {
+  background: #1565c0;
+}
+
+.turtle-copy-btn.copied {
+  background: #2e7d32;
+  color: white;
+}
+
+.turtle-example-tip {
+  font-size: 0.85rem;
+  color: #555;
+  font-style: italic;
+}
+
 .turtle-command-reference {
   background: #e8f5e9;
   border-radius: 8px;
