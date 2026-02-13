@@ -274,7 +274,15 @@ forward(100)
         const result = applyLine(line, state);
         if (result.segment) segments.push(result.segment);
         state = result.newState;
-        drawSegmentsAndTurtle(ctx, segments, state, CANVAS_SIZE, CANVAS_SIZE);
+        // Only clear and redraw when something visible changed (new line or turtle turned).
+        // Skipping redraw for color/penup/pendown keeps the drawing from flashing or erasing.
+        const needRedraw =
+          result.segment !== undefined ||
+          /^(?:right|rt)\s*\(/.test(line) ||
+          /^(?:left|lt)\s*\(/.test(line);
+        if (needRedraw) {
+          drawSegmentsAndTurtle(ctx, segments, state, CANVAS_SIZE, CANVAS_SIZE);
+        }
         await new Promise((r) => setTimeout(r, DRAW_STEP_MS));
       }
       if (!animationCancelledRef.current) setMessage('Drawing complete!');
