@@ -131,6 +131,8 @@ const CHALLENGES: Challenge[] = [
   }
 ];
 
+const GRID_SIZE = 20;
+
 export default function BlockBuilderPage() {
   const { character, addCoins, addExperience, addPoints } = useCharacter();
   const { authState } = useAuth();
@@ -273,10 +275,10 @@ export default function BlockBuilderPage() {
         const width = sceneRef.current.clientWidth || 800;
         const height = sceneRef.current.clientHeight || 600;
 
-        // Camera
+        // Camera - center on play area 0 to GRID_SIZE
         const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-        camera.position.set(10, 10, 10);
-        camera.lookAt(0, 0, 0);
+        camera.position.set(GRID_SIZE / 2, 18, GRID_SIZE / 2);
+        camera.lookAt(GRID_SIZE / 2, 0, GRID_SIZE / 2);
         cameraRef.current = camera;
 
         // Renderer
@@ -320,8 +322,9 @@ export default function BlockBuilderPage() {
         directionalLight.castShadow = true;
         scene.add(directionalLight);
 
-        // Grid helper
-        const gridHelper = new THREE.GridHelper(20, 20, 0x888888, 0xcccccc);
+        // Grid helper - position so grid spans 0 to GRID_SIZE in X and Z
+        const gridHelper = new THREE.GridHelper(GRID_SIZE, GRID_SIZE, 0x888888, 0xcccccc);
+        gridHelper.position.set(GRID_SIZE / 2, 0, GRID_SIZE / 2);
         scene.add(gridHelper);
 
         // Coordinate labels along X (left-right) and Z (forward-back) axes to help players place blocks
@@ -348,8 +351,8 @@ export default function BlockBuilderPage() {
           return sprite;
         };
 
-        // Labels assume blocks are placed at integer coordinates 0–9 on x and z, matching the grid
-        for (let x = 0; x <= 9; x++) {
+        // Labels for integer coordinates 0 to GRID_SIZE-1 on x and z, matching the grid
+        for (let x = 0; x < GRID_SIZE; x++) {
           const sprite = createLabelSprite(String(x), 0.55);
           if (sprite) {
             sprite.position.set(x, 0.01, -1.1); // just in front of the grid
@@ -357,7 +360,7 @@ export default function BlockBuilderPage() {
           }
         }
 
-        for (let z = 0; z <= 9; z++) {
+        for (let z = 0; z < GRID_SIZE; z++) {
           const sprite = createLabelSprite(String(z), 0.55);
           if (sprite) {
             sprite.position.set(-1.1, 0.01, z); // along the left edge of the grid
@@ -368,13 +371,13 @@ export default function BlockBuilderPage() {
         // Axis labels to show which direction is X, Z, and Y
         const xLabel = createLabelSprite('X', 0.7);
         if (xLabel) {
-          xLabel.position.set(9.8, 0.02, -2); // near front-right corner
+          xLabel.position.set(GRID_SIZE - 0.2, 0.02, -2); // near front-right corner
           scene.add(xLabel);
         }
 
         const zLabel = createLabelSprite('Z', 0.7);
         if (zLabel) {
-          zLabel.position.set(-2, 0.02, 9.8); // near back-left corner
+          zLabel.position.set(-2, 0.02, GRID_SIZE - 0.2); // near back-left corner
           scene.add(zLabel);
         }
 
@@ -384,12 +387,12 @@ export default function BlockBuilderPage() {
           scene.add(yLabel);
         }
 
-        // Ground
-        const groundGeometry = new THREE.PlaneGeometry(20, 20);
+        // Ground - align with grid (0 to GRID_SIZE in X and Z)
+        const groundGeometry = new THREE.PlaneGeometry(GRID_SIZE, GRID_SIZE);
         const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x90ee90 });
         const ground = new THREE.Mesh(groundGeometry, groundMaterial);
         ground.rotation.x = -Math.PI / 2;
-        ground.position.y = -0.5;
+        ground.position.set(GRID_SIZE / 2, -0.5, GRID_SIZE / 2);
         ground.receiveShadow = true;
         scene.add(ground);
 
